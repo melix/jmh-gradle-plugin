@@ -1,0 +1,16 @@
+// Handles publication of distributions to Bintray
+
+apply plugin: 'bintray'
+
+bintray {
+    user = bintrayUsername
+    key = bintrayKey
+    publications = ['mavenJava']
+    pkg {
+        repo = '${bintrayRepo}'
+        name = 'gradle-${pluginName}-plugin'
+        desc = '${pluginDescription}'
+        licenses = ['Apache-2.0']
+        labels = []
+    }
+}
