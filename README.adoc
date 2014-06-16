@@ -1,0 +1,123 @@
+= JMH Gradle Plugin
+
+This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
+
+== Usage
+
+To enable the plugin, you must add this to your `build.gradle` file:
+
+[source,groovy]
+.build.gradle
+----
+buildscript {
+   repositories {
+      jcenter()
+   }
+   dependencies {
+      classpath 'me.champeau.gradle:jmh-gradle-plugin:0.1'
+   }
+}
+
+repositories {
+   jcenter() // repository from which JMH will be downloaded
+}
+
+apply plugin: 'me.champeau.gradle.jmh'
+
+----
+
+== Configuration
+
+The plugin makes it easy to integrate into an existing project thanks to a specific configuration. In particular,
+benchmark source files are expected to be found in the `src/jmh` directory:
+
+----
+src/jmh
+     |- java       : java sources for benchmarks
+     |- resources  : resources for benchmarks
+----
+
+The plugin creates a `jmh` configuration that you should use if your benchmark files depend on a 3rd party library.
+For example, if you want to use `commons-io`, you can add the dependency like this:
+
+[source,groovy]
+.build.gradle
+----
+dependencies {
+    jmh 'commons-io:commons-io:2.4'
+}
+----
+
+The plugin uses JMH 0.9. You can upgrade the version just by changing the version in the `dependencies` block:
+
+[source,groovy]
+.build.gradle
+----
+dependencies {
+    jmh 'org.openjdk.jmh:jmh-core:0.9'
+    jmh 'org.openjdk.jmh:jmh-generator-annprocess:0.9'
+}
+----
+
+== Tasks
+
+The project will add several tasks:
+    * `jhmClasses` : compiles the benchmarks
+    * `jhmJar`     : builds the JMH jar containing the JHM runtime and your compiled benchmark classes
+    * `jmh`        : executes the benchmarks
+    
+The `jmh` task is the main task and depends on the others so it is in general sufficient to execute this task:
+
+----
+gradle jmh
+----
+
+== Configuration options
+
+By default, all benchmarks will be executed, and the results will be generated into `$buildDir/reports/jmh`. But you
+can change various options thanks to the `jmh` configuration block. All configurations variables apart from `include`
+are unset, implying that they fall back to the default JMH values:
+
+[source,groovy]
+.build.gradle
+----
+jmh {
+   include = 'some regular expression' // include pattern (regular expression) for benchmarks to be executed
+   exclude = 'some regular expression' // exclude pattern (regular expression) for benchmarks to be executed
+   iterations = 10 // Number of measurement iterations to do.
+   benchmarkMode = 'thrpt' // Benchmark mode. Available modes are: [Throughput/thrpt, AverageTime/avgt, SampleTime/sample, SingleShotTime/ss, All/all]
+   batchSize = 1 // Batch size: number of benchmark method calls per operation. (some benchmark modes can ignore this setting)
+   fork = 2 // How many times to forks a single benchmark. Use 0 to disable forking altogether
+   failOnError = false // Should JMH fail immediately if any benchmark had experienced the unrecoverable error?
+   forceGC = false // Should JMH force GC between iterations?
+   jvm = 'myjvm' // Custom JVM to use when forking.
+   jvmArgs = 'Custom JVM args to use when forking.'
+   jvmArgsAppend = 'Custom JVM args to use when forking (append these)'
+   jvmArgsPrepend = 'Custom JVM args to use when forking (prepend these)'
+   humanOutputFile = project.file("${project.buildDir}/reports/jmh/human.txt") // human-readable output file
+   resultsFile = project.file("${project.buildDir}/reports/jmh/results.txt") // results file
+   operationsPerInvocation = 10 // Operations per invocation.
+   benchmarkParameters =  [:] // Benchmark parameters.
+   profilers = [] // Use profilers to collect additional data.
+   timeOnIteration = '1s' // Time to spend at each measurement iteration.
+   resultFormat = 'op/s' // Result format type.
+   synchronizeIterations = false // Synchronize iterations?
+   threads = 4 // Number of worker threads to run with.
+   threadGroups = [2,3,4] //Override thread group distribution for asymmetric benchmarks.
+   timeUnit = 'ms' // Output time unit. Available time units are: [m, s, ms, us, ns].
+   verbosity = 'NORMAL' // Verbosity mode. Available modes are: [SILENT, NORMAL, EXTRA]
+   warmup = '1s' // Time to spend at each warmup iteration.
+   warmupBatchSize = 10 // Warmup batch size: number of benchmark method calls per operation.
+   warmupForks = 0 // How many warmup forks to make for a single benchmark. 0 to disable warmup forks.
+   warmupIterations = 1 // Number of warmup iterations to do.
+   warmupMode = 'INDI' // Warmup mode for warming up selected benchmarks. Warmup modes are: [INDI, BULK, BULK_INDI].
+   warmupBenchmarks = ['.*Warmup'] // Warmup benchmarks to include in the run in addition to already selected. JMH will not measure these benchmarks, but only use them for the warmup.
+}
+----
+
+== Dependency on project files
+
+The `jmh` plugin makes it easy to test existing sources *without* having to create a separate project for this. This is
+the reason why you must put your files into `src/jmh/java` instead of `src/main/java`. This means that by default, the
+`jmh` task depends on your `main` source set.
+
