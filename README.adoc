@@ -62,9 +62,10 @@ dependencies {
 == Tasks
 
 The project will add several tasks:
-    * `jhmClasses` : compiles the benchmarks
-    * `jhmJar`     : builds the JMH jar containing the JHM runtime and your compiled benchmark classes
-    * `jmh`        : executes the benchmarks
+
+* `jhmClasses` : compiles the benchmarks
+* `jhmJar`     : builds the JMH jar containing the JHM runtime and your compiled benchmark classes
+* `jmh`        : executes the benchmarks
     
 The `jmh` task is the main task and depends on the others so it is in general sufficient to execute this task:
 
