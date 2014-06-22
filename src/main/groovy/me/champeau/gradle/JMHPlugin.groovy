@@ -63,6 +63,8 @@ class JMHPlugin implements Plugin<Project> {
             manifest {
                 attributes 'Main-Class': 'org.openjdk.jmh.Main'
             }
+
+            classifier = 'jmh'
         }
         project.tasks.create(name: 'jmh', type: JavaExec) {
             dependsOn project.jmhJar
