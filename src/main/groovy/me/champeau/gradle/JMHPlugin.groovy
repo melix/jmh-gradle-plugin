@@ -47,6 +47,7 @@ class JMHPlugin implements Plugin<Project> {
             jmh 'org.openjdk.jmh:jmh-generator-annprocess:0.9'
             jmh 'net.sf.jopt-simple:jopt-simple:4.6'
             jmh 'org.apache.commons:commons-math3:3.2'
+            jmh project.configurations.compile
         }
 
         project.tasks.create(name: 'jmhJar', type: Jar) {
@@ -56,6 +57,7 @@ class JMHPlugin implements Plugin<Project> {
                     exclude '**/META-INF/services/**'
                 }
                 from (project.sourceSets.jmh.output)
+                from (project.sourceSets.main.output)
             }
 
             manifest {
