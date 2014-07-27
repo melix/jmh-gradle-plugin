@@ -43,8 +43,8 @@ class JMHPlugin implements Plugin<Project> {
             }
         }
         project.dependencies {
-            jmh 'org.openjdk.jmh:jmh-core:0.9'
-            jmh 'org.openjdk.jmh:jmh-generator-annprocess:0.9'
+            jmh 'org.openjdk.jmh:jmh-core:0.9.5'
+            jmh 'org.openjdk.jmh:jmh-generator-annprocess:0.9.5'
             jmh 'net.sf.jopt-simple:jopt-simple:4.6'
             jmh 'org.apache.commons:commons-math3:3.2'
             jmh project.configurations.compile
