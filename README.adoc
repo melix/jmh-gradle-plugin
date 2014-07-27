@@ -101,7 +101,7 @@ jmh {
    benchmarkParameters =  [:] // Benchmark parameters.
    profilers = [] // Use profilers to collect additional data.
    timeOnIteration = '1s' // Time to spend at each measurement iteration.
-   resultFormat = 'op/s' // Result format type.
+   resultFormat = 'CSV' // Result format type (one of CSV, JSON, NONE, SCSV, TEXT)
    synchronizeIterations = false // Synchronize iterations?
    threads = 4 // Number of worker threads to run with.
    threadGroups = [2,3,4] //Override thread group distribution for asymmetric benchmarks.
