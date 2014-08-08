@@ -55,6 +55,9 @@ class JMHPlugin implements Plugin<Project> {
             doFirst {
                 from(project.configurations.jmh.collect { it.isDirectory() ? it : project.zipTree(it) }) {
                     exclude '**/META-INF/services/**'
+                    exclude '**/META-INF/*.SF'
+                    exclude '**/META-INF/*.DSA'
+                    exclude '**/META-INF/*.RSA'
                 }
                 from (project.sourceSets.jmh.output)
                 from (project.sourceSets.main.output)
