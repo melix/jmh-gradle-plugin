@@ -31,6 +31,7 @@ buildscript {
 dependencies {
     compile localGroovy()
     compile gradleApi()
+    compile 'com.github.jengelman.gradle.plugins:shadow:1.0.3'
 }
 
 group='me.champeau.gradle'
