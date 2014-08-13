@@ -18,6 +18,8 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
+import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 /**
  * Configures the JMH Plugin.
@@ -28,6 +30,7 @@ import org.gradle.api.tasks.bundling.Jar
 class JMHPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
+        project.plugins.apply(ShadowPlugin)
         def extension = project.extensions.create('jmh', JMHPluginExtension, project)
         project.configurations.create('jmh')
 
@@ -50,7 +53,7 @@ class JMHPlugin implements Plugin<Project> {
             jmh project.configurations.compile
         }
 
-        project.tasks.create(name: 'jmhJar', type: Jar) {
+        project.tasks.create(name: 'jmhJar', type: ShadowJar) {
             dependsOn 'jmhClasses'
             doFirst {
                 from(project.configurations.jmh.collect { it.isDirectory() ? it : project.zipTree(it) }) {
