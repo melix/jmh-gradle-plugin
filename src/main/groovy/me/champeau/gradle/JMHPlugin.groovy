@@ -52,6 +52,7 @@ class JMHPlugin implements Plugin<Project> {
 
         project.tasks.create(name: 'jmhJar', type: Jar) {
             dependsOn 'jmhClasses'
+            zip64 = "true".equals(System.getProperty("jmh.zip64"))
             inputs.dir project.sourceSets.jmh.output
             doFirst {
                 from(project.configurations.jmh.collect { it.isDirectory() ? it : project.zipTree(it) }) {
