@@ -53,6 +53,7 @@ class JMHPlugin implements Plugin<Project> {
         project.tasks.create(name: 'jmhJar', type: Jar) {
             dependsOn 'jmhClasses'
             inputs.dir project.sourceSets.jmh.output
+            inputs.dir project.sourceSets.main.output
             doFirst {
                 from(project.configurations.jmh.collect { it.isDirectory() ? it : project.zipTree(it) }) {
                     exclude '**/META-INF/services/**'
