@@ -38,8 +38,8 @@ class JMHPlugin implements Plugin<Project> {
                     groovy.srcDir 'src/jmh/groovy'
                 }
                 resources.srcDir 'src/jmh/resources'
-                compileClasspath += project.configurations.jmh + main.output
-                runtimeClasspath += project.configurations.jmh + main.output
+                compileClasspath += project.configurations.jmh + main.output + test.output
+                runtimeClasspath += project.configurations.jmh + main.output + test.output
             }
         }
         project.dependencies {
@@ -47,7 +47,7 @@ class JMHPlugin implements Plugin<Project> {
             jmh 'org.openjdk.jmh:jmh-generator-annprocess:0.9.5'
             jmh 'net.sf.jopt-simple:jopt-simple:4.6'
             jmh 'org.apache.commons:commons-math3:3.2'
-            jmh project.configurations.compile
+            jmh project.configurations.testCompile
         }
 
         project.tasks.create(name: 'jmhJar', type: Jar) {
@@ -62,6 +62,7 @@ class JMHPlugin implements Plugin<Project> {
                 }
                 from (project.sourceSets.jmh.output)
                 from (project.sourceSets.main.output)
+                from (project.sourceSets.test.output)
             }
 
             manifest {
