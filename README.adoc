@@ -113,6 +113,7 @@ jmh {
    warmupIterations = 1 // Number of warmup iterations to do.
    warmupMode = 'INDI' // Warmup mode for warming up selected benchmarks. Warmup modes are: [INDI, BULK, BULK_INDI].
    warmupBenchmarks = ['.*Warmup'] // Warmup benchmarks to include in the run in addition to already selected. JMH will not measure these benchmarks, but only use them for the warmup.
+   zip64 = true // Use ZIP64 format for bigger archives
 }
 ----
 

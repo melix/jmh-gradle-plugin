@@ -44,6 +44,7 @@ public class JMHPluginExtension {
     private Integer warmupIterations;
     private String warmupMode;
     private List<String> warmupBenchmarks;
+    private boolean zip64 = false;
 
     public JMHPluginExtension(final Project project) {
         this.project = project;
@@ -386,5 +387,11 @@ public class JMHPluginExtension {
         this.warmupBenchmarks = warmupBenchmarks;
     }
 
+    public boolean isZip64() {
+        return zip64;
+    }
 
+    public void setZip64(final boolean zip64) {
+        this.zip64 = zip64;
+    }
 }

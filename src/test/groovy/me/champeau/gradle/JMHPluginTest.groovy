@@ -15,6 +15,7 @@ package me.champeau.gradle
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 
 class JMHPluginTest extends GroovyTestCase {
@@ -45,6 +46,23 @@ class JMHPluginTest extends GroovyTestCase {
 
         def task = project.tasks.findByName('jmh')
         assert task instanceof JavaExec
+
+    }
+
+    void testPluginIsAppliedWithZip64() {
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenLocal()
+            jcenter()
+        }
+        project.apply plugin: 'groovy'
+        project.apply plugin: 'me.champeau.gradle.jmh'
+
+        project.jmh.zip64 = true
+
+        def task = project.tasks.findByName('jmhJar')
+        assert task instanceof Jar
+        assert task.zip64
 
     }
 }

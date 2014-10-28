@@ -60,8 +60,8 @@ class JMHPlugin implements Plugin<Project> {
                     exclude '**/META-INF/*.DSA'
                     exclude '**/META-INF/*.RSA'
                 }
-                from (project.sourceSets.jmh.output)
-                from (project.sourceSets.main.output)
+                from(project.sourceSets.jmh.output)
+                from(project.sourceSets.main.output)
             }
 
             manifest {
@@ -69,6 +69,7 @@ class JMHPlugin implements Plugin<Project> {
             }
 
             classifier = 'jmh'
+            zip64 = { extension.zip64 }
         }
         project.tasks.create(name: 'jmh', type: JavaExec) {
             dependsOn project.jmhJar
