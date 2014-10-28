@@ -89,10 +89,15 @@ class JMHPlugin implements Plugin<Project> {
             if (hasIdea) {
                 project.idea {
                     module {
-                        project.sourceSets.jmh.java.each {
-                            testSourceDirs += it
-                        }
                         scopes.TEST.plus += [ project.configurations.jmh ]
+                    }
+                }
+                def rootProject = project.rootProject
+                rootProject.idea {
+                    module {
+                        project.sourceSets.jmh.java.srcDirs.each {
+                            testSourceDirs += rootProject.file(it)
+                        }
                     }
                 }
             }
