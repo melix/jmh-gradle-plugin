@@ -74,7 +74,7 @@ class JMHPlugin implements Plugin<Project> {
         project.tasks.create(name: 'jmh', type: JavaExec) {
             dependsOn project.jmhJar
             main = 'org.openjdk.jmh.Main'
-            classpath = project.files(project.jmhJar.archivePath) + project.sourceSets.main.runtimeClasspath
+            classpath = project.files({project.jmhJar.archivePath}) + project.sourceSets.main.runtimeClasspath
 
             doFirst {
                 args = [*args, *extension.buildArgs()]
