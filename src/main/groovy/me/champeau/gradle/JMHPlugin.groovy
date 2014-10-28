@@ -83,6 +83,20 @@ class JMHPlugin implements Plugin<Project> {
             }
         }
 
+        project.afterEvaluate {
+            def hasIdea = project.plugins.findPlugin(org.gradle.plugins.ide.idea.IdeaPlugin)
+            if (hasIdea) {
+                project.idea {
+                    module {
+                        project.sourceSets.jmh.java.each {
+                            testSourceDirs += it
+                        }
+                        scopes.TEST.plus += [ project.configurations.jmh ]
+                    }
+                }
+            }
+        }
+
     }
 
 }
