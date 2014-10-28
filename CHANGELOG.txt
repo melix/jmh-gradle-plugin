@@ -1,0 +1,8 @@
+Version 0.1.3
+-------------
+
+    * Support for IDEA plugin setup
+    * Allow changing the name of generated Jar
+    * Support for ZIP64
+    * jmhJar does not rebuild JAR if bechmarks are changed
+    * Exclude signature files from the destination JAR
