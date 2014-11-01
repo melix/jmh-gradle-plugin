@@ -77,7 +77,7 @@ class JMHPlugin implements Plugin<Project> {
             classpath = project.files {project.jmhJar.archivePath}
 
             doFirst {
-                classpath += project.sourceSets.main.runtimeClasspath
+                classpath = project.sourceSets.main.runtimeClasspath + classpath
                 args = [*args, *extension.buildArgs()]
                 extension.humanOutputFile?.parentFile?.mkdirs()
                 extension.resultsFile?.parentFile?.mkdirs()
