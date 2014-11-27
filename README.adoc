@@ -48,14 +48,13 @@ dependencies {
 }
 ----
 
-The plugin uses JMH 0.9. You can upgrade the version just by changing the version in the `dependencies` block:
+The plugin uses JMH 1.3.2. You can change JMH version in the `jmh` block:
 
 [source,groovy]
 .build.gradle
 ----
-dependencies {
-    jmh 'org.openjdk.jmh:jmh-core:0.9'
-    jmh 'org.openjdk.jmh:jmh-generator-annprocess:0.9'
+jmh {
+    jmhVersion '1.3.2'
 }
 ----
 
@@ -113,7 +112,10 @@ jmh {
    warmupIterations = 1 // Number of warmup iterations to do.
    warmupMode = 'INDI' // Warmup mode for warming up selected benchmarks. Warmup modes are: [INDI, BULK, BULK_INDI].
    warmupBenchmarks = ['.*Warmup'] // Warmup benchmarks to include in the run in addition to already selected. JMH will not measure these benchmarks, but only use them for the warmup.
+
    zip64 = true // Use ZIP64 format for bigger archives
+   jmhVersion = 1.3.2 // Specifies JMH version
+   includeTests = false // Allows to include test sources into generate JMH jar, i.e. use it when benchmarks depend on the test classes.
 }
 ----
 
@@ -122,4 +124,20 @@ jmh {
 The `jmh` plugin makes it easy to test existing sources *without* having to create a separate project for this. This is
 the reason why you must put your files into `src/jmh/java` instead of `src/main/java`. This means that by default, the
 `jmh` task depends on your `main` source set.
+
+It is possible a dependency on the `test` source set by setting property `includeTests` to true inside `jmh` block.
+
+== Using JMH Gradle Plugin with Shadow Plugin
+Optionally it is possible to use https://github.com/johnrengelman/shadow/[Shadow Plugin] to do actual JMH jar
+creation. The configuration of Shadow Plugin for JMH jar is done via `jmhJar` block.
+For example:
+[source,groovy]
+.build.gradle
+----
+jmhJar {
+  append('META-INF/spring.handlers')
+  append('META-INF/spring.schemas')
+  exclude 'LICENSE'
+}
+----
 
