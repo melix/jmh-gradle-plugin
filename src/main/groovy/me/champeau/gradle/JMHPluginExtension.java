@@ -14,6 +14,9 @@ import java.util.Set;
 public class JMHPluginExtension {
     private final Project project;
 
+    private String jmhVersion = "1.3.2";
+    private boolean includeTests;
+
     private String include = ".*";
     private String exclude;
     private String benchmarkMode;
@@ -393,5 +396,21 @@ public class JMHPluginExtension {
 
     public void setZip64(final boolean zip64) {
         this.zip64 = zip64;
+    }
+
+    public String getJmhVersion() {
+        return jmhVersion;
+    }
+
+    public void setJmhVersion(String jmhVersion) {
+        this.jmhVersion = jmhVersion;
+    }
+
+    public boolean isIncludeTests() {
+        return includeTests;
+    }
+
+    public void setIncludeTests(boolean includeTests) {
+        this.includeTests = includeTests;
     }
 }
