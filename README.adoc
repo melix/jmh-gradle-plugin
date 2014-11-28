@@ -48,13 +48,13 @@ dependencies {
 }
 ----
 
-The plugin uses JMH 1.3.2. You can change JMH version in the `jmh` block:
+The plugin uses JMH '1.3.2'. You can change JMH version in the `jmh` block:
 
 [source,groovy]
 .build.gradle
 ----
 jmh {
-    jmhVersion '1.3.2'
+    jmhVersion = '1.3.2'
 }
 ----
 
