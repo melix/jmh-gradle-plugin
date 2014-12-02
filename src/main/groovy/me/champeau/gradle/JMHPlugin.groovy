@@ -28,7 +28,7 @@ import org.gradle.api.tasks.bundling.Jar
 class JMHPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
-        def extension = project.extensions.create('jmh', JMHPluginExtension, project)
+        JMHPluginExtension extension = project.extensions.create('jmh', JMHPluginExtension, project)
         project.configurations.create('jmh')
 
         project.sourceSets {
@@ -38,46 +38,81 @@ class JMHPlugin implements Plugin<Project> {
                     groovy.srcDir 'src/jmh/groovy'
                 }
                 resources.srcDir 'src/jmh/resources'
-                compileClasspath += project.configurations.jmh + main.output
-                runtimeClasspath += project.configurations.jmh + main.output
+                compileClasspath += project.configurations.jmh + project.configurations.compile + main.output
+                runtimeClasspath += project.configurations.jmh + project.configurations.runtime + main.output
             }
         }
         project.dependencies {
-            jmh 'org.openjdk.jmh:jmh-core:1.1.1'
-            jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.1.1'
-            jmh 'net.sf.jopt-simple:jopt-simple:4.6'
-            jmh 'org.apache.commons:commons-math3:3.2'
-            jmh project.configurations.compile
+            jmh "org.openjdk.jmh:jmh-core:${extension.jmhVersion}"
+            jmh "org.openjdk.jmh:jmh-generator-annprocess:${extension.jmhVersion}"
         }
 
-        project.tasks.create(name: 'jmhJar', type: Jar) {
-            dependsOn 'jmhClasses'
-            inputs.dir project.sourceSets.jmh.output
-            doFirst {
-                from(project.configurations.jmh.collect { it.isDirectory() ? it : project.zipTree(it) }) {
-                    exclude '**/META-INF/services/**'
-                    exclude '**/META-INF/*.SF'
-                    exclude '**/META-INF/*.DSA'
-                    exclude '**/META-INF/*.RSA'
+        if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
+            project.tasks.create(name: 'jmhJar', type: Jar) {
+                dependsOn 'jmhClasses'
+                inputs.dir project.sourceSets.jmh.output
+                doFirst {
+                    def filter = { it.isDirectory() ? it : project.zipTree(it) }
+                    def exclusions = {
+                        exclude '**/META-INF/services/**'
+                        exclude '**/META-INF/*.SF'
+                        exclude '**/META-INF/*.DSA'
+                        exclude '**/META-INF/*.RSA'
+                    }
+                    from(project.configurations.jmh.collect(filter), exclusions)
+                    from(project.configurations.compile.collect(filter), exclusions)
+                    from(project.sourceSets.jmh.output)
+                    from(project.sourceSets.main.output)
+                    if (extension.includeTests) {
+                        from(project.sourceSets.test.output)
+                    }
                 }
-                from(project.sourceSets.jmh.output)
-                from(project.sourceSets.main.output)
-            }
 
-            manifest {
-                attributes 'Main-Class': 'org.openjdk.jmh.Main'
-            }
+                manifest {
+                    attributes 'Main-Class': 'org.openjdk.jmh.Main'
+                }
 
-            classifier = 'jmh'
-            zip64 = { extension.zip64 }
+                classifier = 'jmh'
+                zip64 = { extension.zip64 }
+            }
+        } else {
+            def shadow = project.tasks.create(name: 'jmhJar', type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar',true, JMHPlugin.classLoader))
+
+            shadow.group = 'jmh'
+            shadow.description = 'Create a combined JAR of project and runtime dependencies'
+            shadow.conventionMapping.with {
+                map('classifier') {
+                    'jmh'
+                }
+            }
+            shadow.manifest.inheritFrom project.tasks.jar.manifest
+            shadow.manifest.attributes 'Main-Class': 'org.openjdk.jmh.Main'
+            shadow.doFirst { task ->
+                def processLibs = { files ->
+                    if (files) {
+                        def libs = [task.manifest.attributes.get('Class-Path')]
+                        libs.addAll files.collect { it.name }
+                        task.manifest.attributes 'Class-Path': libs.unique().join(' ')
+                    }
+                }
+                processLibs project.configurations.jmh.files
+                processLibs project.configurations.shadow.files
+            }
+            shadow.from(project.sourceSets.jmh.output)
+            shadow.from(project.sourceSets.main.output)
+            if (extension.includeTests) {
+                shadow.from(project.sourceSets.test.output)
+            }
+            shadow.configurations = [project.configurations.runtime, project.configurations.jmh]
+            shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
         }
+
         project.tasks.create(name: 'jmh', type: JavaExec) {
             dependsOn project.jmhJar
             main = 'org.openjdk.jmh.Main'
-            classpath = project.files {project.jmhJar.archivePath}
+            classpath = project.files { project.jmhJar.archivePath }
 
             doFirst {
-                classpath += project.sourceSets.main.runtimeClasspath
                 args = [*args, *extension.buildArgs()]
                 extension.humanOutputFile?.parentFile?.mkdirs()
                 extension.resultsFile?.parentFile?.mkdirs()
@@ -89,7 +124,7 @@ class JMHPlugin implements Plugin<Project> {
             if (hasIdea) {
                 project.idea {
                     module {
-                        scopes.TEST.plus += [ project.configurations.jmh ]
+                        scopes.TEST.plus += [project.configurations.jmh]
                     }
                 }
                 def rootProject = project.rootProject
