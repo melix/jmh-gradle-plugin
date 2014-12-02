@@ -1,3 +1,7 @@
+Version 0.1.4
+-------------
+    * Support for the 'shadow' plugin
+
 Version 0.1.3
 -------------
 
