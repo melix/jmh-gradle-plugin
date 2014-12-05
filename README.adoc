@@ -56,6 +56,13 @@ The plugin uses JMH '1.3.2'. You can change JMH version in the `jmh` block:
 jmh {
     jmhVersion = '1.3.2'
 }
+
+The jars
+
+* `org.openjdk.jmh:jmh-core`
+* `org.openjdk.jmh:jmh-generator-annprocess`
+
+will be automatically added to the list of library dependencies for the jmh configuration.
 ----
 
 == Tasks
@@ -114,7 +121,7 @@ jmh {
    warmupBenchmarks = ['.*Warmup'] // Warmup benchmarks to include in the run in addition to already selected. JMH will not measure these benchmarks, but only use them for the warmup.
 
    zip64 = true // Use ZIP64 format for bigger archives
-   jmhVersion = 1.3.2 // Specifies JMH version
+   jmhVersion = '1.3.2' // Specifies JMH version
    includeTests = false // Allows to include test sources into generate JMH jar, i.e. use it when benchmarks depend on the test classes.
 }
 ----
