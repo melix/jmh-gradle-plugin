@@ -12,13 +12,15 @@
  */
 
 package me.champeau.gradle
-
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ResolvableDependencies
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
-
 /**
  * Configures the JMH Plugin.
  *
@@ -26,10 +28,11 @@ import org.gradle.api.tasks.bundling.Jar
  *
  */
 class JMHPlugin implements Plugin<Project> {
+
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
-        JMHPluginExtension extension = project.extensions.create('jmh', JMHPluginExtension, project)
-        project.configurations.create('jmh')
+        final JMHPluginExtension extension = project.extensions.create('jmh', JMHPluginExtension, project)
+        final Configuration configuration = project.configurations.create('jmh')
 
         project.sourceSets {
             jmh {
@@ -42,10 +45,15 @@ class JMHPlugin implements Plugin<Project> {
                 runtimeClasspath += project.configurations.jmh + project.configurations.runtime + main.output
             }
         }
-        project.dependencies {
-            jmh "org.openjdk.jmh:jmh-core:${extension.jmhVersion}"
-            jmh "org.openjdk.jmh:jmh-generator-annprocess:${extension.jmhVersion}"
-        }
+
+        configuration.getIncoming().beforeResolve(new Action<ResolvableDependencies>() {
+            public void execute(ResolvableDependencies resolvableDependencies) {
+                DependencyHandler dependencyHandler = project.getDependencies();
+                def dependencies = configuration.getDependencies()
+                dependencies.add(dependencyHandler.create("org.openjdk.jmh:jmh-core:" + extension.jmhVersion))
+                dependencies.add(dependencyHandler.create("org.openjdk.jmh:jmh-generator-annprocess:" + extension.jmhVersion))
+            }
+        });
 
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
             project.tasks.create(name: 'jmhJar', type: Jar) {
