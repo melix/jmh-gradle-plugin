@@ -57,13 +57,14 @@ jmh {
     jmhVersion = '1.3.2'
 }
 
+----
+
 The jars
 
 * `org.openjdk.jmh:jmh-core`
 * `org.openjdk.jmh:jmh-generator-annprocess`
 
 will be automatically added to the list of library dependencies for the jmh configuration.
-----
 
 == Tasks
 
