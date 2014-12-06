@@ -29,6 +29,9 @@ import org.gradle.api.tasks.bundling.Jar
  */
 class JMHPlugin implements Plugin<Project> {
 
+    public static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
+    public static final String JMH_ANNOT_PROC_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-annprocess:'
+
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
         final JMHPluginExtension extension = project.extensions.create('jmh', JMHPluginExtension, project)
@@ -50,8 +53,8 @@ class JMHPlugin implements Plugin<Project> {
             public void execute(ResolvableDependencies resolvableDependencies) {
                 DependencyHandler dependencyHandler = project.getDependencies();
                 def dependencies = configuration.getDependencies()
-                dependencies.add(dependencyHandler.create("org.openjdk.jmh:jmh-core:" + extension.jmhVersion))
-                dependencies.add(dependencyHandler.create("org.openjdk.jmh:jmh-generator-annprocess:" + extension.jmhVersion))
+                dependencies.add(dependencyHandler.create(JMH_CORE_DEPENDENCY + extension.jmhVersion))
+                dependencies.add(dependencyHandler.create(JMH_ANNOT_PROC_DEPENDENCY + extension.jmhVersion))
             }
         });
 

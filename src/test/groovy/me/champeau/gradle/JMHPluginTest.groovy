@@ -12,8 +12,9 @@
  */
 
 package me.champeau.gradle
-
 import org.gradle.api.Project
+import org.gradle.api.artifacts.DependencyResolutionListener
+import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
@@ -64,5 +65,34 @@ class JMHPluginTest extends GroovyTestCase {
         assert task instanceof Jar
         assert task.zip64
 
+    }
+
+    void testPluginWithAlternativeJmhVersion() {
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenLocal()
+            jcenter()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.gradle.jmh'
+
+        def expectedVersion = 'my.expected.version-SNAPSHOT'
+        project.jmh.jmhVersion = expectedVersion
+
+        def config = project.project.configurations.getByName('jmh')
+
+        def dependencies = config.dependencies
+
+        assert dependencies.isEmpty();
+
+        // mock-trigger beforeResolve() to avoid 'real' resolution of dependencies
+        DependencyResolutionListener broadcast = config.getDependencyResolutionBroadcast()
+        ResolvableDependencies incoming = config.getIncoming()
+        broadcast.beforeResolve(incoming)
+
+        def dependencyHandler = project.getDependencies();
+
+        assert dependencies.contains(dependencyHandler.create(JMHPlugin.JMH_ANNOT_PROC_DEPENDENCY + expectedVersion))
+        assert dependencies.contains(dependencyHandler.create(JMHPlugin.JMH_CORE_DEPENDENCY + expectedVersion))
     }
 }
