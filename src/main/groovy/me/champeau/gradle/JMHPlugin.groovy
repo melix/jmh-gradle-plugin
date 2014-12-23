@@ -138,11 +138,10 @@ class JMHPlugin implements Plugin<Project> {
                         scopes.TEST.plus += [project.configurations.jmh]
                     }
                 }
-                def rootProject = project.rootProject
-                rootProject.idea {
+                project.idea {
                     module {
                         project.sourceSets.jmh.java.srcDirs.each {
-                            testSourceDirs += rootProject.file(it)
+                            testSourceDirs += project.file(it)
                         }
                     }
                 }
