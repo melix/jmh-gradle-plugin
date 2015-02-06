@@ -5,7 +5,8 @@ import org.openjdk.jmh.annotations.Benchmark;
 public class SampleBenchmark {
 
     @Benchmark
-    public void sqrtBenchmark(){
-        Math.sqrt(3.0);
+    public double sqrtBenchmark(){
+        // return prevents dead code removal!
+        return Math.sqrt(3.0);
     }
 }
