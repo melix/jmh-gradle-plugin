@@ -2,6 +2,35 @@
 
 This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
 
+== Fork adaptions/changes
+- Adapted to work wih gradle 2.2.1
+- Fixed JMH version definition ignored issue (https://github.com/melix/jmh-gradle-plugin/issues/26)
+- Fixed sourceSet definitions being attached to idea root project only instead of the actual module
+- Provides a small sample module as show case (Run gradle jmh in sample subdirectory)
+
+**In order to use this fork, please build and ship it to you local maven repository with**
+[source,bash]
+----
+gradle publishToMavenLocal
+----
+
+**Then use this alternative buildscript block**
+[source,groovy]
+.build.gradle
+----
+buildscript {
+   repositories {
+      mavenLocal()
+   }
+   dependencies {
+      classpath 'me.champeau.gradle:jmh-gradle-plugin:+'
+   }
+}
+----
+
+We will try to get this integrated back to the master. A re-release of the fork is also considered in future.
+
+== Original Readme Start
 == Usage
 
 To enable the plugin, you must add this to your `build.gradle` file:
@@ -56,7 +85,15 @@ The plugin uses JMH '1.3.2'. You can change JMH version in the `jmh` block:
 jmh {
     jmhVersion = '1.3.2'
 }
+
 ----
+
+The jars
+
+* `org.openjdk.jmh:jmh-core`
+* `org.openjdk.jmh:jmh-generator-annprocess`
+
+will be automatically added to the list of library dependencies for the jmh configuration.
 
 == Tasks
 
@@ -114,7 +151,7 @@ jmh {
    warmupBenchmarks = ['.*Warmup'] // Warmup benchmarks to include in the run in addition to already selected. JMH will not measure these benchmarks, but only use them for the warmup.
 
    zip64 = true // Use ZIP64 format for bigger archives
-   jmhVersion = 1.3.2 // Specifies JMH version
+   jmhVersion = '1.3.2' // Specifies JMH version
    includeTests = false // Allows to include test sources into generate JMH jar, i.e. use it when benchmarks depend on the test classes.
 }
 ----
