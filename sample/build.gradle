@@ -6,7 +6,7 @@ buildscript {
 
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.0'
-        classpath 'me.champeau.gradle:jmh-gradle-plugin:+'
+        classpath "me.champeau.gradle:jmh-gradle-plugin:$pluginVersion"
     }
 
 }
