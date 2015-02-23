@@ -2,29 +2,6 @@
 
 This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
 
-**In order to use this fork, please build and ship it to you local maven repository with**
-[source,bash]
-----
-gradle publishToMavenLocal
-----
-
-**Then use this alternative buildscript block**
-[source,groovy]
-.build.gradle
-----
-buildscript {
-   repositories {
-      mavenLocal()
-   }
-   dependencies {
-      classpath 'me.champeau.gradle:jmh-gradle-plugin:+'
-   }
-}
-----
-
-We will try to get this integrated back to the master. A re-release of the fork is also considered in future.
-
-== Original Readme Start
 == Usage
 
 To enable the plugin, you must add this to your `build.gradle` file:
