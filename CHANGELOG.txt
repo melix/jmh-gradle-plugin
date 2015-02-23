@@ -1,3 +1,10 @@
+Version 0.2.0
+-------------
+    * Requires Gradle 2.2+
+    * Fixed JMH version definition ignored issue (https://github.com/melix/jmh-gradle-plugin/issues/26)
+    * Fixed sourceSet definitions being attached to idea root project only instead of the actual module
+    * Provides a small sample module as show case (Run gradle jmh in sample subdirectory)
+
 Version 0.1.4
 -------------
     * Support for the 'shadow' plugin
