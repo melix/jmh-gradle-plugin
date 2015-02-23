@@ -2,12 +2,6 @@
 
 This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
 
-== Fork adaptions/changes
-- Adapted to work wih gradle 2.2.1
-- Fixed JMH version definition ignored issue (https://github.com/melix/jmh-gradle-plugin/issues/26)
-- Fixed sourceSet definitions being attached to idea root project only instead of the actual module
-- Provides a small sample module as show case (Run gradle jmh in sample subdirectory)
-
 **In order to use this fork, please build and ship it to you local maven repository with**
 [source,bash]
 ----
