@@ -12,7 +12,6 @@
  */
 
 package me.champeau.gradle
-import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -49,14 +48,12 @@ class JMHPlugin implements Plugin<Project> {
             }
         }
 
-        configuration.getIncoming().beforeResolve(new Action<ResolvableDependencies>() {
-            public void execute(ResolvableDependencies resolvableDependencies) {
-                DependencyHandler dependencyHandler = project.getDependencies();
-                def dependencies = configuration.getDependencies()
-                dependencies.add(dependencyHandler.create(JMH_CORE_DEPENDENCY + extension.jmhVersion))
-                dependencies.add(dependencyHandler.create(JMH_ANNOT_PROC_DEPENDENCY + extension.jmhVersion))
-            }
-        });
+        configuration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
+            DependencyHandler dependencyHandler = project.getDependencies();
+            def dependencies = configuration.getDependencies()
+            dependencies.add(dependencyHandler.create("${JMH_CORE_DEPENDENCY}${extension.jmhVersion}"))
+            dependencies.add(dependencyHandler.create("${JMH_ANNOT_PROC_DEPENDENCY}${extension.jmhVersion}"))
+        }
 
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
             project.tasks.create(name: 'jmhJar', type: Jar) {
