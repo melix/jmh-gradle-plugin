@@ -13,7 +13,7 @@
 
 // Handles publication of distributions to Bintray
 
-apply plugin: 'bintray'
+apply plugin: 'com.jfrog.bintray'
 
 bintray {
     user = bintrayUsername
@@ -24,6 +24,9 @@ bintray {
         name = 'jmh-gradle-plugin'
         desc = 'Integrates the JMH microbenchmarking project into Gradle'
         licenses = ['Apache-2.0']
-        labels = []
+        labels = ['jmh','gradle']
+        version {
+            attributes = ['gradle-plugin': 'me.champeau.gradle.jmh:me.champeau.gradle:jmh-gradle-plugin ']
+        }
     }
 }
