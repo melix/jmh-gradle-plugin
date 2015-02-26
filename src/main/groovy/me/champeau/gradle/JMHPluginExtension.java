@@ -52,7 +52,6 @@ public class JMHPluginExtension {
     public JMHPluginExtension(final Project project) {
         this.project = project;
         this.humanOutputFile = project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/human.txt");
-        this.resultsFile = project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/results.txt");
     }
 
     public List<String> buildArgs() {
@@ -73,9 +72,9 @@ public class JMHPluginExtension {
         addOption(args, operationsPerInvocation, "opi");
         addOption(args, benchmarkParameters, "p");
         addOption(args, profilers, "prof");
-        addOption(args, resultsFile, "rff");
+        addOption(args, resolveResultsFile(), "rff");
         addOption(args, timeOnIteration, "r");
-        addOption(args, resultFormat, "rf");
+        addOption(args, resolveResultFormat(), "rf");
         addOption(args, synchronizeIterations, "si");
         addOption(args, threads, "t");
         addOption(args, threadGroups, "tg");
@@ -89,6 +88,14 @@ public class JMHPluginExtension {
         addOption(args, warmupBenchmarks, "wmb");
 
         return args;
+    }
+
+    private File resolveResultsFile() {
+        return resultsFile != null ? resultsFile : project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/results." + resolveResultFormat());
+    }
+
+    private String resolveResultFormat() {
+        return resultFormat != null ? resultFormat : "txt";
     }
 
     private void addOption(List<String> options, String str, String option) {

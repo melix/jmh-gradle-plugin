@@ -95,4 +95,36 @@ class JMHPluginTest extends GroovyTestCase {
         assert dependencies.contains(dependencyHandler.create(JMHPlugin.JMH_ANNOT_PROC_DEPENDENCY + expectedVersion))
         assert dependencies.contains(dependencyHandler.create(JMHPlugin.JMH_CORE_DEPENDENCY + expectedVersion))
     }
+
+    void testResultsFileShouldProvidedResultsFile() {
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenLocal()
+            jcenter()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.gradle.jmh'
+
+        File resultsFile = new File('some/result/file.pdf')
+        project.jmh.resultsFile = resultsFile
+
+        List options = project.jmh.buildArgs()
+        assert project.relativePath(resultsFile) in options
+    }
+
+    void testResultsFileShouldUseResultFormatAsExtension() {
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenLocal()
+            jcenter()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.gradle.jmh'
+
+        project.jmh.resultFormat = 'json'
+
+        File expectedFile = project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/results.json")
+        List options = project.jmh.buildArgs()
+        assert project.relativePath(expectedFile) in options
+    }
 }
