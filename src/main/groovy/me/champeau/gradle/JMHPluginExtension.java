@@ -51,7 +51,6 @@ public class JMHPluginExtension {
 
     public JMHPluginExtension(final Project project) {
         this.project = project;
-        this.humanOutputFile = project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/human.txt");
         this.resultsFile = project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/results.txt");
     }
 
