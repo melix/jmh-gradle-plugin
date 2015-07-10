@@ -12,6 +12,7 @@
  */
 
 package me.champeau.gradle
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -20,6 +21,8 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.testing.Test
+
 /**
  * Configures the JMH Plugin.
  *
@@ -36,6 +39,22 @@ class JMHPlugin implements Plugin<Project> {
         final JMHPluginExtension extension = project.extensions.create('jmh', JMHPluginExtension, project)
         final Configuration configuration = project.configurations.create('jmh')
 
+        final Configuration testConfiguration = project.configurations.testCompile
+        testConfiguration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
+            DependencyHandler dependencyHandler = project.getDependencies();
+            def dependencies = testConfiguration.getDependencies()
+            dependencies.add(dependencyHandler.create("${JMH_CORE_DEPENDENCY}${extension.jmhVersion}"))
+            dependencies.add(dependencyHandler.create("${JMH_ANNOT_PROC_DEPENDENCY}${extension.jmhVersion}"))
+        }
+
+        /** Either programmatically remove jmh-generator-annprocess from compile */
+//        final Configuration compileConfiguration =  project.configurations.compile
+//        compileConfiguration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
+//            DependencyHandler dependencyHandler = project.getDependencies();
+//            def dependencies = compileConfiguration.getDependencies()
+//            dependencies.remove(dependencyHandler.create("${JMH_ANNOT_PROC_DEPENDENCY}${extension.jmhVersion}"))
+//        }
+
         project.sourceSets {
             jmh {
                 java.srcDir 'src/jmh/java'
@@ -45,6 +64,11 @@ class JMHPlugin implements Plugin<Project> {
                 resources.srcDir 'src/jmh/resources'
                 compileClasspath += project.configurations.jmh + project.configurations.compile + main.output
                 runtimeClasspath += project.configurations.jmh + project.configurations.runtime + main.output
+
+                if (extension.includeTests) {
+                    compileClasspath += project.configurations.testCompile
+                    runtimeClasspath += project.configurations.testRuntime
+                }
             }
         }
 
@@ -53,6 +77,12 @@ class JMHPlugin implements Plugin<Project> {
             def dependencies = configuration.getDependencies()
             dependencies.add(dependencyHandler.create("${JMH_CORE_DEPENDENCY}${extension.jmhVersion}"))
             dependencies.add(dependencyHandler.create("${JMH_ANNOT_PROC_DEPENDENCY}${extension.jmhVersion}"))
+        }
+
+        /** or fix for jmh-generator-annprocess added to compile */
+        def jmhExclusions = {
+            exclude '**/META-INF/BenchmarkList'
+            exclude '**/META-INF/CompilerHints'
         }
 
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
@@ -70,9 +100,9 @@ class JMHPlugin implements Plugin<Project> {
                     from(project.configurations.jmh.collect(filter), exclusions)
                     from(project.configurations.compile.collect(filter), exclusions)
                     from(project.sourceSets.jmh.output)
-                    from(project.sourceSets.main.output)
+                    from(project.sourceSets.main.output, jmhExclusions)
                     if (extension.includeTests) {
-                        from(project.sourceSets.test.output)
+                        from(project.sourceSets.test.output, jmhExclusions)
                     }
                 }
 
@@ -84,7 +114,7 @@ class JMHPlugin implements Plugin<Project> {
                 zip64 = { extension.zip64 }
             }
         } else {
-            def shadow = project.tasks.create(name: 'jmhJar', type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar',true, JMHPlugin.classLoader))
+            def shadow = project.tasks.create(name: 'jmhJar', type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar', true, JMHPlugin.classLoader))
 
             shadow.group = 'jmh'
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
@@ -107,9 +137,9 @@ class JMHPlugin implements Plugin<Project> {
                 processLibs project.configurations.shadow.files
             }
             shadow.from(project.sourceSets.jmh.output)
-            shadow.from(project.sourceSets.main.output)
+            shadow.from(project.sourceSets.main.output, jmhExclusions)
             if (extension.includeTests) {
-                shadow.from(project.sourceSets.test.output)
+                shadow.from(project.sourceSets.test.output, jmhExclusions)
             }
             shadow.configurations = [project.configurations.runtime, project.configurations.jmh]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
@@ -119,12 +149,21 @@ class JMHPlugin implements Plugin<Project> {
             dependsOn project.jmhJar
             main = 'org.openjdk.jmh.Main'
             classpath = project.files { project.jmhJar.archivePath }
+            group = 'Verification'
+            description = 'Runs JMH benchmarks.'
 
             doFirst {
                 args = [*args, *extension.buildArgs()]
                 extension.humanOutputFile?.parentFile?.mkdirs()
                 extension.resultsFile?.parentFile?.mkdirs()
             }
+        }
+
+        /** Intellij scope hack */
+        project.tasks.create(name: 'addJmhToTestScope', type: Test) {
+            description = 'Adds JMH to IDE test scope.'
+            testClassesDir = project.sourceSets.jmh.output.classesDir
+            classpath = project.sourceSets.jmh.runtimeClasspath
         }
 
         project.afterEvaluate {
