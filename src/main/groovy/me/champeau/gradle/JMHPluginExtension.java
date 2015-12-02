@@ -1,15 +1,11 @@
 package me.champeau.gradle;
 
-import groovy.lang.Closure;
-import groovy.lang.GString;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.gradle.api.Project;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class JMHPluginExtension {
     private final Project project;
@@ -35,6 +31,7 @@ public class JMHPluginExtension {
     private Map benchmarkParameters;
     private List<String> profilers;
     private String timeOnIteration;
+    private String resultExtension;
     private String resultFormat;
     private Boolean synchronizeIterations;
     private Integer threads;
@@ -54,6 +51,8 @@ public class JMHPluginExtension {
     }
 
     public List<String> buildArgs() {
+        resolveArgs();
+
         List<String> args = new ArrayList<String>();
         args.add(include);
         addOption(args, exclude, "e");
@@ -71,9 +70,9 @@ public class JMHPluginExtension {
         addOption(args, operationsPerInvocation, "opi");
         addOption(args, benchmarkParameters, "p");
         addOption(args, profilers, "prof");
-        addOption(args, resolveResultsFile(), "rff");
+        addOption(args, resultsFile, "rff");
         addOption(args, timeOnIteration, "r");
-        addOption(args, resolveResultFormat(), "rf");
+        addOption(args, resultFormat, "rf");
         addOption(args, synchronizeIterations, "si");
         addOption(args, threads, "t");
         addOption(args, threadGroups, "tg");
@@ -89,12 +88,26 @@ public class JMHPluginExtension {
         return args;
     }
 
-    private File resolveResultsFile() {
-        return resultsFile != null ? resultsFile : project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/results." + resolveResultFormat());
+    private void resolveArgs() {
+        resolveResultExtension();
+        resolveResultFormat();
+        resolveResultsFile();
     }
 
-    private String resolveResultFormat() {
-        return resultFormat != null ? resultFormat : "txt";
+    private void resolveResultsFile() {
+        resultsFile = resultsFile != null ? resultsFile : project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/results." + resultExtension);
+    }
+
+    private void resolveResultExtension() {
+        resultExtension = resultFormat != null ? parseResultFormat() : "txt";
+    }
+
+    private void resolveResultFormat() {
+        resultFormat = resultFormat != null ? resultFormat : "text";
+    }
+
+    private String parseResultFormat() {
+        return ResultFormatType.translate(resultFormat);
     }
 
     private void addOption(List<String> options, String str, String option) {
@@ -418,5 +431,23 @@ public class JMHPluginExtension {
 
     public void setIncludeTests(boolean includeTests) {
         this.includeTests = includeTests;
+    }
+
+    private enum ResultFormatType {
+        TEXT("txt"),
+        CSV("cvs"),
+        SCSV("scsv"),
+        JSON("json"),
+        LATEX("tex");
+
+        private String extension;
+
+        ResultFormatType(String extension) {
+            this.extension = extension;
+        }
+
+        public static String translate(String resultFormat) {
+            return ResultFormatType.valueOf(resultFormat.toUpperCase()).extension;
+        }
     }
 }
