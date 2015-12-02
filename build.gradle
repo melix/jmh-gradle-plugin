@@ -12,7 +12,7 @@
  */
 
 plugins {
-    id 'com.jfrog.bintray' version '1.0'
+    id 'com.jfrog.bintray' version '1.5'
     id 'com.jfrog.artifactory' version '3.0.0'
 }
 
