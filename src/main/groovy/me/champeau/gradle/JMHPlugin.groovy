@@ -10,26 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package me.champeau.gradle
+
+import org.gradle.BuildAdapter
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
+
 /**
  * Configures the JMH Plugin.
  *
  * @author Cédric Champeau
- *
  */
 class JMHPlugin implements Plugin<Project> {
-
-    public static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
-    public static final String JMH_ANNOT_PROC_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-annprocess:'
+    static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
+    static final String JMH_ANNOT_PROC_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-annprocess:'
 
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
@@ -47,6 +48,8 @@ class JMHPlugin implements Plugin<Project> {
                 runtimeClasspath += project.configurations.jmh + project.configurations.runtime + main.output
             }
         }
+
+        registerBuildListener(project, extension)
 
         configuration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
             DependencyHandler dependencyHandler = project.getDependencies();
@@ -68,10 +71,11 @@ class JMHPlugin implements Plugin<Project> {
                         exclude '**/META-INF/*.RSA'
                     }
                     from(project.configurations.jmh.collect(filter), exclusions)
-                    from(project.configurations.compile.collect(filter), exclusions)
+                    from(project.configurations.runtime.collect(filter), exclusions)
                     from(project.sourceSets.jmh.output)
                     from(project.sourceSets.main.output)
                     if (extension.includeTests) {
+                        from(project.configurations.testRuntime.collect(filter), exclusions)
                         from(project.sourceSets.test.output)
                     }
                 }
@@ -105,12 +109,15 @@ class JMHPlugin implements Plugin<Project> {
                 }
                 processLibs project.configurations.jmh.files
                 processLibs project.configurations.shadow.files
+
+                if (extension.includeTests) {
+                    task.configurations += [project.configurations.testRuntime]
+                    task.from(project.sourceSets.test.output)
+                }
             }
             shadow.from(project.sourceSets.jmh.output)
             shadow.from(project.sourceSets.main.output)
-            if (extension.includeTests) {
-                shadow.from(project.sourceSets.test.output)
-            }
+
             shadow.configurations = [project.configurations.runtime, project.configurations.jmh]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
         }
@@ -144,7 +151,22 @@ class JMHPlugin implements Plugin<Project> {
                 }
             }
         }
-
     }
 
+    private void registerBuildListener(
+        final Project project, final JMHPluginExtension extension) {
+        project.gradle.addBuildListener(new BuildAdapter() {
+            @Override
+            void projectsEvaluated(Gradle gradle) {
+                if (extension.includeTests) {
+                    project.sourceSets {
+                        jmh {
+                            compileClasspath += test.output + project.configurations.testCompile
+                            runtimeClasspath += test.output + project.configurations.testRuntime
+                        }
+                    }
+                }
+            }
+        })
+    }
 }

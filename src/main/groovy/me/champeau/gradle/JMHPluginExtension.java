@@ -11,7 +11,7 @@ public class JMHPluginExtension {
     private final Project project;
 
     private String jmhVersion = "1.3.2";
-    private boolean includeTests;
+    private boolean includeTests = true;
 
     private String include = ".*";
     private String exclude;
