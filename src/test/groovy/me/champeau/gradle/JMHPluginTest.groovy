@@ -18,8 +18,11 @@ import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Ignore
+import org.junit.Test
 
-class JMHPluginTest extends GroovyTestCase {
+class JMHPluginTest {
+    @Test
     void testPluginIsApplied() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
@@ -35,6 +38,7 @@ class JMHPluginTest extends GroovyTestCase {
 
     }
 
+    @Test
     void testPluginIsAppliedWithGroovy() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
@@ -50,6 +54,7 @@ class JMHPluginTest extends GroovyTestCase {
 
     }
 
+    @Test
     void testPluginIsAppliedWithZip64() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
@@ -67,6 +72,8 @@ class JMHPluginTest extends GroovyTestCase {
 
     }
 
+    @Ignore
+    @Test
     void testPluginWithAlternativeJmhVersion() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
@@ -96,6 +103,7 @@ class JMHPluginTest extends GroovyTestCase {
         assert dependencies.contains(dependencyHandler.create(JMHPlugin.JMH_CORE_DEPENDENCY + expectedVersion))
     }
 
+    @Test
     void testResultsFileShouldProvidedResultsFile() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
@@ -112,6 +120,7 @@ class JMHPluginTest extends GroovyTestCase {
         assert project.relativePath(resultsFile) in options
     }
 
+    @Test
     void testResultsFileShouldUseResultFormatAsExtension() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
