@@ -3,10 +3,10 @@ package me.champeau.gradle.jmh.sample;
 import org.openjdk.jmh.annotations.Benchmark;
 
 public class SampleBenchmark {
+    private double value = 3.0;
 
     @Benchmark
     public double sqrtBenchmark(){
-        // return prevents dead code removal!
-        return Math.sqrt(3.0);
+        return Math.sqrt(value);
     }
 }
