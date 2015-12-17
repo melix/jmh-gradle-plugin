@@ -58,24 +58,25 @@ class JMHPlugin implements Plugin<Project> {
             dependencies.add(dependencyHandler.create("${JMH_ANNOT_PROC_DEPENDENCY}${extension.jmhVersion}"))
         }
 
+        def metaInfExcludes = ['META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
             project.tasks.create(name: 'jmhJar', type: Jar) {
                 dependsOn 'jmhClasses'
                 inputs.dir project.sourceSets.jmh.output
                 doFirst {
                     def filter = { it.isDirectory() ? it : project.zipTree(it) }
-                    def exclusions = {
-                        exclude '**/META-INF/services/**'
-                        exclude '**/META-INF/*.SF'
-                        exclude '**/META-INF/*.DSA'
-                        exclude '**/META-INF/*.RSA'
+                    from(project.configurations.jmh.collect(filter)) {
+                        exclude metaInfExcludes
                     }
-                    from(project.configurations.jmh.collect(filter), exclusions)
-                    from(project.configurations.runtime.collect(filter), exclusions)
+                    from(project.configurations.runtime.collect(filter)) {
+                        exclude metaInfExcludes
+                    }
                     from(project.sourceSets.jmh.output)
                     from(project.sourceSets.main.output)
                     if (extension.includeTests) {
-                        from(project.configurations.testRuntime.collect(filter), exclusions)
+                        from(project.configurations.testRuntime.collect(filter)) {
+                            exclude metaInfExcludes
+                        }
                         from(project.sourceSets.test.output)
                     }
                 }
@@ -119,7 +120,7 @@ class JMHPlugin implements Plugin<Project> {
             shadow.from(project.sourceSets.main.output)
 
             shadow.configurations = [project.configurations.runtime, project.configurations.jmh]
-            shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+            shadow.exclude(metaInfExcludes)
         }
 
         project.tasks.create(name: 'jmh', type: JavaExec) {
