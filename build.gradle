@@ -38,7 +38,7 @@ task release {
 
 task testSample(type:GradleBuild) {
     dependsOn(publishToMavenLocal)
-    buildFile = 'sample/build.gradle'
+    buildFile = 'src/test/resources/sample/build.gradle'
     startParameter.projectProperties.pluginVersion = rootProject.version
     tasks = ['jmh']
 }
