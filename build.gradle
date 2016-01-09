@@ -23,9 +23,25 @@ apply from: 'gradle/publishing.gradle'
 apply from: 'gradle/bintray.gradle'
 apply from: 'gradle/artifactory.gradle'
 
+
+task createPluginClasspathManifest {
+    def outputDir = file("$buildDir/testClasspath")
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    }
+}
+
 dependencies {
     compile localGroovy()
     compile gradleApi()
+
+    testCompile 'junit:junit:4.12'
+    testCompile gradleTestKit()
+    testRuntime files(createPluginClasspathManifest)
 }
 
 group='me.champeau.gradle'
@@ -42,3 +58,8 @@ task testSample(type:GradleBuild) {
     startParameter.projectProperties.pluginVersion = rootProject.version
     tasks = ['jmh']
 }
+
+test {
+    testLogging.showStandardStreams = true
+}
+
