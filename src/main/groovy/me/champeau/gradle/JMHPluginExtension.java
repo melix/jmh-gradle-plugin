@@ -435,7 +435,7 @@ public class JMHPluginExtension {
 
     private enum ResultFormatType {
         TEXT("txt"),
-        CSV("cvs"),
+        CSV("csv"),
         SCSV("scsv"),
         JSON("json"),
         LATEX("tex");
