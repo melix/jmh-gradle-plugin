@@ -26,8 +26,12 @@ dependencies {
     compile 'org.jetbrains.kotlin:kotlin-stdlib:0.14.451'
 }
 
+println sourceSets.jmh.output.classesDir
+println sourceSets.jmh.output.resourcesDir
+println sourceSets.jmh.output.dirs
+
 jmh {
-    jmhVersion = '1.11.2'
+    jmhVersion = '1.11.3'
     resultFormat = "csv"
     resultsFile = file("build/reports/benchmarks.csv")
 }

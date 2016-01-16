@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package me.champeau.gradle.jmh.sample.mixlang;
+package me.champeau.gradle.jmh.mixlang;
 
 import org.openjdk.jmh.annotations.*;
 

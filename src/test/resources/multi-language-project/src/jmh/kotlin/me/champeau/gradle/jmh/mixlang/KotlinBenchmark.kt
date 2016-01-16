@@ -23,13 +23,11 @@ open class KotlinBenchmark {
     var value: Double = 0.0
 
     @Setup
-    fun setUp() {
+    fun setUp(): Unit {
         value = 3.0
     }
 
     @Benchmark
-    fun sqrtBenchmark(): Double {
-        return return Math.sqrt(value)
-    }
+    fun sqrtBenchmark(): Double = Math.sqrt(value)
 
 }

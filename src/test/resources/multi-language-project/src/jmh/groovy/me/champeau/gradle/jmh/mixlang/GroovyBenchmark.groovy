@@ -23,7 +23,7 @@ public class GroovyBenchmark {
     private double value;
 
     @Setup
-    def setUp() {
+    void setUp() {
         value = 3.0
     }
 
