@@ -22,6 +22,7 @@ import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.compile.JavaCompile
 
 /**
  * Configures the JMH Plugin.
@@ -30,19 +31,22 @@ import org.gradle.api.tasks.bundling.Jar
  */
 class JMHPlugin implements Plugin<Project> {
     static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
-    static final String JMH_ANNOT_PROC_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-annprocess:'
+    static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
 
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
         final JMHPluginExtension extension = project.extensions.create('jmh', JMHPluginExtension, project)
         final Configuration configuration = project.configurations.create('jmh')
+        configuration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
+            DependencyHandler dependencyHandler = project.getDependencies();
+            def dependencies = configuration.getDependencies()
+            dependencies.add(dependencyHandler.create("${JMH_CORE_DEPENDENCY}${extension.jmhVersion}"))
+            dependencies.add(dependencyHandler.create("${JMH_GENERATOR_DEPENDENCY}${extension.jmhVersion}"))
+        }
 
         project.sourceSets {
             jmh {
                 java.srcDir 'src/jmh/java'
-                if (project.plugins.hasPlugin('groovy')) {
-                    groovy.srcDir 'src/jmh/groovy'
-                }
                 resources.srcDir 'src/jmh/resources'
                 compileClasspath += project.configurations.jmh + project.configurations.compile + main.output
                 runtimeClasspath += project.configurations.jmh + project.configurations.runtime + main.output
@@ -51,17 +55,32 @@ class JMHPlugin implements Plugin<Project> {
 
         registerBuildListener(project, extension)
 
-        configuration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
-            DependencyHandler dependencyHandler = project.getDependencies();
-            def dependencies = configuration.getDependencies()
-            dependencies.add(dependencyHandler.create("${JMH_CORE_DEPENDENCY}${extension.jmhVersion}"))
-            dependencies.add(dependencyHandler.create("${JMH_ANNOT_PROC_DEPENDENCY}${extension.jmhVersion}"))
+        def jmhGeneratedSourcesDir = project.file("$project.buildDir/jmh-generated-sources")
+        def jmhGeneratedClassesDir = project.file("$project.buildDir/jmh-generated-classes")
+        project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JavaExec) {
+            dependsOn 'jmhClasses'
+            inputs.dir project.sourceSets.jmh.output
+            outputs.dir jmhGeneratedSourcesDir
+
+            main = 'org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator'
+            classpath = project.sourceSets.jmh.runtimeClasspath
+            args = [project.sourceSets.jmh.output.classesDir, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, 'default']
+        }
+
+        project.tasks.create(name: 'jmhCompileGenerateClasses', type: JavaCompile) {
+            dependsOn 'jmhRunBytecodeGenerator'
+            inputs.dir jmhGeneratedSourcesDir
+            outputs.dir jmhGeneratedClassesDir
+
+            classpath = project.sourceSets.jmh.runtimeClasspath
+            source = project.fileTree(jmhGeneratedSourcesDir)
+            destinationDir = jmhGeneratedClassesDir
         }
 
         def metaInfExcludes = ['META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
             project.tasks.create(name: 'jmhJar', type: Jar) {
-                dependsOn 'jmhClasses'
+                dependsOn 'jmhCompileGenerateClasses'
                 inputs.dir project.sourceSets.jmh.output
                 doFirst {
                     def filter = { it.isDirectory() ? it : project.zipTree(it) }
@@ -73,6 +92,7 @@ class JMHPlugin implements Plugin<Project> {
                     }
                     from(project.sourceSets.jmh.output)
                     from(project.sourceSets.main.output)
+                    from(project.file(jmhGeneratedClassesDir))
                     if (extension.includeTests) {
                         from(project.configurations.testRuntime.collect(filter)) {
                             exclude metaInfExcludes
@@ -90,7 +110,6 @@ class JMHPlugin implements Plugin<Project> {
             }
         } else {
             def shadow = project.tasks.create(name: 'jmhJar', type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar',true, JMHPlugin.classLoader))
-
             shadow.group = 'jmh'
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.conventionMapping.with {
@@ -118,6 +137,7 @@ class JMHPlugin implements Plugin<Project> {
             }
             shadow.from(project.sourceSets.jmh.output)
             shadow.from(project.sourceSets.main.output)
+            shadow.from(project.file(jmhGeneratedClassesDir))
 
             shadow.configurations = [project.configurations.runtime, project.configurations.jmh]
             shadow.exclude(metaInfExcludes)
