@@ -22,7 +22,7 @@ import org.junit.Test
 
 class MultiLanguageTest {
     private File projectDir = new File("src/test/resources/multi-language-project")
-    private def pluginClasspath
+    private List<String> pluginClasspath
 
     @Before
     public void setUp() {
