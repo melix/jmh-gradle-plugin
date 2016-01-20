@@ -77,26 +77,25 @@ class JMHPlugin implements Plugin<Project> {
             destinationDir = jmhGeneratedClassesDir
         }
 
-        def metaInfExcludes = ['META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
             project.tasks.create(name: 'jmhJar', type: Jar) {
                 dependsOn 'jmhCompileGenerateClasses'
                 inputs.dir project.sourceSets.jmh.output
                 doFirst {
                     def filter = { it.isDirectory() ? it : project.zipTree(it) }
-                    from(project.configurations.jmh.collect(filter)) {
-                        exclude metaInfExcludes
+                    def exclusions = {
+                        exclude '**/META-INF/services/**'
+                        exclude '**/META-INF/*.SF'
+                        exclude '**/META-INF/*.DSA'
+                        exclude '**/META-INF/*.RSA'
                     }
-                    from(project.configurations.runtime.collect(filter)) {
-                        exclude metaInfExcludes
-                    }
+                    from(project.configurations.jmh.collect(filter), exclusions)
+                    from(project.configurations.runtime.collect(filter), exclusions)
                     from(project.sourceSets.jmh.output)
                     from(project.sourceSets.main.output)
                     from(project.file(jmhGeneratedClassesDir))
                     if (extension.includeTests) {
-                        from(project.configurations.testRuntime.collect(filter)) {
-                            exclude metaInfExcludes
-                        }
+                        from(project.configurations.testRuntime.collect(filter), exclusions)
                         from(project.sourceSets.test.output)
                     }
                 }
@@ -140,7 +139,7 @@ class JMHPlugin implements Plugin<Project> {
             shadow.from(project.file(jmhGeneratedClassesDir))
 
             shadow.configurations = [project.configurations.runtime, project.configurations.jmh]
-            shadow.exclude(metaInfExcludes)
+            shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
         }
 
         project.tasks.create(name: 'jmh', type: JavaExec) {
