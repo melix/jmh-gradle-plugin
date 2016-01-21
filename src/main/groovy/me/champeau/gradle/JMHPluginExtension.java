@@ -10,7 +10,7 @@ import java.util.Map;
 public class JMHPluginExtension {
     private final Project project;
 
-    private String jmhVersion = "1.3.2";
+    private String jmhVersion = "1.11.3";
     private boolean includeTests = true;
 
     private String include = ".*";
