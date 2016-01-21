@@ -1,3 +1,5 @@
+before_script:
+  - ./gradlew --version
 script: ./gradlew -s -PbuildInfo.build.number=$TRAVIS_BUILD_NUMBER -PbuildInfo.buildUrl=https://travis-ci.org/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_JOB_ID}
   -PbuildInfo.buildAgent.name=$USER -PbuildInfo.principal=$USER clean build
 jdk:
