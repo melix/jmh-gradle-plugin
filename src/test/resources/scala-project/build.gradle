@@ -1,0 +1,18 @@
+plugins {
+    id 'scala'
+    id 'me.champeau.gradle.jmh'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.11.7'
+}
+
+jmh {
+    jmhVersion = '1.11.3'
+    resultFormat = 'csv'
+    resultsFile = file('build/reports/benchmarks.csv')
+}

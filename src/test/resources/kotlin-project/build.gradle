@@ -9,29 +9,20 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'groovy'
-    id 'scala'
     id 'me.champeau.gradle.jmh'
 }
 apply plugin: 'kotlin'
 
 repositories {
     jcenter()
-    mavenCentral()
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.4.5'
-    compile 'org.scala-lang:scala-library:2.11.7'
     compile 'org.jetbrains.kotlin:kotlin-stdlib:0.14.451'
 }
 
-println sourceSets.jmh.output.classesDir
-println sourceSets.jmh.output.resourcesDir
-println sourceSets.jmh.output.dirs
-
 jmh {
     jmhVersion = '1.11.3'
-    resultFormat = "csv"
-    resultsFile = file("build/reports/benchmarks.csv")
+    resultFormat = 'csv'
+    resultsFile = file('build/reports/benchmarks.csv')
 }

@@ -1,0 +1,18 @@
+plugins {
+    id 'groovy'
+    id 'me.champeau.gradle.jmh'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.5'
+}
+
+jmh {
+    jmhVersion = '1.11.3'
+    resultFormat = 'csv'
+    resultsFile = file('build/reports/benchmarks.csv')
+}

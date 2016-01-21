@@ -17,37 +17,35 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.BuildTask
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.Before
-import org.junit.Test
+import spock.lang.Specification
+import spock.lang.Unroll
 
-class MultiLanguageTest {
-    private File projectDir = new File("src/test/resources/multi-language-project")
-    private List<String> pluginClasspath
-
-    @Before
-    public void setUp() {
+@Unroll
+class MultiLanguageSpec extends Specification {
+    def "Execute #language benchmarks"() {
+        given:
+        File projectDir = new File("src/test/resources/${language.toLowerCase()}-project")
         def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
         }
-        pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
-    }
+        List<String> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
 
-    @Test
-    public void runJmh() {
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath(pluginClasspath)
-                .withArguments("clean", "jmh")
-                .build();
+        BuildResult project = GradleRunner.create()
+            .withProjectDir(projectDir)
+            .withPluginClasspath(pluginClasspath)
+            .withArguments("clean", "jmh")
+            .build();
 
-        BuildTask taskResult = result.task(":jmh");
-        assert taskResult.outcome == TaskOutcome.SUCCESS
-
+        when:
+        BuildTask taskResult = project.task(":jmh");
         String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
-        ['JavaBenchmark', 'ScalaBenchmark', 'GroovyBenchmark', 'KotlinBenchmark'].each { bench ->
-            assert benchmarkResults.contains(bench+'.sqrtBenchmark')
-        }
-    }
 
+        then:
+        taskResult.outcome == TaskOutcome.SUCCESS
+        benchmarkResults.contains(language + 'Benchmark.sqrtBenchmark')
+
+        where:
+        language << ['Groovy', 'Java', 'Kotlin', 'Scala']
+    }
 }
