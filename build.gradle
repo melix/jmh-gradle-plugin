@@ -60,6 +60,20 @@ task testSample(type:GradleBuild) {
 }
 
 test {
-    testLogging.showStandardStreams = true
-}
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: " + descriptor)
+    }
 
+    onOutput { descriptor, event ->
+        logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+    }
+
+    testLogging {
+        showStandardStreams = true
+        afterSuite { desc, result ->
+            if (!desc.parent) {
+                println "Test results ${project.name}: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
+            }
+        }
+    }
+}
