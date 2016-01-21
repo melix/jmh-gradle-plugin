@@ -38,6 +38,7 @@ public class JMHPluginExtension {
     private List<Integer> threadGroups;
     private String timeUnit;
     private String verbosity;
+    private String timeout;
     private String warmup;
     private Integer warmupBatchSize;
     private Integer warmupForks;
@@ -75,6 +76,7 @@ public class JMHPluginExtension {
         addOption(args, resultFormat, "rf");
         addOption(args, synchronizeIterations, "si");
         addOption(args, threads, "t");
+        addOption(args, timeout, "to");
         addOption(args, threadGroups, "tg");
         addOption(args, timeUnit, "tu");
         addOption(args, verbosity, "v");
@@ -435,6 +437,14 @@ public class JMHPluginExtension {
 
     public void setIncludeTests(boolean includeTests) {
         this.includeTests = includeTests;
+    }
+
+    public String getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(String timeout) {
+        this.timeout = timeout;
     }
 
     private enum ResultFormatType {
