@@ -69,7 +69,7 @@ public class JMHPluginExtension {
         addOption(args, humanOutputFile, "o");
         addOption(args, operationsPerInvocation, "opi");
         addOption(args, benchmarkParameters, "p");
-        addOption(args, profilers, "prof");
+        addOption(args, profilers, "prof", "-prof");
         addOption(args, resultsFile, "rff");
         addOption(args, timeOnIteration, "r");
         addOption(args, resultFormat, "rf");
@@ -118,6 +118,10 @@ public class JMHPluginExtension {
     }
 
     private void addOption(List<String> options, List values, String option) {
+        addOption(options, values, option, ",");
+    }
+
+    private void addOption(List<String> options, List values, String option, String separator) {
         if (values!=null) {
             options.add("-"+option);
             StringBuilder sb = new StringBuilder();
@@ -125,7 +129,7 @@ public class JMHPluginExtension {
                 final Object value = values.get(i);
                 sb.append(value);
                 if (i<values.size()-1) {
-                    sb.append(",");
+                    sb.append(separator);
                 }
             }
             options.add(sb.toString());
