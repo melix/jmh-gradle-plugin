@@ -171,6 +171,13 @@ class JMHPlugin implements Plugin<Project> {
                     }
                 }
             }
+            def hasEclipsePlugin = project.plugins.findPlugin(org.gradle.plugins.ide.eclipse.EclipsePlugin)
+            def hasEclipseWtpPlugin = project.plugins.findPlugin(org.gradle.plugins.ide.eclipse.EclipseWtpPlugin)
+            if (hasEclipsePlugin != null || hasEclipseWtpPlugin != null) {
+                project.eclipse {
+                    classpath.plusConfigurations += [ project.configurations.jmh ]
+                }
+            }
         }
     }
 
