@@ -12,7 +12,6 @@ dependencies {
 }
 
 jmh {
-    jmhVersion = '1.11.3'
     resultFormat = 'csv'
     resultsFile = file('build/reports/benchmarks.csv')
 }
