@@ -13,7 +13,7 @@ public class JMHPluginExtension {
     private String jmhVersion = "1.11.3";
     private boolean includeTests = true;
 
-    private String include = ".*";
+    private String include = "";
     private String exclude;
     private String benchmarkMode;
     private Integer iterations;
