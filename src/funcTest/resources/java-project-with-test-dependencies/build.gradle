@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'me.champeau.gradle.jmh'
+}
+
+repositories {
+    jcenter()
+}
+
+jmh {
+    resultFormat = 'csv'
+    resultsFile = file('build/reports/benchmarks.csv')
+}
