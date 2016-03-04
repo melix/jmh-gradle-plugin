@@ -24,7 +24,7 @@ import spock.lang.Unroll
 class MultiLanguageSpec extends Specification {
     def "Execute #language benchmarks"() {
         given:
-        File projectDir = new File("src/test/resources/${language.toLowerCase()}-project")
+        File projectDir = new File("src/funcTest/resources/${language.toLowerCase()}-project")
         def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")

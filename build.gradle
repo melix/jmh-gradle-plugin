@@ -19,29 +19,17 @@ plugins {
 apply plugin: 'idea'
 apply from: 'gradle/credentials.gradle'
 apply from: 'gradle/compile.gradle'
+apply from: 'gradle/funcTest.gradle'
 apply from: 'gradle/publishing.gradle'
 apply from: 'gradle/bintray.gradle'
 apply from: 'gradle/artifactory.gradle'
 
-
-task createPluginClasspathManifest {
-    def outputDir = file("$buildDir/testClasspath")
-    inputs.files sourceSets.main.runtimeClasspath
-    outputs.dir outputDir
-
-    doLast {
-        outputDir.mkdirs()
-        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
-    }
-}
 
 dependencies {
     compile localGroovy()
     compile gradleApi()
 
     testCompile 'junit:junit:4.12'
-    testCompile gradleTestKit()
-    testRuntime files(createPluginClasspathManifest)
     testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
@@ -63,7 +51,7 @@ task testSample(type:GradleBuild) {
     tasks = ['jmh']
 }
 
-test {
+project.tasks.withType(Test) {
     beforeTest { descriptor ->
         logger.lifecycle("Running test: " + descriptor)
     }
