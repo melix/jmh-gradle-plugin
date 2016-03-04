@@ -32,6 +32,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 class JMHPlugin implements Plugin<Project> {
     static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
     static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
+    static final String JMH_GROUP = 'jmh'
 
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
@@ -58,6 +59,7 @@ class JMHPlugin implements Plugin<Project> {
         def jmhGeneratedSourcesDir = project.file("$project.buildDir/jmh-generated-sources")
         def jmhGeneratedClassesDir = project.file("$project.buildDir/jmh-generated-classes")
         project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JavaExec) {
+            group JMH_GROUP
             dependsOn 'jmhClasses'
             inputs.dir project.sourceSets.jmh.output
             outputs.dir jmhGeneratedSourcesDir
@@ -68,6 +70,7 @@ class JMHPlugin implements Plugin<Project> {
         }
 
         project.tasks.create(name: 'jmhCompileGenerateClasses', type: JavaCompile) {
+            group JMH_GROUP
             dependsOn 'jmhRunBytecodeGenerator'
             inputs.dir jmhGeneratedSourcesDir
             outputs.dir jmhGeneratedClassesDir
@@ -80,6 +83,7 @@ class JMHPlugin implements Plugin<Project> {
         def metaInfExcludes = ['META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
             project.tasks.create(name: 'jmhJar', type: Jar) {
+                group JMH_GROUP
                 dependsOn 'jmhCompileGenerateClasses'
                 inputs.dir project.sourceSets.jmh.output
                 doFirst {
@@ -110,7 +114,7 @@ class JMHPlugin implements Plugin<Project> {
             }
         } else {
             def shadow = project.tasks.create(name: 'jmhJar', type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar',true, JMHPlugin.classLoader))
-            shadow.group = 'jmh'
+            shadow.group = JMH_GROUP
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.conventionMapping.with {
                 map('classifier') {
@@ -144,6 +148,7 @@ class JMHPlugin implements Plugin<Project> {
         }
 
         project.tasks.create(name: 'jmh', type: JavaExec) {
+            group JMH_GROUP
             dependsOn project.jmhJar
             main = 'org.openjdk.jmh.Main'
             classpath = project.files { project.jmhJar.archivePath }
