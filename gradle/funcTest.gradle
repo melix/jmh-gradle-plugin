@@ -10,12 +10,12 @@ sourceSets {
 task createClasspathManifest {
     def outputDir = sourceSets.functionalTest.output.resourcesDir
 
-    inputs.files sourceSets.main.runtimeClasspath
+    inputs.files sourceSets.test.runtimeClasspath
     outputs.dir outputDir
 
     doLast {
         outputDir.mkdirs()
-        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.test.runtimeClasspath.join("\n")
     }
 }
 

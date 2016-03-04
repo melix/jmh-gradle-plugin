@@ -115,6 +115,7 @@ class JMHPlugin implements Plugin<Project> {
         } else {
             def shadow = project.tasks.create(name: 'jmhJar', type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar',true, JMHPlugin.classLoader))
             shadow.group = JMH_GROUP
+            shadow.dependsOn('jmhCompileGenerateClasses')
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.conventionMapping.with {
                 map('classifier') {
