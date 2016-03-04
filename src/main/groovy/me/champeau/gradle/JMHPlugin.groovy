@@ -69,7 +69,7 @@ class JMHPlugin implements Plugin<Project> {
             args = [project.sourceSets.jmh.output.classesDir, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, 'default']
         }
 
-        project.tasks.create(name: 'jmhCompileGenerateClasses', type: JavaCompile) {
+        project.tasks.create(name: 'jmhCompileGeneratedClasses', type: JavaCompile) {
             group JMH_GROUP
             dependsOn 'jmhRunBytecodeGenerator'
             inputs.dir jmhGeneratedSourcesDir
@@ -84,7 +84,7 @@ class JMHPlugin implements Plugin<Project> {
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
             project.tasks.create(name: 'jmhJar', type: Jar) {
                 group JMH_GROUP
-                dependsOn 'jmhCompileGenerateClasses'
+                dependsOn 'jmhCompileGeneratedClasses'
                 inputs.dir project.sourceSets.jmh.output
                 doFirst {
                     def filter = { it.isDirectory() ? it : project.zipTree(it) }
@@ -115,7 +115,7 @@ class JMHPlugin implements Plugin<Project> {
         } else {
             def shadow = project.tasks.create(name: 'jmhJar', type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar',true, JMHPlugin.classLoader))
             shadow.group = JMH_GROUP
-            shadow.dependsOn('jmhCompileGenerateClasses')
+            shadow.dependsOn('jmhCompileGeneratedClasses')
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.conventionMapping.with {
                 map('classifier') {
