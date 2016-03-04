@@ -67,7 +67,7 @@ class JMHPlugin implements Plugin<Project> {
             main = 'org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator'
             classpath = project.sourceSets.jmh.runtimeClasspath
             if (extension.includeTests) {
-                classpath += project.sourceSets.test.runtimeClasspath
+                classpath += project.sourceSets.test.output + project.sourceSets.test.runtimeClasspath
             }
             args = [project.sourceSets.jmh.output.classesDir, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, 'default']
         }
