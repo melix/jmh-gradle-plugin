@@ -34,6 +34,7 @@ dependencies {
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
+    testCompile 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
 }
 
 group='me.champeau.gradle'
