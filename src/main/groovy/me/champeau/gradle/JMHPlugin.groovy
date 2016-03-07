@@ -19,6 +19,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.invocation.Gradle
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
@@ -34,6 +35,7 @@ class JMHPlugin implements Plugin<Project> {
     static final String JMH_GROUP = 'jmh'
 
     void apply(Project project) {
+        project.plugins.apply(JavaPlugin)
         final JMHPluginExtension extension = project.extensions.create('jmh', JMHPluginExtension, project)
         final Configuration configuration = project.configurations.create('jmh')
         configuration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
@@ -45,6 +47,8 @@ class JMHPlugin implements Plugin<Project> {
 
         project.sourceSets {
             jmh {
+                java.srcDir 'src/jmh/java'
+                resources.srcDir 'src/jmh/resources'
                 compileClasspath += project.configurations.jmh + project.configurations.compile + main.output
                 runtimeClasspath += project.configurations.jmh + project.configurations.runtime + main.output
             }
