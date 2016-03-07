@@ -21,6 +21,6 @@ public class HelperClassFromTestPackage {
 	}
 
     public double compute() {
-        return Math.sqrt(value);
+        return org.apache.commons.lang3.math.IEEE754rUtils.min(value, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
     }
 }

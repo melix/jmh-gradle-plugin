@@ -7,6 +7,11 @@ repositories {
     jcenter()
 }
 
+dependencies {
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.apache.commons:commons-lang3:3.4'
+}
+
 jmh {
     resultFormat = 'csv'
     resultsFile = file('build/reports/benchmarks.csv')

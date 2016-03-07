@@ -79,6 +79,9 @@ class JMHPlugin implements Plugin<Project> {
             outputs.dir jmhGeneratedClassesDir
 
             classpath = project.sourceSets.jmh.runtimeClasspath
+            if (extension.includeTests) {
+                classpath += project.sourceSets.test.output + project.sourceSets.test.runtimeClasspath
+            }
             source = project.fileTree(jmhGeneratedSourcesDir)
             destinationDir = jmhGeneratedClassesDir
         }
