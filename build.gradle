@@ -15,9 +15,11 @@
  */
 
 plugins {
-    id 'com.jfrog.bintray' version '1.5'
+    id 'com.jfrog.bintray' version '1.6'
     id 'com.jfrog.artifactory' version '3.0.0'
     id 'com.github.hierynomus.license' version '0.11.0'
+    id 'net.nemerosa.versioning' version '1.6.2'
+    id 'com.github.ben-manes.versions' version '0.12.0'
 }
 
 apply plugin: 'idea'
@@ -35,7 +37,6 @@ dependencies {
     compile gradleApi()
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
