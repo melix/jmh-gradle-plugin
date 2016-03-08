@@ -32,6 +32,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 class JMHPlugin implements Plugin<Project> {
     static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
     static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
+    static final String JMH_GROUP = 'jmh'
 
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
@@ -58,21 +59,29 @@ class JMHPlugin implements Plugin<Project> {
         def jmhGeneratedSourcesDir = project.file("$project.buildDir/jmh-generated-sources")
         def jmhGeneratedClassesDir = project.file("$project.buildDir/jmh-generated-classes")
         project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JavaExec) {
+            group JMH_GROUP
             dependsOn 'jmhClasses'
             inputs.dir project.sourceSets.jmh.output
             outputs.dir jmhGeneratedSourcesDir
 
             main = 'org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator'
             classpath = project.sourceSets.jmh.runtimeClasspath
+            if (extension.includeTests) {
+                classpath += project.sourceSets.test.output + project.sourceSets.test.runtimeClasspath
+            }
             args = [project.sourceSets.jmh.output.classesDir, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, 'default']
         }
 
-        project.tasks.create(name: 'jmhCompileGenerateClasses', type: JavaCompile) {
+        project.tasks.create(name: 'jmhCompileGeneratedClasses', type: JavaCompile) {
+            group JMH_GROUP
             dependsOn 'jmhRunBytecodeGenerator'
             inputs.dir jmhGeneratedSourcesDir
             outputs.dir jmhGeneratedClassesDir
 
             classpath = project.sourceSets.jmh.runtimeClasspath
+            if (extension.includeTests) {
+                classpath += project.sourceSets.test.output + project.sourceSets.test.runtimeClasspath
+            }
             source = project.fileTree(jmhGeneratedSourcesDir)
             destinationDir = jmhGeneratedClassesDir
         }
@@ -80,7 +89,8 @@ class JMHPlugin implements Plugin<Project> {
         def metaInfExcludes = ['META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
             project.tasks.create(name: 'jmhJar', type: Jar) {
-                dependsOn 'jmhCompileGenerateClasses'
+                group JMH_GROUP
+                dependsOn 'jmhCompileGeneratedClasses'
                 inputs.dir project.sourceSets.jmh.output
                 doFirst {
                     def filter = { it.isDirectory() ? it : project.zipTree(it) }
@@ -110,7 +120,8 @@ class JMHPlugin implements Plugin<Project> {
             }
         } else {
             def shadow = project.tasks.create(name: 'jmhJar', type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar',true, JMHPlugin.classLoader))
-            shadow.group = 'jmh'
+            shadow.group = JMH_GROUP
+            shadow.dependsOn('jmhCompileGeneratedClasses')
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.conventionMapping.with {
                 map('classifier') {
@@ -144,6 +155,7 @@ class JMHPlugin implements Plugin<Project> {
         }
 
         project.tasks.create(name: 'jmh', type: JavaExec) {
+            group JMH_GROUP
             dependsOn project.jmhJar
             main = 'org.openjdk.jmh.Main'
             classpath = project.files { project.jmhJar.archivePath }

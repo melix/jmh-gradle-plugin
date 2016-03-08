@@ -12,14 +12,19 @@
  */
 
 package me.champeau.gradle
+
+import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Ignore
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 class JMHPluginTest {
     @Test
@@ -135,5 +140,35 @@ class JMHPluginTest {
         File expectedFile = project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/results.json")
         List options = project.jmh.buildArgs()
         assert project.relativePath(expectedFile) in options
+    }
+
+    @Test
+    void testAllJmhTasksBelongToJmhGroup() {
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenLocal()
+            jcenter()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.gradle.jmh'
+
+        project.tasks.find { it.name.startsWith('jmh') }.each {
+            assert it.group == JMHPlugin.JMH_GROUP
+        }
+    }
+
+    @Test
+    void testPluginIsAppliedTogetherWithShadow() {
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenLocal()
+            jcenter()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.johnrengelman.shadow'
+        project.apply plugin: 'me.champeau.gradle.jmh'
+
+        def task = project.tasks.findByName('jmhJar')
+        assert task instanceof ShadowJar
     }
 }
