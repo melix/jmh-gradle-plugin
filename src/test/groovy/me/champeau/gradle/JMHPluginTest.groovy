@@ -13,18 +13,15 @@
 
 package me.champeau.gradle
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Ignore
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 
 class JMHPluginTest {
     @Test
@@ -60,6 +57,24 @@ class JMHPluginTest {
     }
 
     @Test
+    void testPluginIsAppliedWithoutZip64() {
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenLocal()
+            jcenter()
+        }
+        project.apply plugin: 'groovy'
+        project.apply plugin: 'me.champeau.gradle.jmh'
+
+
+        def task = project.tasks.findByName('jmhJar')
+        assert task.zip64 == false
+        assert task instanceof Jar
+
+    }
+
+    @Ignore
+    @Test
     void testPluginIsAppliedWithZip64() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
@@ -70,6 +85,7 @@ class JMHPluginTest {
         project.apply plugin: 'me.champeau.gradle.jmh'
 
         project.jmh.zip64 = true
+
 
         def task = project.tasks.findByName('jmhJar')
         assert task instanceof Jar

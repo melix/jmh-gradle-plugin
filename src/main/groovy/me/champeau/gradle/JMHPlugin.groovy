@@ -33,11 +33,14 @@ class JMHPlugin implements Plugin<Project> {
     static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
     static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
     static final String JMH_GROUP = 'jmh'
+    static final String JMH_NAME = 'jmh'
+    static final String JMH_JAR_TASK_NAME = 'jmhJar'
+    static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
 
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
-        final JMHPluginExtension extension = project.extensions.create('jmh', JMHPluginExtension, project)
-        final Configuration configuration = project.configurations.create('jmh')
+        final JMHPluginExtension extension = project.extensions.create(JMH_NAME, JMHPluginExtension, project)
+        final Configuration configuration = project.configurations.create(JMH_NAME)
         configuration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
             DependencyHandler dependencyHandler = project.getDependencies();
             def dependencies = configuration.getDependencies()
@@ -72,7 +75,7 @@ class JMHPlugin implements Plugin<Project> {
             args = [project.sourceSets.jmh.output.classesDir, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, 'default']
         }
 
-        project.tasks.create(name: 'jmhCompileGeneratedClasses', type: JavaCompile) {
+        project.tasks.create(name: JMH_TASK_COMPILE_GENERATED_CLASSES_NAME, type: JavaCompile) {
             group JMH_GROUP
             dependsOn 'jmhRunBytecodeGenerator'
             inputs.dir jmhGeneratedSourcesDir
@@ -88,9 +91,9 @@ class JMHPlugin implements Plugin<Project> {
 
         def metaInfExcludes = ['META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
         if (project.plugins.findPlugin('com.github.johnrengelman.shadow') == null) {
-            project.tasks.create(name: 'jmhJar', type: Jar) {
+            project.tasks.create(name: JMH_JAR_TASK_NAME, type: Jar) {
                 group JMH_GROUP
-                dependsOn 'jmhCompileGeneratedClasses'
+                dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
                 inputs.dir project.sourceSets.jmh.output
                 doFirst {
                     def filter = { it.isDirectory() ? it : project.zipTree(it) }
@@ -115,17 +118,16 @@ class JMHPlugin implements Plugin<Project> {
                     attributes 'Main-Class': 'org.openjdk.jmh.Main'
                 }
 
-                classifier = 'jmh'
-                zip64 = { extension.zip64 }
+                classifier = JMH_NAME
             }
         } else {
-            def shadow = project.tasks.create(name: 'jmhJar', type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar',true, JMHPlugin.classLoader))
+            def shadow = project.tasks.create(name: JMH_JAR_TASK_NAME, type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar',true, JMHPlugin.classLoader))
             shadow.group = JMH_GROUP
-            shadow.dependsOn('jmhCompileGeneratedClasses')
+            shadow.dependsOn(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME)
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.conventionMapping.with {
                 map('classifier') {
-                    'jmh'
+                    JMH_NAME
                 }
             }
             shadow.manifest.inheritFrom project.tasks.jar.manifest
@@ -154,7 +156,7 @@ class JMHPlugin implements Plugin<Project> {
             shadow.exclude(metaInfExcludes)
         }
 
-        project.tasks.create(name: 'jmh', type: JavaExec) {
+        project.tasks.create(name: JMH_NAME, type: JavaExec) {
             group JMH_GROUP
             dependsOn project.jmhJar
             main = 'org.openjdk.jmh.Main'
@@ -206,6 +208,9 @@ class JMHPlugin implements Plugin<Project> {
                         }
                     }
                 }
+
+                def task = project.tasks.findByName(JMH_JAR_TASK_NAME)
+                task.zip64 = extension.zip64
             }
         })
     }
