@@ -168,8 +168,8 @@ public class JMHPluginExtension {
             for (int i = 0; i < values.size(); i++) {
                 final Map.Entry entry = values.get(i);
                 sb.append(entry.getKey()).append("=").append(entry.getValue());
-                if (i<values.size()-1) {
-                    sb.append(",");
+                if (i < values.size() - 1) {
+                    sb.append(" -" + option + " ");
                 }
             }
             options.add(sb.toString());
