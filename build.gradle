@@ -37,9 +37,6 @@ dependencies {
     testCompile 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
 }
 
-group='me.champeau.gradle'
-version='0.3.0-SNAPSHOT'
-
 task release {
     description = "Releases a version of the plugin on Artifactory and Bintray"
     dependsOn artifactoryPublish, bintrayUpload
