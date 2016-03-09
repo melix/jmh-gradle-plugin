@@ -95,3 +95,17 @@ publishing {
         }
     }
 }
+
+pluginBundle {
+    website = 'https://github.com/melix/jmh-gradle-plugin'
+    vcsUrl = 'https://github.com/melix/jmh-gradle-plugin'
+    description = 'Integrates the JMH microbenchmarking framework with Gradle'
+    tags = ['jmh']
+
+    plugins {
+        jmhPlugin {
+            id = 'me.champeau.gradle.jmh'
+            displayName = 'Gradle JMH plugin'
+        }
+    }
+}
