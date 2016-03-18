@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:0.14.451'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.1'
     }
 }
 
@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jetbrains.kotlin:kotlin-stdlib:0.14.451'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.0.1'
 }
 
 jmh {
