@@ -1,0 +1,8 @@
+plugins {
+    id 'java'
+    id 'me.champeau.gradle.jmh'
+}
+
+repositories {
+    jcenter()
+}
