@@ -20,13 +20,11 @@ import org.gradle.testkit.runner.BuildTask
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Specification
-import spock.lang.Unroll
 
-@Unroll
-class JmhWithShadowPluginSpec extends Specification {
-    def "Run #language benchmarks that are packaged with Shadow plugin"() {
+class ProjectWithDuplicateClassesSpec extends Specification {
+    def "Fail the build if duplicate classes detected"() {
         given:
-        File projectDir = new File("src/funcTest/resources/${language.toLowerCase()}-project")
+        File projectDir = new File("src/funcTest/resources/java-project-with-duplicate-classes")
         def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
@@ -34,20 +32,15 @@ class JmhWithShadowPluginSpec extends Specification {
         List<String> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
 
         BuildResult project = GradleRunner.create()
-            .withProjectDir(projectDir)
-            .withPluginClasspath(pluginClasspath)
-            .withArguments("clean", "jmh")
-            .build();
+                .withProjectDir(projectDir)
+                .withPluginClasspath(pluginClasspath)
+                .withArguments("clean", "jmh")
+                .buildAndFail();
 
         when:
-        BuildTask taskResult = project.task(":jmh");
-        String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
+        BuildTask taskResult = project.task(":jmhJar");
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains(language + 'Benchmark.sqrtBenchmark')
-
-        where:
-        language << ['Java', 'Scala']
+        taskResult.outcome == TaskOutcome.FAILED
     }
 }
