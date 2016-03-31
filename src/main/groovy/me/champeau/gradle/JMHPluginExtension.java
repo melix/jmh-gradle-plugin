@@ -21,6 +21,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.unique;
 
 public class JMHPluginExtension {
     private final Project project;
@@ -30,7 +33,7 @@ public class JMHPluginExtension {
 
     private String include = "";
     private String exclude;
-    private String benchmarkMode;
+    private List<String> benchmarkMode;
     private Integer iterations;
     private Integer batchSize;
     private Integer fork;
@@ -73,7 +76,7 @@ public class JMHPluginExtension {
         args.add(include);
         addOption(args, exclude, "e");
         addOption(args, iterations, "i");
-        addOption(args, benchmarkMode, "bm");
+        addOption(args, unique(benchmarkMode), "bm");
         addOption(args, batchSize, "bs");
         addOption(args, fork, "f");
         addOption(args, failOnError, "foe");
@@ -190,6 +193,11 @@ public class JMHPluginExtension {
             options.add(sb.toString());
         }
     }
+
+    private List<String> asList(Set<String> set) {
+        return set != null ? new ArrayList<String>(set) : null;
+    }
+
     public String getInclude() {
         return include;
     }
@@ -206,11 +214,11 @@ public class JMHPluginExtension {
         this.exclude = exclude;
     }
 
-    public String getBenchmarkMode() {
+    public List<String> getBenchmarkMode() {
         return benchmarkMode;
     }
 
-    public void setBenchmarkMode(String benchmarkMode) {
+    public void setBenchmarkMode(List<String> benchmarkMode) {
         this.benchmarkMode = benchmarkMode;
     }
 
