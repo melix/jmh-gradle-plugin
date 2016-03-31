@@ -22,23 +22,70 @@ import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Specification
 
 class ProjectWithDuplicateClassesSpec extends Specification {
-    def "Fail the build if duplicate classes detected"() {
-        given:
-        File projectDir = new File("src/funcTest/resources/java-project-with-duplicate-classes")
+    File projectDir
+    File buildFile
+    List<File> pluginClasspath
+
+    def setup() {
+        projectDir = new File("src/funcTest/resources/java-project-with-duplicate-classes")
+        buildFile = new File(projectDir, 'build.gradle')
+        assert buildFile.createNewFile()
         def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
         }
-        List<String> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+        pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+    }
 
-        BuildResult project = GradleRunner.create()
+    def cleanup() {
+        assert buildFile.delete()
+    }
+
+    def "Fail the build while executing jmhJar task"() {
+        given:
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'me.champeau.gradle.jmh'
+            }
+
+            repositories {
+                jcenter()
+            }
+                    """
+        BuildResult project = configure().buildAndFail()
+
+        when:
+        BuildTask taskResult = project.task(":jmhJar")
+
+        then:
+        taskResult.outcome == TaskOutcome.FAILED
+    }
+
+    GradleRunner configure() {
+        return GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath(pluginClasspath)
                 .withArguments("clean", "jmh")
-                .buildAndFail();
+    }
+
+    def "Fail the build while executing jmhJar task when Shadow plugin applied"() {
+        given:
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.johnrengelman.shadow'
+                id 'me.champeau.gradle.jmh'
+            }
+
+            repositories {
+                jcenter()
+            }
+                    """
+        BuildResult project = configure().buildAndFail()
 
         when:
-        BuildTask taskResult = project.task(":jmhJar");
+        BuildTask taskResult = project.task(":jmhJar")
 
         then:
         taskResult.outcome == TaskOutcome.FAILED
