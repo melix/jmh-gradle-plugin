@@ -76,7 +76,7 @@ public class JMHPluginExtension {
         args.add(include);
         addOption(args, exclude, "e");
         addOption(args, iterations, "i");
-        addOption(args, unique(benchmarkMode), "bm");
+        addOption(args, benchmarkMode != null ? unique(benchmarkMode) : null, "bm");
         addOption(args, batchSize, "bs");
         addOption(args, fork, "f");
         addOption(args, failOnError, "foe");
