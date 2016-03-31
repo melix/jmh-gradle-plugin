@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.unique;
+
 public class JMHPluginExtension {
     private final Project project;
 
@@ -31,7 +33,7 @@ public class JMHPluginExtension {
 
     private String include = "";
     private String exclude;
-    private Set<String> benchmarkMode;
+    private List<String> benchmarkMode;
     private Integer iterations;
     private Integer batchSize;
     private Integer fork;
@@ -74,7 +76,7 @@ public class JMHPluginExtension {
         args.add(include);
         addOption(args, exclude, "e");
         addOption(args, iterations, "i");
-        addOption(args, asList(benchmarkMode), "bm");
+        addOption(args, unique(benchmarkMode), "bm");
         addOption(args, batchSize, "bs");
         addOption(args, fork, "f");
         addOption(args, failOnError, "foe");
@@ -212,11 +214,11 @@ public class JMHPluginExtension {
         this.exclude = exclude;
     }
 
-    public Set<String> getBenchmarkMode() {
+    public List<String> getBenchmarkMode() {
         return benchmarkMode;
     }
 
-    public void setBenchmarkMode(Set<String> benchmarkMode) {
+    public void setBenchmarkMode(List<String> benchmarkMode) {
         this.benchmarkMode = benchmarkMode;
     }
 
