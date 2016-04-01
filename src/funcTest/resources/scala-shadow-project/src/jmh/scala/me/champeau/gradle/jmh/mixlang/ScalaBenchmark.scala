@@ -19,8 +19,8 @@ import org.openjdk.jmh.annotations._
 
 @State(Scope.Benchmark)
 @Fork(1)
-@Warmup(iterations = 1)
-@Measurement(iterations = 5)
+@Warmup(iterations = 0)
+@Measurement(iterations = 1)
 class ScalaBenchmark {
   var value: Double = 0
 

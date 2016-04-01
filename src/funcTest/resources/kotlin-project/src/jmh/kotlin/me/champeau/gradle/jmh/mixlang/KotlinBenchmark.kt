@@ -17,8 +17,8 @@ import org.openjdk.jmh.annotations.*
 
 @State(Scope.Benchmark)
 @Fork(1)
-@Warmup(iterations = 1)
-@Measurement(iterations = 5)
+@Warmup(iterations = 0)
+@Measurement(iterations = 1)
 open class KotlinBenchmark {
     var value: Double = 0.0
 
