@@ -100,19 +100,15 @@ class JMHPlugin implements Plugin<Project> {
                 inputs.dir project.sourceSets.jmh.output
                 doFirst {
                     def filter = { it.isDirectory() ? it : project.zipTree(it) }
-                    from(project.configurations.jmh.collect(filter)) {
-                        exclude metaInfExcludes
-                    }
-                    from(project.configurations.runtime.collect(filter)) {
+                    Configuration depsConfig = createConfigurationToResolveDependencies(project, extension)
+                    def dependencies = depsConfig.resolve()
+                    from(dependencies.collect(filter)) {
                         exclude metaInfExcludes
                     }
                     from(project.sourceSets.jmh.output)
                     from(project.sourceSets.main.output)
                     from(project.file(jmhGeneratedClassesDir))
                     if (extension.includeTests) {
-                        from(project.configurations.testRuntime.collect(filter)) {
-                            exclude metaInfExcludes
-                        }
                         from(project.sourceSets.test.output)
                     }
                 }
@@ -147,15 +143,14 @@ class JMHPlugin implements Plugin<Project> {
                 processLibs project.configurations.shadow.files
 
                 if (extension.includeTests) {
-                    task.configurations += [project.configurations.testRuntime]
                     task.from(project.sourceSets.test.output)
                 }
+                task.configurations += createConfigurationToResolveDependencies(project, extension)
             }
             shadow.from(project.sourceSets.jmh.output)
             shadow.from(project.sourceSets.main.output)
             shadow.from(project.file(jmhGeneratedClassesDir))
 
-            shadow.configurations = [project.configurations.runtime, project.configurations.jmh]
             shadow.exclude(metaInfExcludes)
         }
 
@@ -216,5 +211,15 @@ class JMHPlugin implements Plugin<Project> {
                 task.zip64 = extension.zip64
             }
         })
+    }
+
+    private Configuration createConfigurationToResolveDependencies(Project project, JMHPluginExtension extension) {
+        def newConfig = project.configurations.detachedConfiguration().setVisible(false)
+        newConfig.dependencies.addAll(project.configurations.jmh.allDependencies)
+        newConfig.dependencies.addAll(project.configurations.runtime.allDependencies)
+        if (extension.includeTests) {
+            newConfig.dependencies.addAll(project.configurations.testRuntime.allDependencies)
+        }
+        newConfig
     }
 }
