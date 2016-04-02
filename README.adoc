@@ -1,5 +1,5 @@
 = JMH Gradle Plugin
-:jmh-version: 1.11.3
+:jmh-version: 1.12
 
 This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
 
@@ -46,7 +46,7 @@ The plugin uses JMH '{jmh-version}'. You can change JMH version in the `jmh` blo
 .build.gradle
 ----
 jmh {
-    jmhVersion = '1.11.2'
+    jmhVersion = '1.12'
 }
 
 ----

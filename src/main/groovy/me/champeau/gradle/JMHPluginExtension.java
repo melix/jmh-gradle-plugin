@@ -29,7 +29,7 @@ import static org.codehaus.groovy.runtime.DefaultGroovyMethods.unique;
 public class JMHPluginExtension {
     private final Project project;
 
-    private String jmhVersion = "1.11.3";
+    private String jmhVersion = "1.12";
     private boolean includeTests = true;
 
     private String include = "";
