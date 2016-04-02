@@ -6,18 +6,31 @@ This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH 
 
 == Usage
 
-To enable the plugin, you must add this to your `build.gradle` file:
+Build script snippet for use in all Gradle versions:
+[source,groovy]
+[subs="attributes"]
+.build.gradle
+----
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath "me.champeau.gradle:jmh-gradle-plugin:{plugin-version}"
+  }
+}
 
+apply plugin: "me.champeau.gradle.jmh"
+----
+
+Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 [source,groovy]
 [subs="attributes"]
 .build.gradle
 ----
 plugins {
-   id 'me.champeau.gradle.jmh' version '{plugin-version}'
+  id "me.champeau.gradle.jmh" version "{plugin-version}"
 }
-
-apply plugin: 'me.champeau.gradle.jmh'
-
 ----
 
 == Configuration
