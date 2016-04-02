@@ -21,6 +21,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec
@@ -110,6 +111,11 @@ class JMHPlugin implements Plugin<Project> {
                     if (extension.includeTests) {
                         from(project.sourceSets.test.output)
                     }
+                    eachFile { FileCopyDetails f ->
+                        if(f.name.endsWith('.class')) {
+                            f.setDuplicatesStrategy(extension.duplicateClassesStrategy)
+                        }
+                    }
                 }
 
                 manifest {
@@ -145,6 +151,11 @@ class JMHPlugin implements Plugin<Project> {
                     task.from(project.sourceSets.test.output)
                 }
                 task.from(resolveDependencies(project, extension))
+                task.eachFile { FileCopyDetails f ->
+                    if(f.name.endsWith('.class')) {
+                        f.setDuplicatesStrategy(extension.duplicateClassesStrategy)
+                    }
+                }
             }
             shadow.from(project.sourceSets.jmh.output)
             shadow.from(project.sourceSets.main.output)
