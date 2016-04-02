@@ -100,8 +100,7 @@ class JMHPlugin implements Plugin<Project> {
                 inputs.dir project.sourceSets.jmh.output
                 doFirst {
                     def filter = { it.isDirectory() ? it : project.zipTree(it) }
-                    Configuration depsConfig = createConfigurationToResolveDependencies(project, extension)
-                    def dependencies = depsConfig.resolve()
+                    def dependencies = resolveDependencies(project, extension)
                     from(dependencies.collect(filter)) {
                         exclude metaInfExcludes
                     }
@@ -145,13 +144,14 @@ class JMHPlugin implements Plugin<Project> {
                 if (extension.includeTests) {
                     task.from(project.sourceSets.test.output)
                 }
-                task.configurations += createConfigurationToResolveDependencies(project, extension)
+                task.from(resolveDependencies(project, extension))
             }
             shadow.from(project.sourceSets.jmh.output)
             shadow.from(project.sourceSets.main.output)
             shadow.from(project.file(jmhGeneratedClassesDir))
 
             shadow.exclude(metaInfExcludes)
+            shadow.configurations = []
         }
 
         project.tasks.create(name: JMH_NAME, type: JavaExec) {
@@ -213,13 +213,13 @@ class JMHPlugin implements Plugin<Project> {
         })
     }
 
-    private Configuration createConfigurationToResolveDependencies(Project project, JMHPluginExtension extension) {
+    private Set<File> resolveDependencies(Project project, JMHPluginExtension extension) {
         def newConfig = project.configurations.detachedConfiguration().setVisible(false)
         newConfig.dependencies.addAll(project.configurations.jmh.allDependencies)
         newConfig.dependencies.addAll(project.configurations.runtime.allDependencies)
         if (extension.includeTests) {
             newConfig.dependencies.addAll(project.configurations.testRuntime.allDependencies)
         }
-        newConfig
+        newConfig.resolve()
     }
 }
