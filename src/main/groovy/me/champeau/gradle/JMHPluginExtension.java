@@ -16,6 +16,7 @@
 package me.champeau.gradle;
 
 import org.gradle.api.Project;
+import org.gradle.api.file.DuplicatesStrategy;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public class JMHPluginExtension {
     private String warmupMode;
     private List<String> warmupBenchmarks;
     private boolean zip64 = false;
+    private DuplicatesStrategy duplicateClassesStrategy = DuplicatesStrategy.FAIL;
 
     public JMHPluginExtension(final Project project) {
         this.project = project;
@@ -468,6 +470,15 @@ public class JMHPluginExtension {
 
     public void setTimeout(String timeout) {
         this.timeout = timeout;
+    }
+
+
+    public DuplicatesStrategy getDuplicateClassesStrategy() {
+        return duplicateClassesStrategy;
+    }
+
+    public void setDuplicateClassesStrategy(DuplicatesStrategy duplicateClassesStrategy) {
+        this.duplicateClassesStrategy = duplicateClassesStrategy;
     }
 
     private enum ResultFormatType {

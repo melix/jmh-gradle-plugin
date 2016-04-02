@@ -90,4 +90,57 @@ class ProjectWithDuplicateClassesSpec extends Specification {
         then:
         taskResult.outcome == TaskOutcome.FAILED
     }
+
+    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used"() {
+        given:
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'me.champeau.gradle.jmh'
+            }
+
+            repositories {
+                jcenter()
+            }
+
+            jmh {
+                duplicateClassesStrategy = 'warn'
+            }
+                    """
+        BuildResult project = configure().build()
+
+        when:
+        BuildTask taskResult = project.task(":jmh")
+
+        then:
+        taskResult.outcome == TaskOutcome.SUCCESS
+        project.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+    }
+
+    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used and Shadow plugin applied"() {
+        given:
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.johnrengelman.shadow'
+                id 'me.champeau.gradle.jmh'
+            }
+
+            repositories {
+                jcenter()
+            }
+
+            jmh {
+                duplicateClassesStrategy = 'warn'
+            }
+                    """
+        BuildResult project = configure().build()
+
+        when:
+        BuildTask taskResult = project.task(":jmh")
+
+        then:
+        taskResult.outcome == TaskOutcome.SUCCESS
+        project.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+    }
 }
