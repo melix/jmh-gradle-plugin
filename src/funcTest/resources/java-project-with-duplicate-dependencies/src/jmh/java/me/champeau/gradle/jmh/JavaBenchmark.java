@@ -17,15 +17,20 @@ package me.champeau.gradle.jmh;
 
 import org.openjdk.jmh.annotations.*;
 
+import java.util.Date;
+
 @State(Scope.Benchmark)
 @Fork(1)
 @Warmup(iterations = 0)
 @Measurement(iterations = 1)
-public class JavaBenchmarkThatDependsOnTest {
+public class JavaBenchmark {
     private HelperClassFromTestPackage helper;
 
     @Setup
     public void setUp() {
+        System.out.println(org.apache.commons.lang3.time.FastDateFormat.getInstance().format(new Date()));
+        System.out.println(new DateFormatter().format(new Date()));
+        System.out.println(org.apache.commons.lang3.ClassUtils.getAbbreviatedName(getClass(), 15));
         helper = new HelperClassFromTestPackage(2.5);
     }
 

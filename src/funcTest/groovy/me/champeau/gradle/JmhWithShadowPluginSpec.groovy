@@ -20,11 +20,13 @@ import org.gradle.testkit.runner.BuildTask
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Specification
+import spock.lang.Unroll
 
+@Unroll
 class JmhWithShadowPluginSpec extends Specification {
-    def "Run benchmarks that are packaged with Shadow plugin"() {
+    def "Run #language benchmarks that are packaged with Shadow plugin"() {
         given:
-        File projectDir = new File("src/funcTest/resources/java-shadow-project")
+        File projectDir = new File("src/funcTest/resources/${language.toLowerCase()}-project")
         def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
@@ -43,6 +45,9 @@ class JmhWithShadowPluginSpec extends Specification {
 
         then:
         taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains('JavaBenchmark.sqrtBenchmark')
+        benchmarkResults.contains(language + 'Benchmark.sqrtBenchmark')
+
+        where:
+        language << ['Java', 'Scala']
     }
 }

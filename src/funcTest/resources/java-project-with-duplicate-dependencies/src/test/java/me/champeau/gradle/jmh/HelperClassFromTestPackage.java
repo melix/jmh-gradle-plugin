@@ -15,22 +15,14 @@
  */
 package me.champeau.gradle.jmh;
 
-import org.openjdk.jmh.annotations.*;
+public class HelperClassFromTestPackage {
+    private double value;
+	
+	public HelperClassFromTestPackage(double value) {
+		this.value = value;
+	}
 
-@State(Scope.Benchmark)
-@Fork(1)
-@Warmup(iterations = 0)
-@Measurement(iterations = 1)
-public class JavaBenchmarkThatDependsOnTest {
-    private HelperClassFromTestPackage helper;
-
-    @Setup
-    public void setUp() {
-        helper = new HelperClassFromTestPackage(2.5);
-    }
-
-    @Benchmark
-    public double sqrtBenchmark(){
-        return helper.compute();
+    public double compute() {
+        return org.apache.commons.lang3.math.IEEE754rUtils.min(value, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
     }
 }

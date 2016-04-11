@@ -15,22 +15,15 @@
  */
 package me.champeau.gradle.jmh;
 
-import org.openjdk.jmh.annotations.*;
+import org.apache.commons.lang3.time.FastDateFormat;
 
-@State(Scope.Benchmark)
-@Fork(1)
-@Warmup(iterations = 0)
-@Measurement(iterations = 1)
-public class JavaBenchmarkThatDependsOnTest {
-    private HelperClassFromTestPackage helper;
+import java.util.Date;
 
-    @Setup
-    public void setUp() {
-        helper = new HelperClassFromTestPackage(2.5);
-    }
+public class DateFormatter {
+    private static final FastDateFormat DATE_FORMATTER =
+            FastDateFormat.getDateTimeInstance(FastDateFormat.LONG, FastDateFormat.SHORT);
 
-    @Benchmark
-    public double sqrtBenchmark(){
-        return helper.compute();
+    public String format(Date date) {
+        return DATE_FORMATTER.format(date);
     }
 }

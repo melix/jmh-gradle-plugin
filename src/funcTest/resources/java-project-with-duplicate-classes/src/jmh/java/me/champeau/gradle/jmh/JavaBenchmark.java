@@ -21,16 +21,16 @@ import org.openjdk.jmh.annotations.*;
 @Fork(1)
 @Warmup(iterations = 0)
 @Measurement(iterations = 1)
-public class JavaBenchmarkThatDependsOnTest {
-    private HelperClassFromTestPackage helper;
+public class JavaBenchmark {
+    private double value;
 
     @Setup
     public void setUp() {
-        helper = new HelperClassFromTestPackage(2.5);
+        value = 3.0;
     }
 
     @Benchmark
     public double sqrtBenchmark(){
-        return helper.compute();
+        return Math.sqrt(value);
     }
 }

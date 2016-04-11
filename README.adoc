@@ -1,21 +1,36 @@
 = JMH Gradle Plugin
-:jmh-version: 1.11.3
+:jmh-version: 1.12
+:plugin-version: 0.3.0
 
 This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
 
 == Usage
 
-To enable the plugin, you must add this to your `build.gradle` file:
-
+Build script snippet for use in all Gradle versions:
 [source,groovy]
+[subs="attributes"]
+.build.gradle
+----
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath "me.champeau.gradle:jmh-gradle-plugin:{plugin-version}"
+  }
+}
+
+apply plugin: "me.champeau.gradle.jmh"
+----
+
+Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
+[source,groovy]
+[subs="attributes"]
 .build.gradle
 ----
 plugins {
-   id 'me.champeau.gradle.jmh' version '0.3.0'
+  id "me.champeau.gradle.jmh" version "{plugin-version}"
 }
-
-apply plugin: 'me.champeau.gradle.jmh'
-
 ----
 
 == Configuration
@@ -43,10 +58,11 @@ dependencies {
 The plugin uses JMH '{jmh-version}'. You can change JMH version in the `jmh` block:
 
 [source,groovy]
+[subs="attributes"]
 .build.gradle
 ----
 jmh {
-    jmhVersion = '1.11.2'
+    jmhVersion = '{jmh-version}'
 }
 
 ----
@@ -54,7 +70,7 @@ jmh {
 The jars
 
 * `org.openjdk.jmh:jmh-core`
-* `org.openjdk.jmh:jmh-generator-annprocess`
+* `org.openjdk.jmh:jmh-generator-bytecode`
 
 will be automatically added to the list of library dependencies for the jmh configuration.
 
@@ -62,9 +78,11 @@ will be automatically added to the list of library dependencies for the jmh conf
 
 The project will add several tasks:
 
-* `jmhClasses` : compiles the benchmarks
-* `jmhJar`     : builds the JMH jar containing the JHM runtime and your compiled benchmark classes
-* `jmh`        : executes the benchmarks
+* `jmhClasses`                 : compiles raw benchmark code
+* `jmhRunBytecodeGenerator`    : runs bytecode generator over raw benchmark code and generates actual benchmarks
+* `jmhCompileGeneratedClasses` : compiles generated benchmarks
+* `jmhJar`                     : builds the JMH jar containing the JHM runtime and your compiled benchmark classes
+* `jmh`                        : executes the benchmarks
     
 The `jmh` task is the main task and depends on the others so it is in general sufficient to execute this task:
 
@@ -117,7 +135,8 @@ jmh {
 
    zip64 = true // Use ZIP64 format for bigger archives
    jmhVersion = '{jmh-version}' // Specifies JMH version
-   includeTests = false // Allows to include test sources into generate JMH jar, i.e. use it when benchmarks depend on the test classes.
+   includeTests = true // Allows to include test sources into generate JMH jar, i.e. use it when benchmarks depend on the test classes.
+   duplicateClassesStrategy = 'fail' // Strategy to apply when encountring duplicate classes during creation of the fat jar (i.e. while executing jmhJar task)
 }
 ----
 
@@ -130,6 +149,7 @@ the reason why you must put your files into `src/jmh/java` instead of `src/main/
 It is possible a dependency on the `test` source set by setting property `includeTests` to true inside `jmh` block.
 
 == Using JMH Gradle Plugin with Shadow Plugin
+
 Optionally it is possible to use https://github.com/johnrengelman/shadow/[Shadow Plugin] to do actual JMH jar
 creation. The configuration of Shadow Plugin for JMH jar is done via `jmhJar` block.
 For example:
@@ -142,4 +162,29 @@ jmhJar {
   exclude 'LICENSE'
 }
 ----
+
+== Duplicate dependencies and classes
+
+This plugin will merge all dependencies that are defined as part of `jmh`, `runtime` and optionally `testRuntime`
+configurations into a single set from which fat jar will be created when executing `jmhJar` task. This is done to ensure
+that no duplicate dependencies will be added the generated jar.
+
+In addition plugin applies https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html[DuplicatesStrategy]
+defined via `duplicateClassesStrategy` extension property to every class while creating fat jar. By default this
+property is set to `DuplicatesStrategy.FAIL` which means that upon detection of
+duplicate classes the task will fail.
+
+It is possible to change this behavior by configuring `duplicateClassesStrategy` property via `jmh` block, e.g.:
+[source,groovy]
+.build.gradle
+----
+jmh {
+  duplicateClassesStrategy = 'warn'
+}
+----
+However if you do encounter problem with defaut value it means that the classpath or sources in your project do contain
+duplicate classes which means that it is not possible to predict which one will be used when fat jar will generated.
+
+To deal with duplicate files other than classes use
+https://github.com/johnrengelman/shadow/[Shadow Plugin] capabilities, see <<Using JMH Gradle Plugin with Shadow Plugin>>.
 

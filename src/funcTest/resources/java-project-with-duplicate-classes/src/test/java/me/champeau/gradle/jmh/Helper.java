@@ -15,22 +15,5 @@
  */
 package me.champeau.gradle.jmh;
 
-import org.openjdk.jmh.annotations.*;
-
-@State(Scope.Benchmark)
-@Fork(1)
-@Warmup(iterations = 0)
-@Measurement(iterations = 1)
-public class JavaBenchmarkThatDependsOnTest {
-    private HelperClassFromTestPackage helper;
-
-    @Setup
-    public void setUp() {
-        helper = new HelperClassFromTestPackage(2.5);
-    }
-
-    @Benchmark
-    public double sqrtBenchmark(){
-        return helper.compute();
-    }
+public class Helper {
 }

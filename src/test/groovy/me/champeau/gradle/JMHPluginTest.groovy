@@ -19,6 +19,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
@@ -188,5 +189,18 @@ class JMHPluginTest {
 
         def task = project.tasks.findByName('jmhJar')
         assert task instanceof ShadowJar
+    }
+
+    @Test
+    void testDuplicateClassesStrategyIsSetToFailByDefault() {
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenLocal()
+            jcenter()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.gradle.jmh'
+
+        assert project.jmh.duplicateClassesStrategy == DuplicatesStrategy.FAIL
     }
 }
