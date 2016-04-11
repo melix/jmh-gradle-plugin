@@ -196,10 +196,6 @@ public class JMHPluginExtension {
         }
     }
 
-    private List<String> asList(Set<String> set) {
-        return set != null ? new ArrayList<String>(set) : null;
-    }
-
     public String getInclude() {
         return include;
     }
