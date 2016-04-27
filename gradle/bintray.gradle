@@ -16,7 +16,8 @@
 
 // Handles publication of distributions to Bintray
 
-apply plugin: 'com.jfrog.bintray'
+if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
+if (!project.hasProperty('bintrayKey')) ext.bintrayKey = ''
 
 bintray {
     user = bintrayUsername

@@ -16,11 +16,11 @@
 
 plugins {
     id 'com.jfrog.bintray' version '1.6'
-    id 'com.jfrog.artifactory' version '3.0.0'
+    id 'com.jfrog.artifactory' version '4.2.0'
     id 'com.github.hierynomus.license' version '0.11.0'
-    id 'net.nemerosa.versioning' version '1.6.2'
+    id 'net.nemerosa.versioning' version '1.7.1'
     id 'com.github.ben-manes.versions' version '0.12.0'
-    id 'com.gradle.plugin-publish' version '0.9.3'
+    id 'com.gradle.plugin-publish' version '0.9.4'
 }
 
 apply plugin: 'idea'
@@ -31,7 +31,6 @@ apply from: 'gradle/publishing.gradle'
 apply from: 'gradle/bintray.gradle'
 apply from: 'gradle/artifactory.gradle'
 apply from: 'gradle/code-quality.gradle'
-
 
 dependencies {
     compile localGroovy()
@@ -74,3 +73,5 @@ project.tasks.withType(Test) {
         }
     }
 }
+
+task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}
