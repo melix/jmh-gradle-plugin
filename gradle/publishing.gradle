@@ -68,16 +68,16 @@ publishing {
                 def Node root = asNode()
 
                 root.appendNode('name', 'Gradle Plugin for JMH')
-                root.appendNode('description', 'Integrates the JMH microbenchmarking framework with Gradle')
-                root.appendNode('url', 'https://github.com/melix/jmh-gradle-plugin')
+                root.appendNode('description', project.project_description)
+                root.appendNode('url', project.project_website)
 
                 def issues = root.appendNode( 'issueManagement' )
                 issues.appendNode( 'system', 'github' )
-                issues.appendNode( 'url', 'https://github.com/melix/jmh-gradle-plugin/issues' )
+                issues.appendNode( 'url', project.project_issues )
 
                 def scm = root.appendNode( 'scm' )
-                scm.appendNode( 'url', 'https://github.com/melix/jmh-gradle-plugin' )
-                scm.appendNode( 'connection', 'scm:git:https://github.com/melix/jmh-gradle-plugin.git' )
+                scm.appendNode( 'url', project.project_website )
+                scm.appendNode( 'connection', 'scm:git:' + project.project_vcs )
                 scm.appendNode( 'developerConnection', 'scm:git:git@github.com:melix/jmh-gradle-plugin.git' )
 
                 def license = root.appendNode( 'licenses' ).appendNode( 'license' );
@@ -97,15 +97,21 @@ publishing {
 }
 
 pluginBundle {
-    website = 'https://github.com/melix/jmh-gradle-plugin'
-    vcsUrl = 'https://github.com/melix/jmh-gradle-plugin'
-    description = 'Integrates the JMH microbenchmarking framework with Gradle'
+    website = project.project_website
+    vcsUrl = project.project_vcs
+    description = project.project_description
     tags = ['jmh']
 
     plugins {
         jmhPlugin {
-            id = 'me.champeau.gradle.jmh'
+            id = project.group + '.jmh'
             displayName = 'Gradle JMH plugin'
         }
+    }
+
+    mavenCoordinates {
+        groupId = project.group
+        artifactId = project.name
+        version = project.version
     }
 }
