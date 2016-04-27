@@ -19,11 +19,9 @@ import org.gradle.api.Project;
 import org.gradle.api.file.DuplicatesStrategy;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.join;
 import static org.codehaus.groovy.runtime.DefaultGroovyMethods.unique;
 
 public class JMHPluginExtension {
@@ -78,7 +76,7 @@ public class JMHPluginExtension {
         args.add(include);
         addOption(args, exclude, "e");
         addOption(args, iterations, "i");
-        addOption(args, benchmarkMode !=null ? unique(benchmarkMode) : null, "bm");
+        addOption(args, benchmarkModeCSV(), "bm");
         addOption(args, batchSize, "bs");
         addOption(args, fork, "f");
         addOption(args, failOnError, "foe");
@@ -110,6 +108,13 @@ public class JMHPluginExtension {
         return args;
     }
 
+    private String benchmarkModeCSV() {
+        if (benchmarkMode == null || benchmarkMode.isEmpty()) {
+            return null;
+        }
+        return join((Iterable<String>) new LinkedHashSet<String>(benchmarkMode), ",");
+    }
+
     private void resolveArgs() {
         resolveResultExtension();
         resolveResultFormat();
@@ -133,8 +138,8 @@ public class JMHPluginExtension {
     }
 
     private void addOption(List<String> options, String str, String option) {
-        if (str!=null) {
-            options.add("-"+option);
+        if (str != null) {
+            options.add("-" + option);
             options.add(str);
         }
     }
@@ -144,13 +149,13 @@ public class JMHPluginExtension {
     }
 
     private void addOption(List<String> options, List values, String option, String separator) {
-        if (values!=null) {
-            options.add("-"+option);
+        if (values != null) {
+            options.add("-" + option);
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < values.size(); i++) {
                 final Object value = values.get(i);
                 sb.append(value);
-                if (i<values.size()-1) {
+                if (i < values.size() - 1) {
                     sb.append(separator);
                 }
             }
@@ -159,30 +164,30 @@ public class JMHPluginExtension {
     }
 
     private void addOption(List<String> options, Boolean b, String option) {
-        if (b!=null) {
-            options.add("-"+option);
-            options.add(b?"1":"0");
+        if (b != null) {
+            options.add("-" + option);
+            options.add(b ? "1" : "0");
         }
     }
 
     private void addOption(List<String> options, Integer i, String option) {
-        if (i!=null) {
-            options.add("-"+option);
+        if (i != null) {
+            options.add("-" + option);
             options.add(String.valueOf(i));
         }
     }
 
     private void addOption(List<String> options, File f, String option) {
-        if (f!=null) {
-            options.add("-"+option);
+        if (f != null) {
+            options.add("-" + option);
             options.add(project.relativePath(f));
         }
     }
 
     @SuppressWarnings("unchecked")
     private void addOption(List<String> options, Map params, String option) {
-        if (params!=null && !params.isEmpty()) {
-            options.add("-"+option);
+        if (params != null && !params.isEmpty()) {
+            options.add("-" + option);
             StringBuilder sb = new StringBuilder();
             List<Map.Entry> values = new ArrayList<Map.Entry>(params.entrySet());
             for (int i = 0; i < values.size(); i++) {

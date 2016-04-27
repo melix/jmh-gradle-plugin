@@ -48,13 +48,6 @@ task release {
     dependsOn artifactoryPublish, bintrayUpload
 }
 
-task testSample(type:GradleBuild) {
-    dependsOn(publishToMavenLocal)
-    buildFile = 'src/test/resources/sample/build.gradle'
-    startParameter.projectProperties.pluginVersion = rootProject.version
-    tasks = ['jmh']
-}
-
 project.tasks.withType(Test) {
     beforeTest { descriptor ->
         logger.lifecycle("Running test: " + descriptor)
@@ -74,4 +67,3 @@ project.tasks.withType(Test) {
     }
 }
 
-task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}
