@@ -12,6 +12,7 @@ dependencies {
 }
 
 jmh {
+    benchmarkMode = ['ss', 'thrpt']
     resultFormat = 'csv'
     resultsFile = file('build/reports/benchmarks.csv')
 }

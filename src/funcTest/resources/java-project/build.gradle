@@ -9,6 +9,6 @@ repositories {
 
 jmh {
     resultFormat = 'csv'
-    benchmarkMode = ['thrpt', 'ss']
+    benchmarkMode = ['thrpt','ss']
     resultsFile = file('build/reports/benchmarks.csv')
 }
