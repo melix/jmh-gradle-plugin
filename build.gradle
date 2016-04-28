@@ -21,6 +21,8 @@ plugins {
     id 'net.nemerosa.versioning' version '1.7.1'
     id 'com.github.ben-manes.versions' version '0.12.0'
     id 'com.gradle.plugin-publish' version '0.9.4'
+    id 'com.github.kt3k.coveralls' version '2.6.3'
+    id 'jacoco'
 }
 
 apply plugin: 'idea'
@@ -67,3 +69,19 @@ project.tasks.withType(Test) {
     }
 }
 
+jacoco {
+    toolVersion = '0.7.6.201602180812'
+}
+
+jacocoTestReport {
+    group = 'Reporting'
+    description = 'Generate Jacoco coverage reports after running tests.'
+    additionalSourceDirs = project.files(sourceSets.main.allSource.srcDirs)
+    sourceDirectories = project.files(sourceSets.main.allSource.srcDirs)
+    classDirectories =  project.files(sourceSets.main.output)
+    reports {
+        xml.enabled = true
+        csv.enabled = false
+        html.enabled = true
+    }
+}
