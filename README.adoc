@@ -2,6 +2,11 @@
 :jmh-version: 1.12
 :plugin-version: 0.3.0
 
+image:http://img.shields.io/travis/melix/jmh-gradle-plugin/master.svg["Build Status (travis)", link="https://travis-ci.org/melix/jmh-gradle-plugin"]
+image:http://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]
+image:https://api.bintray.com/packages/melix/gradle-plugins/jmh-gradle-plugin/images/download.svg[Download, link="https://bintray.com/melix/gradle-plugins/jmh-gradle-plugin"]
+image:http://img.shields.io/badge/license-ASF2-blue.svg["Apache License 2", link="http://www.apache.org/licenses/LICENSE-2.0.txt"]
+
 This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
 
 == Usage
