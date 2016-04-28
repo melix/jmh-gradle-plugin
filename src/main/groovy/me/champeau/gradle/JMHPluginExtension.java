@@ -19,7 +19,9 @@ import org.gradle.api.Project;
 import org.gradle.api.file.DuplicatesStrategy;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.codehaus.groovy.runtime.DefaultGroovyMethods.join;
 import static org.codehaus.groovy.runtime.DefaultGroovyMethods.unique;
@@ -88,7 +90,7 @@ public class JMHPluginExtension {
         addOption(args, humanOutputFile, "o");
         addOption(args, operationsPerInvocation, "opi");
         addOption(args, benchmarkParameters, "p");
-        addOption(args, profilers, "prof", " -prof ");
+        addRepeatableOption(args, profilers, "prof");
         addOption(args, resultsFile, "rff");
         addOption(args, timeOnIteration, "r");
         addOption(args, resultFormat, "rf");
@@ -160,6 +162,15 @@ public class JMHPluginExtension {
                 }
             }
             options.add(sb.toString());
+        }
+    }
+
+    private void addRepeatableOption(List<String> options, List values, String option) {
+        if (values != null) {
+            for (Object value : values) {
+                options.add("-" + option);
+                options.add(String.valueOf(value));
+            }
         }
     }
 
