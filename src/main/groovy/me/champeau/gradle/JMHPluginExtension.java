@@ -88,7 +88,7 @@ public class JMHPluginExtension {
         addOption(args, humanOutputFile, "o");
         addOption(args, operationsPerInvocation, "opi");
         addOption(args, benchmarkParameters, "p");
-        addOption(args, profilers, "prof", "-prof");
+        addOption(args, profilers, "prof", " -prof ");
         addOption(args, resultsFile, "rff");
         addOption(args, timeOnIteration, "r");
         addOption(args, resultFormat, "rf");
