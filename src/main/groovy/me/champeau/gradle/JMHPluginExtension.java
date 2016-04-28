@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.*;
 
 import static org.codehaus.groovy.runtime.DefaultGroovyMethods.join;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.unique;
 
 public class JMHPluginExtension {
     private final Project project;
@@ -112,7 +111,7 @@ public class JMHPluginExtension {
         if (benchmarkMode == null || benchmarkMode.isEmpty()) {
             return null;
         }
-        return join((Iterable<String>) new LinkedHashSet<String>(benchmarkMode), ",");
+        return join(benchmarkMode, ",");
     }
 
     private void resolveArgs() {
