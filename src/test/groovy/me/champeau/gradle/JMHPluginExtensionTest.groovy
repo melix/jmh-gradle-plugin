@@ -58,7 +58,6 @@ class JMHPluginExtensionTest {
         assert result.get(index + 1) == 'abc'
     }
 
-
     @Test
     void multipleBenchmarkModes() {
         extension.setBenchmarkMode(Arrays.asList('abc', 'xyz', 'WWW', 'abc', 'www'))
@@ -67,5 +66,21 @@ class JMHPluginExtensionTest {
         int index = result.indexOf("-bm")
         assert index >= 0
         assert result.get(index + 1) == 'abc,xyz,WWW,www'
+    }
+
+    @Test
+    void multipleProfilers() {
+        // given:
+        extension.setProfilers(['foo', 'bar'])
+
+        // when:
+        def result = extension.buildArgs()
+
+        // then:
+        int index = result.indexOf('-prof')
+        assert index >= 0
+        assert result[index + 1] == 'foo'
+        assert result[index + 2] == '-prof'
+        assert result[index + 3] == 'bar'
     }
 }
