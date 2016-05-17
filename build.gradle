@@ -85,3 +85,5 @@ jacocoTestReport {
         html.enabled = true
     }
 }
+
+task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}
