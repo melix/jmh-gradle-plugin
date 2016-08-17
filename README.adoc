@@ -1,6 +1,6 @@
 = JMH Gradle Plugin
 :jmh-version: 1.12
-:plugin-version: 0.3.0
+:plugin-version: 0.3.1
 
 image:http://img.shields.io/travis/melix/jmh-gradle-plugin/master.svg["Build Status (travis)", link="https://travis-ci.org/melix/jmh-gradle-plugin"]
 image:http://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]
@@ -67,7 +67,7 @@ The plugin uses JMH '{jmh-version}'. You can change JMH version in the `jmh` blo
 .build.gradle
 ----
 jmh {
-    jmhVersion = '{jmh-version}'
+    jmhVersion = '1.13'
 }
 
 ----
