@@ -15,6 +15,8 @@
  */
 
 plugins {
+    id 'com.gradle.build-scan' version '1.2'
+    id 'me.champeau.buildscan-recipes' version '0.1.1'
     id 'com.jfrog.bintray' version '1.6'
     id 'com.jfrog.artifactory' version '4.2.0'
     id 'com.github.hierynomus.license' version '0.11.0'
@@ -23,6 +25,14 @@ plugins {
     id 'com.gradle.plugin-publish' version '0.9.4'
     id 'com.github.kt3k.coveralls' version '2.6.3'
     id 'jacoco'
+}
+
+buildScan {
+    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
+
+    recipes 'git-status', 'travis-ci', 'disk-usage'
+    recipe 'git-commit', baseUrl: 'https://github.com/melix/jmh-gradle-plugin/tree'
 }
 
 apply plugin: 'idea'

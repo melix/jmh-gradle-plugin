@@ -7,7 +7,7 @@ before_install:
 before_script:
   - ./gradlew --version
 script: ./gradlew -s -PbuildInfo.build.number=$TRAVIS_BUILD_NUMBER -PbuildInfo.buildUrl=https://travis-ci.org/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_JOB_ID}
-  -PbuildInfo.buildAgent.name=$USER -PbuildInfo.principal=$USER clean build jacocoTestReport
+  -PbuildInfo.buildAgent.name=$USER -PbuildInfo.principal=$USER -Dscan clean build jacocoTestReport
 env:
   global:
   - secure: h70tXNCi71aRJ5K8wlVLqnejPnO1CpIPIMqhRaw7Oz1eRzi2cy+sBideXqw5WDM4G/VozflBtqd3YHF9FkEbeKjo4nJdILYnmf38mllMrr7poQ7XRWY+tsPG30rG7wxjZ0RkbdEzQTNUpa5rrKSnOOMwY894+TAqHRTFbdr5HWg=
