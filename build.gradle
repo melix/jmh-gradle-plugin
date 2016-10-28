@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.gradle.build-scan' version '1.2'
-    id 'me.champeau.buildscan-recipes' version '0.1.1'
+    id 'me.champeau.buildscan-recipes' version '0.1.2'
     id 'com.jfrog.bintray' version '1.6'
     id 'com.jfrog.artifactory' version '4.2.0'
     id 'com.github.hierynomus.license' version '0.11.0'
@@ -31,7 +31,7 @@ buildScan {
     licenseAgreementUrl = 'https://gradle.com/terms-of-service'
     licenseAgree = 'yes'
 
-    recipes 'git-status', 'travis-ci', 'disk-usage'
+    recipes 'git-status', 'travis-ci', 'disk-usage', 'gc-stats'
     recipe 'git-commit', baseUrl: 'https://github.com/melix/jmh-gradle-plugin/tree'
 }
 
