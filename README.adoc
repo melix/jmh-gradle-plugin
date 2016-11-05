@@ -1,5 +1,5 @@
 = JMH Gradle Plugin
-:jmh-version: 1.12
+:jmh-version: 1.15
 :plugin-version: 0.3.1
 
 image:http://img.shields.io/travis/melix/jmh-gradle-plugin/master.svg["Build Status (travis)", link="https://travis-ci.org/melix/jmh-gradle-plugin"]
@@ -60,7 +60,16 @@ dependencies {
 }
 ----
 
-The plugin uses JMH '{jmh-version}'.
+The plugin uses JMH 0.9. You can upgrade the version just by changing the version in the `dependencies` block:
+
+[source,groovy]
+.build.gradle
+----
+dependencies {
+    jmh 'org.openjdk.jmh:jmh-core:0.9'
+    jmh 'org.openjdk.jmh:jmh-generator-annprocess:0.9'
+}
+----
 
 == Tasks
 
