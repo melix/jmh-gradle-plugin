@@ -284,7 +284,7 @@ class ExtensionOptions implements Options {
 
     public SerializableOptions asSerializable() {
         Map<String, Collection<String>> benchmarkParameters = extension.getBenchmarkParameters();
-        Map<String, Optional<Collection<String>>> asOptional = new HashMap<>();
+        Map<String, Optional<Collection<String>>> asOptional = new HashMap<String, Optional<Collection<String>>>();
         if (benchmarkParameters != null) {
             for (Map.Entry<String, Collection<String>> entry : benchmarkParameters.entrySet()) {
                 asOptional.put(entry.getKey(), Optional.eitherOf(entry.getValue()));

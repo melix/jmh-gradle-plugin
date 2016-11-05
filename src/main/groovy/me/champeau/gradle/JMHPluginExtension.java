@@ -32,8 +32,8 @@ public class JMHPluginExtension {
     private String jmhVersion = "1.15";
     private boolean includeTests = true;
 
-    private List<String> include = new ArrayList<>();
-    private List<String> exclude = new ArrayList<>();
+    private List<String> include = new ArrayList<String>();
+    private List<String> exclude = new ArrayList<String>();
     private List<String> benchmarkMode;
     private Integer iterations;
     private Integer batchSize;
