@@ -20,20 +20,20 @@ import org.gradle.api.file.DuplicatesStrategy;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.join;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.unique;
 
 public class JMHPluginExtension {
     private final Project project;
 
-    private String jmhVersion = "1.12";
+    private String jmhVersion = "1.15";
     private boolean includeTests = true;
 
-    private String include = "";
-    private String exclude;
+    private List<String> include = new ArrayList<>();
+    private List<String> exclude = new ArrayList<>();
     private List<String> benchmarkMode;
     private Integer iterations;
     private Integer batchSize;
@@ -41,13 +41,13 @@ public class JMHPluginExtension {
     private Boolean failOnError;
     private Boolean forceGC;
     private String jvm;
-    private String jvmArgs;
-    private String jvmArgsAppend;
-    private String jvmArgsPrepend;
+    private List<String> jvmArgs;
+    private List<String> jvmArgsAppend;
+    private List<String> jvmArgsPrepend;
     private File humanOutputFile;
     private File resultsFile;
     private Integer operationsPerInvocation;
-    private Map benchmarkParameters;
+    private Map<String, Collection<String>> benchmarkParameters;
     private List<String> profilers;
     private String timeOnIteration;
     private String resultExtension;
@@ -71,53 +71,15 @@ public class JMHPluginExtension {
         this.project = project;
     }
 
-    public List<String> buildArgs() {
-        resolveArgs();
-
-        List<String> args = new ArrayList<String>();
-        args.add(include);
-        addOption(args, exclude, "e");
-        addOption(args, iterations, "i");
-        addOption(args, benchmarkModeCSV(), "bm");
-        addOption(args, batchSize, "bs");
-        addOption(args, fork, "f");
-        addOption(args, failOnError, "foe");
-        addOption(args, forceGC, "gc");
-        addOption(args, jvm, "jvm");
-        addOption(args, jvmArgs, "jvmArgs");
-        addOption(args, jvmArgsAppend, "jvmArgsAppend");
-        addOption(args, jvmArgsPrepend, "jvmArgsPrepend");
-        addOption(args, humanOutputFile, "o");
-        addOption(args, operationsPerInvocation, "opi");
-        addOption(args, benchmarkParameters, "p");
-        addRepeatableOption(args, profilers, "prof");
-        addOption(args, resultsFile, "rff");
-        addOption(args, timeOnIteration, "r");
-        addOption(args, resultFormat, "rf");
-        addOption(args, synchronizeIterations, "si");
-        addOption(args, threads, "t");
-        addOption(args, timeout, "to");
-        addOption(args, threadGroups, "tg");
-        addOption(args, timeUnit, "tu");
-        addOption(args, verbosity, "v");
-        addOption(args, warmup, "w");
-        addOption(args, warmupBatchSize, "wbs");
-        addOption(args, warmupForks, "wf");
-        addOption(args, warmupIterations, "wi");
-        addOption(args, warmupMode, "wm");
-        addOption(args, warmupBenchmarks, "wmb");
-
-        return args;
+    public String getJmhVersion() {
+        return jmhVersion;
     }
 
-    private String benchmarkModeCSV() {
-        if (benchmarkMode == null || benchmarkMode.isEmpty()) {
-            return null;
-        }
-        return join(unique(new ArrayList<String>(benchmarkMode)), ",");
+    public void setJmhVersion(final String jmhVersion) {
+        this.jmhVersion = jmhVersion;
     }
 
-    private void resolveArgs() {
+    void resolveArgs() {
         resolveResultExtension();
         resolveResultFormat();
         resolveResultsFile();
@@ -139,92 +101,29 @@ public class JMHPluginExtension {
         return ResultFormatType.translate(resultFormat);
     }
 
-    private void addOption(List<String> options, String str, String option) {
-        if (str != null) {
-            options.add("-" + option);
-            options.add(str);
-        }
-    }
-
-    private void addOption(List<String> options, List values, String option) {
-        addOption(options, values, option, ",");
-    }
-
-    private void addOption(List<String> options, List values, String option, String separator) {
-        if (values != null) {
-            options.add("-" + option);
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < values.size(); i++) {
-                final Object value = values.get(i);
-                sb.append(value);
-                if (i < values.size() - 1) {
-                    sb.append(separator);
-                }
-            }
-            options.add(sb.toString());
-        }
-    }
-
-    private void addRepeatableOption(List<String> options, List values, String option) {
-        if (values != null) {
-            for (Object value : values) {
-                options.add("-" + option);
-                options.add(String.valueOf(value));
-            }
-        }
-    }
-
-    private void addOption(List<String> options, Boolean b, String option) {
-        if (b != null) {
-            options.add("-" + option);
-            options.add(b ? "1" : "0");
-        }
-    }
-
-    private void addOption(List<String> options, Integer i, String option) {
-        if (i != null) {
-            options.add("-" + option);
-            options.add(String.valueOf(i));
-        }
-    }
-
-    private void addOption(List<String> options, File f, String option) {
-        if (f != null) {
-            options.add("-" + option);
-            options.add(project.relativePath(f));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void addOption(List<String> options, Map params, String option) {
-        if (params != null && !params.isEmpty()) {
-            options.add("-" + option);
-            StringBuilder sb = new StringBuilder();
-            List<Map.Entry> values = new ArrayList<Map.Entry>(params.entrySet());
-            for (int i = 0; i < values.size(); i++) {
-                final Map.Entry entry = values.get(i);
-                sb.append(entry.getKey()).append("=").append(entry.getValue());
-                if (i < values.size() - 1) {
-                    sb.append(" -" + option + " ");
-                }
-            }
-            options.add(sb.toString());
-        }
-    }
-
-    public String getInclude() {
+    public List<String> getInclude() {
         return include;
     }
 
+    @Deprecated
     public void setInclude(String include) {
+        this.include = Collections.singletonList(include);
+    }
+
+    public void setInclude(List<String> include) {
         this.include = include;
     }
 
-    public String getExclude() {
+    public List<String> getExclude() {
         return exclude;
     }
 
+    @Deprecated
     public void setExclude(String exclude) {
+        this.exclude = Collections.singletonList(exclude);
+    }
+
+    public void setExclude(List<String> exclude) {
         this.exclude = exclude;
     }
 
@@ -284,27 +183,42 @@ public class JMHPluginExtension {
         this.jvm = jvm;
     }
 
-    public String getJvmArgs() {
+    public List<String> getJvmArgs() {
         return jvmArgs;
     }
 
+    @Deprecated
     public void setJvmArgs(String jvmArgs) {
+        this.jvmArgs = Arrays.asList(jvmArgs.split(" "));
+    }
+
+    public void setJvmArgs(List<String> jvmArgs) {
         this.jvmArgs = jvmArgs;
     }
 
-    public String getJvmArgsAppend() {
+    public List<String> getJvmArgsAppend() {
         return jvmArgsAppend;
     }
 
+    @Deprecated
     public void setJvmArgsAppend(String jvmArgsAppend) {
+        this.jvmArgsAppend = Arrays.asList(jvmArgsAppend.split(" "));
+    }
+
+    public void setJvmArgsAppend(List<String> jvmArgsAppend) {
         this.jvmArgsAppend = jvmArgsAppend;
     }
 
-    public String getJvmArgsPrepend() {
+    public List<String> getJvmArgsPrepend() {
         return jvmArgsPrepend;
     }
 
+    @Deprecated
     public void setJvmArgsPrepend(String jvmArgsPrepend) {
+        this.jvmArgsPrepend = Arrays.asList(jvmArgsPrepend.split(" "));
+    }
+
+    public void setJvmArgsPrepend(List<String> jvmArgsPrepend) {
         this.jvmArgsPrepend = jvmArgsPrepend;
     }
 
@@ -332,11 +246,11 @@ public class JMHPluginExtension {
         this.operationsPerInvocation = operationsPerInvocation;
     }
 
-    public Map getBenchmarkParameters() {
+    public Map<String, Collection<String>> getBenchmarkParameters() {
         return benchmarkParameters;
     }
 
-    public void setBenchmarkParameters(Map benchmarkParameters) {
+    public void setBenchmarkParameters(Map<String, Collection<String>> benchmarkParameters) {
         this.benchmarkParameters = benchmarkParameters;
     }
 
@@ -458,14 +372,6 @@ public class JMHPluginExtension {
 
     public void setZip64(final boolean zip64) {
         this.zip64 = zip64;
-    }
-
-    public String getJmhVersion() {
-        return jmhVersion;
-    }
-
-    public void setJmhVersion(String jmhVersion) {
-        this.jmhVersion = jmhVersion;
     }
 
     public boolean isIncludeTests() {

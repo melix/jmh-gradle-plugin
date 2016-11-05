@@ -17,10 +17,7 @@ package me.champeau.gradle
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
-import org.gradle.api.artifacts.DependencyResolutionListener
-import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Ignore
@@ -39,7 +36,7 @@ class JMHPluginTest {
 
 
         def task = project.tasks.findByName('jmh')
-        assert task instanceof JavaExec
+        assert task instanceof JMHTask
 
     }
 
@@ -55,7 +52,7 @@ class JMHPluginTest {
 
 
         def task = project.tasks.findByName('jmh')
-        assert task instanceof JavaExec
+        assert task instanceof JMHTask
 
     }
 
@@ -94,71 +91,6 @@ class JMHPluginTest {
         assert task instanceof Jar
         assert task.zip64
 
-    }
-
-    @Ignore
-    @Test
-    void testPluginWithAlternativeJmhVersion() {
-        Project project = ProjectBuilder.builder().build()
-        project.repositories {
-            mavenLocal()
-            jcenter()
-        }
-        project.apply plugin: 'java'
-        project.apply plugin: 'me.champeau.gradle.jmh'
-
-        def expectedVersion = 'my.expected.version-SNAPSHOT'
-        project.jmh.jmhVersion = expectedVersion
-
-        def config = project.project.configurations.getByName('jmh')
-
-        def dependencies = config.dependencies
-
-        assert dependencies.isEmpty();
-
-        // mock-trigger beforeResolve() to avoid 'real' resolution of dependencies
-        DependencyResolutionListener broadcast = config.getDependencyResolutionBroadcast()
-        ResolvableDependencies incoming = config.getIncoming()
-        broadcast.beforeResolve(incoming)
-
-        def dependencyHandler = project.getDependencies();
-
-        assert dependencies.contains(dependencyHandler.create(JMHPlugin.JMH_ANNOT_PROC_DEPENDENCY + expectedVersion))
-        assert dependencies.contains(dependencyHandler.create(JMHPlugin.JMH_CORE_DEPENDENCY + expectedVersion))
-    }
-
-    @Test
-    void testResultsFileShouldProvidedResultsFile() {
-        Project project = ProjectBuilder.builder().build()
-        project.repositories {
-            mavenLocal()
-            jcenter()
-        }
-        project.apply plugin: 'java'
-        project.apply plugin: 'me.champeau.gradle.jmh'
-
-        File resultsFile = new File('some/result/file.pdf')
-        project.jmh.resultsFile = resultsFile
-
-        List options = project.jmh.buildArgs()
-        assert project.relativePath(resultsFile) in options
-    }
-
-    @Test
-    void testResultsFileShouldUseResultFormatAsExtension() {
-        Project project = ProjectBuilder.builder().build()
-        project.repositories {
-            mavenLocal()
-            jcenter()
-        }
-        project.apply plugin: 'java'
-        project.apply plugin: 'me.champeau.gradle.jmh'
-
-        project.jmh.resultFormat = 'json'
-
-        File expectedFile = project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/results.json")
-        List options = project.jmh.buildArgs()
-        assert project.relativePath(expectedFile) in options
     }
 
     @Test

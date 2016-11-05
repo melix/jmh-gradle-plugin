@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.gradle.build-scan' version '1.2'
-    id 'me.champeau.buildscan-recipes' version '0.1.2'
+    id 'me.champeau.buildscan-recipes' version '0.1.3'
     id 'com.jfrog.bintray' version '1.6'
     id 'com.jfrog.artifactory' version '4.2.0'
     id 'com.github.hierynomus.license' version '0.11.0'
@@ -33,6 +33,8 @@ buildScan {
 
     recipes 'git-status', 'travis-ci', 'disk-usage', 'gc-stats'
     recipe 'git-commit', baseUrl: 'https://github.com/melix/jmh-gradle-plugin/tree'
+
+    publishAlways()
 }
 
 apply plugin: 'idea'
@@ -44,9 +46,15 @@ apply from: 'gradle/bintray.gradle'
 apply from: 'gradle/artifactory.gradle'
 apply from: 'gradle/code-quality.gradle'
 
+configurations {
+    runner
+    compile.extendsFrom runner
+}
+
 dependencies {
     compile localGroovy()
     compile gradleApi()
+    runner project(':runner')
 
     testCompile 'junit:junit:4.12'
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
@@ -94,4 +102,8 @@ jacocoTestReport {
         csv.enabled = false
         html.enabled = true
     }
+}
+
+jar {
+    from configurations.runner
 }

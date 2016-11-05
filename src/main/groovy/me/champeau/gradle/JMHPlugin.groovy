@@ -38,6 +38,7 @@ class JMHPlugin implements Plugin<Project> {
     static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
     static final String JMH_GROUP = 'jmh'
     static final String JMH_NAME = 'jmh'
+    static final String JMH_RUNNER_EXTRACT_TASK_NAME = 'jmhExtractRunner'
     static final String JMH_JAR_TASK_NAME = 'jmhJar'
     static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
 
@@ -164,18 +165,20 @@ class JMHPlugin implements Plugin<Project> {
             shadow.exclude(metaInfExcludes)
             shadow.configurations = []
         }
-
-        project.tasks.create(name: JMH_NAME, type: JavaExec) {
-            group JMH_GROUP
-            dependsOn project.jmhJar
-            main = 'org.openjdk.jmh.Main'
-            classpath = project.files { project.jmhJar.archivePath }
-
-            doFirst {
-                args = [*args, *extension.buildArgs()]
-                extension.humanOutputFile?.parentFile?.mkdirs()
-                extension.resultsFile?.parentFile?.mkdirs()
+        def extractRunner = project.tasks.create(name: JMH_RUNNER_EXTRACT_TASK_NAME) {
+            ext.outputFile = project.file("$temporaryDir/runner.jar")
+            outputs.file(ext.outputFile)
+            doLast {
+                temporaryDir.mkdir()
+                ext.outputFile.bytes = JMHPlugin.classLoader.getResourceAsStream('runner.jar').bytes
             }
+        }
+
+        project.tasks.create(name: JMH_NAME, type: JMHTask) {
+            group JMH_GROUP
+            dependsOn project.jmhJar, extractRunner
+            main = 'me.champeau.jmh.runner.Main'
+            classpath = project.files({ project.jmhJar.archivePath }, extractRunner.outputFile)
         }
 
         project.afterEvaluate {

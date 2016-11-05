@@ -31,7 +31,7 @@ task createClasspathManifest {
 
     doLast {
         outputDir.mkdirs()
-        file("$outputDir/plugin-classpath.txt").text = sourceSets.test.runtimeClasspath.join("\n")
+        file("$outputDir/plugin-classpath.txt").text = files(sourceSets.test.runtimeClasspath, jar.archivePath).join("\n")
     }
 }
 

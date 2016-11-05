@@ -30,3 +30,4 @@ include 'services:webservice'
 */
 
 rootProject.name = 'jmh-gradle-plugin'
+include 'runner'

@@ -60,24 +60,7 @@ dependencies {
 }
 ----
 
-The plugin uses JMH '{jmh-version}'. You can change JMH version in the `jmh` block:
-
-[source,groovy]
-[subs="attributes"]
-.build.gradle
-----
-jmh {
-    jmhVersion = '1.13'
-}
-
-----
-
-The jars
-
-* `org.openjdk.jmh:jmh-core`
-* `org.openjdk.jmh:jmh-generator-bytecode`
-
-will be automatically added to the list of library dependencies for the jmh configuration.
+The plugin uses JMH '{jmh-version}'.
 
 == Tasks
 
@@ -106,8 +89,8 @@ are unset, implying that they fall back to the default JMH values:
 .build.gradle
 ----
 jmh {
-   include = 'some regular expression' // include pattern (regular expression) for benchmarks to be executed
-   exclude = 'some regular expression' // exclude pattern (regular expression) for benchmarks to be executed
+   include = ['some regular expression'] // include pattern (regular expression) for benchmarks to be executed
+   exclude = ['some regular expression'] // exclude pattern (regular expression) for benchmarks to be executed
    iterations = 10 // Number of measurement iterations to do.
    benchmarkMode = ['thrpt','ss'] // Benchmark mode. Available modes are: [Throughput/thrpt, AverageTime/avgt, SampleTime/sample, SingleShotTime/ss, All/all]
    batchSize = 1 // Batch size: number of benchmark method calls per operation. (some benchmark modes can ignore this setting)
@@ -115,9 +98,9 @@ jmh {
    failOnError = false // Should JMH fail immediately if any benchmark had experienced the unrecoverable error?
    forceGC = false // Should JMH force GC between iterations?
    jvm = 'myjvm' // Custom JVM to use when forking.
-   jvmArgs = 'Custom JVM args to use when forking.'
-   jvmArgsAppend = 'Custom JVM args to use when forking (append these)'
-   jvmArgsPrepend = 'Custom JVM args to use when forking (prepend these)'
+   jvmArgs = ['Custom JVM args to use when forking.']
+   jvmArgsAppend = ['Custom JVM args to use when forking (append these)']
+   jvmArgsPrepend =[ 'Custom JVM args to use when forking (prepend these)']
    humanOutputFile = project.file("${project.buildDir}/reports/jmh/human.txt") // human-readable output file
    resultsFile = project.file("${project.buildDir}/reports/jmh/results.txt") // results file
    operationsPerInvocation = 10 // Operations per invocation.
