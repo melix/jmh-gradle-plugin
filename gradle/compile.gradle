@@ -16,6 +16,9 @@
 
 apply plugin: 'groovy'
 
+sourceCompatibility=1.6
+targetCompatibility=1.6
+
 compileGroovy.options.encoding = 'UTF-8'
 
 // custom tasks for creating source/javadoc jars
