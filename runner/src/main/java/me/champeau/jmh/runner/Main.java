@@ -25,7 +25,7 @@ public class Main {
         ObjectInputStream ois = null;
         SerializableOptions options;
         try {
-            new ObjectInputStream(new FileInputStream(optionsFile));
+            ois = new ObjectInputStream(new FileInputStream(optionsFile));
             options = (SerializableOptions) ois.readObject();
         } finally {
             if (ois != null) {
