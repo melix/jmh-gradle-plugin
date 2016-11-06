@@ -47,10 +47,16 @@ public class JMHTask extends JavaExec {
             File tempFile = File.createTempFile("options-", ".bin", getTemporaryDir());
             if (parentFile.exists() || parentFile.mkdirs()) {
                 SerializableOptions serializable = options.asSerializable();
-                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tempFile));
-                oos.writeObject(serializable);
-                oos.flush();
-                oos.close();
+                ObjectOutputStream oos = null;
+                try {
+                    oos = new ObjectOutputStream(new FileOutputStream(tempFile));
+                    oos.writeObject(serializable);
+                    oos.flush();
+                } finally {
+                    if (oos != null) {
+                        oos.close();
+                    }
+                }
                 setArgs(Collections.singleton(tempFile.getAbsolutePath()));
             } else {
                 throw new GradleException("Unable to create output directory " + parentFile);

@@ -22,9 +22,16 @@ import java.io.ObjectInputStream;
 public class Main {
     public static void main(String[] args) throws IOException, RunnerException, ClassNotFoundException {
         String optionsFile = args[0];
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(optionsFile));
-        SerializableOptions options = (SerializableOptions) ois.readObject();
-        ois.close();
+        ObjectInputStream ois = null;
+        SerializableOptions options;
+        try {
+            new ObjectInputStream(new FileInputStream(optionsFile));
+            options = (SerializableOptions) ois.readObject();
+        } finally {
+            if (ois != null) {
+                ois.close();
+            }
+        }
         Runner runner = new Runner(options);
         runner.run();
     }
