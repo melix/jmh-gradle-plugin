@@ -107,3 +107,5 @@ jacocoTestReport {
 jar {
     from configurations.runner
 }
+
+task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}
