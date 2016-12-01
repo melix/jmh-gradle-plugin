@@ -19,6 +19,9 @@ Build script snippet for use in all Gradle versions:
 buildscript {
   repositories {
     jcenter()
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
   }
   dependencies {
     classpath "me.champeau.gradle:jmh-gradle-plugin:{plugin-version}"
