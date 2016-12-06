@@ -143,8 +143,8 @@ jmh {
 == Dependency on project files
 
 The `jmh` plugin makes it easy to test existing sources *without* having to create a separate project for this. This is
-the reason why you must put your files into `src/jmh/java` instead of `src/main/java`. This means that by default, the
-`jmh` task depends on your `main` source set.
+the reason why you must put your benchmark source files into `src/jmh/java` instead of `src/main/java`. This means that
+by default, the `jmh` (benchmarks) task depends on your `main` (production) source set.
 
 It is possible a dependency on the `test` source set by setting property `includeTests` to true inside `jmh` block.
 
