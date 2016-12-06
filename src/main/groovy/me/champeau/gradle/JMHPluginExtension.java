@@ -29,7 +29,7 @@ import java.util.Map;
 public class JMHPluginExtension {
     private final Project project;
 
-    private String jmhVersion = "1.15";
+    private String jmhVersion = "1.17.2";
     private boolean includeTests = true;
 
     private List<String> include = new ArrayList<String>();
