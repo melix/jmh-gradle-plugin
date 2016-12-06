@@ -4,6 +4,10 @@ jdk:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install oracle-java8-installer
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.gradle
 before_script:
   - ./gradlew --version
 script: ./gradlew -s -PbuildInfo.build.number=$TRAVIS_BUILD_NUMBER -PbuildInfo.buildUrl=https://travis-ci.org/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_JOB_ID}
