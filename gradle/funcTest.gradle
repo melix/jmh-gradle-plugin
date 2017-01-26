@@ -38,6 +38,7 @@ task createClasspathManifest {
 dependencies {
     functionalTestCompile gradleTestKit()
     functionalTestCompile files(createClasspathManifest)
+    functionalTestCompile project(':runner')
 }
 
 compileFunctionalTestJava.dependsOn createClasspathManifest
