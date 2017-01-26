@@ -43,7 +43,7 @@ dependencies {
 
 compileFunctionalTestJava.dependsOn createClasspathManifest
 
-task functionalTest(type: Test) {
+task functionalTest(type: Test, dependsOn: [jar]) {
     description = 'Runs the functional tests.'
     group = 'verification'
     testClassesDir = sourceSets.functionalTest.output.classesDir
