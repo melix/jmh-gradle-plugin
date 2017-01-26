@@ -140,6 +140,45 @@ jmh {
 }
 ----
 
+== JMH Options Mapping
+
+The following table describes the mappings between JMH's command line options and the plugin's extension properties.
+
+[options="header"]
+|===
+| JMH Option               | Extension Property
+| -bm <mode>               | benchmarkMode
+| -bs <int>                | batchSize
+| -e <regexp+>             | exclude
+| -f <int>                 | fork
+| -foe <bool>              | failOnError
+| -gc <bool>               | forceGC
+| -i <int>                 | iterations
+| -jvm <string>            | jvm
+| -jvmArgs <string>        | jvmArgs
+| -jvmArgsAppend <string>  | jvmArgsAppend
+| -jvmArgsPrepend <string> | jvmArgsPrepend
+| -o <filename>            | humanOutputFile
+| -opi <int>               | operationsPerInvocation
+| -p <param={v,}*>         | benchmarkParameters?
+| -prof <profiler>         | profilers
+| -r <time>                | timeOnIteration
+| -rf <type>               | resultFormat
+| -rff <filename>          | resultsFile
+| -si <bool>               | synchronizeIterations
+| -t <int>                 | threads
+| -tg <int+>               | threadGroups
+| -to <time>               | timeout
+| -tu <TU>                 | timeUnit
+| -v <mode>                | verbosity
+| -w <time>                | warmup
+| -wbs <int>               | warmupBatchSize
+| -wf <int>                | warmupForks
+| -wi <int>                | warmupIterations
+| -wm <mode>               | warmupMode
+| -wmb <regexp+>           | warmupBenchmarks
+|===
+
 == Dependency on project files
 
 The `jmh` plugin makes it easy to test existing sources *without* having to create a separate project for this. This is
