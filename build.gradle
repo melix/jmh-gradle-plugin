@@ -52,12 +52,13 @@ apply from: 'gradle/code-quality.gradle'
 
 configurations {
     runner
-    compile.extendsFrom runner
 }
 
 dependencies {
     compile localGroovy()
     compile gradleApi()
+    compileOnly project(':runner')
+    testCompile project(':runner')
     runner project(':runner')
 
     testCompile "junit:junit:$junitVersion"

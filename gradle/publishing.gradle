@@ -89,8 +89,7 @@ publishing {
                 dev.appendNode( 'id', 'melix' )
                 dev.appendNode( 'name', 'Cédric Champeau' )
                 dev.appendNode( 'organization', 'Groovy' )
-                dev.appendNode( 'organizationUrl', 'http://groovy.codehaus.org' )
-
+                dev.appendNode( 'organizationUrl', 'http://groovy-lang.org' )
             }
         }
     }
