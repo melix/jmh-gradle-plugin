@@ -69,6 +69,7 @@ class JMHPlugin implements Plugin<Project> {
         project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JavaExec) {
             group JMH_GROUP
             dependsOn 'jmhClasses'
+            zip64 = "true".equals(System.getProperty("jmh.zip64"))
             inputs.dir project.sourceSets.jmh.output
             outputs.dir jmhGeneratedSourcesDir
 
