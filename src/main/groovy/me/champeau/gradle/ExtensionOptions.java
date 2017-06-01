@@ -15,7 +15,6 @@
  */
 package me.champeau.gradle;
 
-import me.champeau.jmh.runner.SerializableOptions;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.options.Options;

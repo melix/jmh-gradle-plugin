@@ -46,7 +46,7 @@ compileFunctionalTestJava.dependsOn createClasspathManifest
 task functionalTest(type: Test, dependsOn: [jar]) {
     description = 'Runs the functional tests.'
     group = 'verification'
-    testClassesDir = sourceSets.functionalTest.output.classesDir
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
     mustRunAfter test
 
