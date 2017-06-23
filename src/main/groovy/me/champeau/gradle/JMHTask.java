@@ -17,6 +17,8 @@ package me.champeau.gradle;
 
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.jvm.tasks.Jar;
 import org.gradle.workers.IsolationMode;
@@ -50,7 +52,12 @@ public class JMHTask extends DefaultTask {
             @Override
             public void execute(final WorkerConfiguration workerConfiguration) {
                 workerConfiguration.setIsolationMode(IsolationMode.PROCESS);
-                workerConfiguration.classpath(getProject().getConfigurations().getByName("jmh").plus(getProject().files(getJarArchive())));
+                ConfigurationContainer configurations = getProject().getConfigurations();
+                FileCollection classpath = configurations.getByName("jmh").plus(getProject().files(getJarArchive()));
+                if (extension.isIncludeTests()) {
+                    classpath = classpath.plus(configurations.getByName("testRuntimeClasspath"));
+                }
+                workerConfiguration.classpath(classpath);
                 workerConfiguration.params(options.asSerializable());
             }
         });

@@ -27,12 +27,10 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 
 import java.util.concurrent.atomic.AtomicReference
-
 /**
  * Configures the JMH Plugin.
  */
@@ -142,18 +140,14 @@ class JMHPlugin implements Plugin<Project> {
     }
 
     private Task createJmhRunBytecodeGeneratorTask(Project project, jmhGeneratedSourcesDir, extension, jmhGeneratedClassesDir) {
-        project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JavaExec) {
+        project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JmhBytecodeGeneratorTask) {
             group JMH_GROUP
             dependsOn 'jmhClasses'
-            inputs.dir project.sourceSets.jmh.output
-            outputs.dir jmhGeneratedSourcesDir
-
-            main = 'org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator'
-            classpath = project.sourceSets.jmh.runtimeClasspath
-            if (extension.includeTests) {
-                classpath += project.sourceSets.test.output + project.sourceSets.test.runtimeClasspath
+            conventionMapping.map('includeTests') {
+                extension.includeTests
             }
-            args = [project.sourceSets.jmh.output.classesDirs, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, 'default']
+            generatedClassesDir = jmhGeneratedClassesDir
+            generatedSourcesDir = jmhGeneratedSourcesDir
         }
     }
 
