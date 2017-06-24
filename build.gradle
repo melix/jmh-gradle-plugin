@@ -22,7 +22,7 @@ plugins {
     id 'com.github.hierynomus.license' version '0.11.0'
     id 'net.nemerosa.versioning' version '2.6.0'
     id 'com.github.ben-manes.versions' version '0.13.0'
-    id 'com.gradle.plugin-publish' version '0.9.4'
+    id 'com.gradle.plugin-publish' version '0.9.7'
     id 'com.github.kt3k.coveralls' version '2.7.1'
     id 'jacoco'
 }
