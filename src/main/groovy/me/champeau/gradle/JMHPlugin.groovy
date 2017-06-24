@@ -29,6 +29,9 @@ import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.plugins.ide.eclipse.EclipsePlugin
+import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
+import org.gradle.plugins.ide.idea.IdeaPlugin
 
 import java.util.concurrent.atomic.AtomicReference
 /**
@@ -82,8 +85,12 @@ class JMHPlugin implements Plugin<Project> {
             dependsOn project.jmhJar
         }
 
+        configureIDESupport(project)
+    }
+
+    private configureIDESupport(Project project) {
         project.afterEvaluate {
-            def hasIdea = project.plugins.findPlugin(org.gradle.plugins.ide.idea.IdeaPlugin)
+            def hasIdea = project.plugins.findPlugin(IdeaPlugin)
             if (hasIdea) {
                 project.idea {
                     module {
@@ -98,8 +105,8 @@ class JMHPlugin implements Plugin<Project> {
                     }
                 }
             }
-            def hasEclipsePlugin = project.plugins.findPlugin(org.gradle.plugins.ide.eclipse.EclipsePlugin)
-            def hasEclipseWtpPlugin = project.plugins.findPlugin(org.gradle.plugins.ide.eclipse.EclipseWtpPlugin)
+            def hasEclipsePlugin = project.plugins.findPlugin(EclipsePlugin)
+            def hasEclipseWtpPlugin = project.plugins.findPlugin(EclipseWtpPlugin)
             if (hasEclipsePlugin != null || hasEclipseWtpPlugin != null) {
                 project.eclipse {
                     classpath.plusConfigurations += [project.configurations.jmh]
@@ -123,7 +130,7 @@ class JMHPlugin implements Plugin<Project> {
         })
     }
 
-    private Task createJmhCompileGeneratedClassesTask(Project project, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, extension) {
+    private Task createJmhCompileGeneratedClassesTask(Project project, File jmhGeneratedSourcesDir, File jmhGeneratedClassesDir, JMHPluginExtension extension) {
         project.tasks.create(name: JMH_TASK_COMPILE_GENERATED_CLASSES_NAME, type: JavaCompile) {
             group JMH_GROUP
             dependsOn 'jmhRunBytecodeGenerator'
@@ -139,7 +146,7 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    private Task createJmhRunBytecodeGeneratorTask(Project project, jmhGeneratedSourcesDir, JMHPluginExtension extension, jmhGeneratedClassesDir) {
+    private Task createJmhRunBytecodeGeneratorTask(Project project, File jmhGeneratedSourcesDir, JMHPluginExtension extension, File jmhGeneratedClassesDir) {
         project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JmhBytecodeGeneratorTask) {
             group JMH_GROUP
             dependsOn 'jmhClasses'
@@ -201,7 +208,7 @@ class JMHPlugin implements Plugin<Project> {
         shadow.configurations = []
     }
 
-    private Task createStandardJmhJar(Project project, JMHPluginExtension extension, metaInfExcludes, jmhGeneratedClassesDir, Configuration runtimeConfiguration) {
+    private Task createStandardJmhJar(Project project, JMHPluginExtension extension, List<String> metaInfExcludes, File jmhGeneratedClassesDir, Configuration runtimeConfiguration) {
         project.tasks.create(name: JMH_JAR_TASK_NAME, type: Jar) {
             group JMH_GROUP
             dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
