@@ -35,7 +35,7 @@ bintray {
         vcsUrl = 'https://github.com/melix/jmh-gradle-plugin.git'
         publicDownloadNumbers = true
         version {
-            attributes = ['gradle-plugin': 'me.champeau.gradle.jmh:me.champeau.gradle:jmh-gradle-plugin ']
+            attributes = ['gradle-plugin': 'me.champeau.gradle.jmh:me.champeau.gradle:jmh-gradle-plugin']
         }
     }
 }

@@ -72,7 +72,7 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
         // resolve the cross-class dependencies
         URLClassLoader amendedCL = new URLClassLoader(
                 urls,
-                Thread.currentThread().getContextClassLoader());
+                this.getClass().getClassLoader());
 
         Thread.currentThread().setContextClassLoader(amendedCL);
 
