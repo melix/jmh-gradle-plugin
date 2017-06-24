@@ -1,3 +1,7 @@
+Version 0.4.0
+-------------
+    * Requires Gradle 4+
+    * Use Shadow 2.0.1
 Version 0.2.0
 -------------
     * Requires Gradle 2.2+
