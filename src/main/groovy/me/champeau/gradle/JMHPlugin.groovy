@@ -139,13 +139,11 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    private Task createJmhRunBytecodeGeneratorTask(Project project, jmhGeneratedSourcesDir, extension, jmhGeneratedClassesDir) {
+    private Task createJmhRunBytecodeGeneratorTask(Project project, jmhGeneratedSourcesDir, JMHPluginExtension extension, jmhGeneratedClassesDir) {
         project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JmhBytecodeGeneratorTask) {
             group JMH_GROUP
             dependsOn 'jmhClasses'
-            conventionMapping.map('includeTests') {
-                extension.includeTests
-            }
+            includeTests = extension.includeTestsProvider
             generatedClassesDir = jmhGeneratedClassesDir
             generatedSourcesDir = jmhGeneratedSourcesDir
         }

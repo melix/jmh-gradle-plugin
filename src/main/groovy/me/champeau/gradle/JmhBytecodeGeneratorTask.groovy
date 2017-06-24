@@ -1,17 +1,19 @@
 package me.champeau.gradle
 
 import groovy.transform.CompileStatic
+import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
-import org.gradle.api.internal.ConventionTask
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.provider.PropertyState
 import org.gradle.api.tasks.*
 import org.gradle.workers.IsolationMode
 import org.gradle.workers.WorkerConfiguration
 import org.gradle.workers.WorkerExecutor
 
 @CompileStatic
-class JmhBytecodeGeneratorTask extends ConventionTask {
+class JmhBytecodeGeneratorTask extends DefaultTask {
     private final SourceSetContainer sourceSets = project.convention.getPlugin(JavaPluginConvention).sourceSets
+    private final PropertyState<Boolean> includeTestsState = project.property(Boolean)
 
     @InputFiles
     FileCollection runtimeClasspath = sourceSets.getByName('jmh').runtimeClasspath
@@ -31,11 +33,18 @@ class JmhBytecodeGeneratorTask extends ConventionTask {
     @OutputDirectory
     File generatedSourcesDir
 
-    @Input
-    boolean includeTests
 
     @Input
     String generatorType = 'default'
+
+    @Input
+    boolean getIncludeTests() {
+        includeTestsState.get()
+    }
+
+    void setIncludeTests(PropertyState<Boolean> state) {
+        includeTestsState.set(state);
+    }
 
     @TaskAction
     void generate() {
@@ -43,7 +52,7 @@ class JmhBytecodeGeneratorTask extends ConventionTask {
         workerExecutor.submit(JmhBytecodeGeneratorRunnable) { WorkerConfiguration config ->
             config.isolationMode = IsolationMode.PROCESS
             def classpath = runtimeClasspath.files
-            if (getIncludeTests()) {
+            if (includeTests) {
                 classpath += testClasses.files + testRuntimeClasspath.files
             }
             config.classpath = classpath
