@@ -32,3 +32,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+tasks.withType(JavaCompile) {
+    options.incremental = true
+}

@@ -15,16 +15,18 @@
  */
 package me.champeau.gradle;
 
-import me.champeau.jmh.runner.SerializableOptions;
-import org.gradle.api.GradleException;
-import org.gradle.api.tasks.JavaExec;
+import org.gradle.api.Action;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.jvm.tasks.Jar;
+import org.gradle.workers.IsolationMode;
+import org.gradle.workers.WorkerConfiguration;
+import org.gradle.workers.WorkerExecutor;
 
+import javax.inject.Inject;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Collections;
 
 /**
  * The JMH task converts our {@link JMHPluginExtension extension configuration} into JMH specific
@@ -32,41 +34,42 @@ import java.util.Collections;
  * JVM is created and a runner is executed using the JMH version that was used to compile the benchmarks.
  * This runner will read the options from the serialized file and execute JMH using them.
  */
-public class JMHTask extends JavaExec {
+public class JMHTask extends DefaultTask {
+    private final WorkerExecutor workerExecutor;
 
-    @TaskAction
-    public void exec() {
-        final JMHPluginExtension extension = getProject().getExtensions().getByType(JMHPluginExtension.class);
-        extension.resolveArgs();
-        ExtensionOptions options = new ExtensionOptions(extension);
-        File parentFile = extension.getResultsFile().getParentFile();
-        createOptionsFile(options, parentFile);
-        super.exec();
+    @Inject
+    public JMHTask(final WorkerExecutor workerExecutor) {
+        this.workerExecutor = workerExecutor;
     }
 
-    private File createOptionsFile(final ExtensionOptions options, final File parentFile) {
-        try {
-            File tempFile = File.createTempFile("options-", ".bin", getTemporaryDir());
-            if (parentFile.exists() || parentFile.mkdirs()) {
-                SerializableOptions serializable = options.asSerializable();
-                ObjectOutputStream oos = null;
-                try {
-                    oos = new ObjectOutputStream(new FileOutputStream(tempFile));
-                    oos.writeObject(serializable);
-                    oos.flush();
-                } finally {
-                    if (oos != null) {
-                        oos.close();
-                    }
+    @TaskAction
+    public void before() {
+        final JMHPluginExtension extension = getProject().getExtensions().getByType(JMHPluginExtension.class);
+        extension.resolveArgs();
+        final ExtensionOptions options = new ExtensionOptions(extension);
+        extension.getResultsFile().getParentFile().mkdirs();
+        workerExecutor.submit(IsolatedRunner.class, new Action<WorkerConfiguration>() {
+            @Override
+            public void execute(final WorkerConfiguration workerConfiguration) {
+                workerConfiguration.setIsolationMode(IsolationMode.PROCESS);
+                ConfigurationContainer configurations = getProject().getConfigurations();
+                FileCollection classpath = configurations.getByName("jmh").plus(getProject().files(getJarArchive()));
+                if (extension.isIncludeTests()) {
+                    classpath = classpath.plus(configurations.getByName("testRuntimeClasspath"));
                 }
-                setArgs(Collections.singleton(tempFile.getAbsolutePath()));
-            } else {
-                throw new GradleException("Unable to create output directory " + parentFile);
+                workerConfiguration.classpath(classpath);
+                workerConfiguration.params(options.asSerializable());
             }
-            return tempFile;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        });
+    }
+
+    @Override
+    public void setDidWork(final boolean didWork) {
+        super.setDidWork(didWork);
+    }
+
+    private File getJarArchive() {
+        return ((Jar)getProject().getTasks().getByName(JMHPlugin.JMH_JAR_TASK_NAME)).getArchivePath();
     }
 
 }

@@ -41,7 +41,7 @@ public class JMHPluginExtension {
     private Boolean failOnError;
     private Boolean forceGC;
     private String jvm;
-    private List<String> jvmArgs;
+    private List<String> jvmArgs = new ArrayList<String>(); // do not use `null` or VM args would be copied over
     private List<String> jvmArgsAppend;
     private List<String> jvmArgsPrepend;
     private File humanOutputFile;
