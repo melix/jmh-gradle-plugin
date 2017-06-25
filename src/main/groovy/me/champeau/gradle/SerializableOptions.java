@@ -250,7 +250,8 @@ public class SerializableOptions implements Options, Serializable {
 
     @Override
     public Optional<Collection<String>> getParameter(final String name) {
-        return parameters.get(name);
+        Optional<Collection<String>> optional = parameters.get(name);
+        return optional == null ? Optional.<Collection<String>>none() : optional;
     }
 
     @Override
