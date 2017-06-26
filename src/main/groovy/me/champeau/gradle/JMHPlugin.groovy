@@ -34,6 +34,7 @@ import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
 import org.gradle.plugins.ide.idea.IdeaPlugin
 
 import java.util.concurrent.atomic.AtomicReference
+
 /**
  * Configures the JMH Plugin.
  */
@@ -44,8 +45,6 @@ class JMHPlugin implements Plugin<Project> {
     public static final String JMH_NAME = 'jmh'
     public static final String JMH_JAR_TASK_NAME = 'jmhJar'
     public static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
-
-    private final static AtomicReference<JMHTask> LAST_ADDED_TASK = new AtomicReference<>()
 
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
@@ -117,11 +116,17 @@ class JMHPlugin implements Plugin<Project> {
 
     @CompileStatic
     private static ensureTasksNotExecutedConcurrently(Project project) {
+        AtomicReference<JMHTask> lastAddedRef = (AtomicReference<JMHTask>) project.rootProject.properties.get('jmhLastAddedTask')
+        if (lastAddedRef == null) {
+            lastAddedRef = new AtomicReference<>()
+            project.rootProject.properties['jmhLastAddedTask'] = lastAddedRef
+        }
+
         project.tasks.whenTaskAdded(new Action<Task>() {
             @Override
             void execute(final Task task) {
                 if (task instanceof JMHTask) {
-                    def lastAdded = LAST_ADDED_TASK.getAndSet(task)
+                    def lastAdded = lastAddedRef.getAndSet(task)
                     if (lastAdded) {
                         task.mustRunAfter(lastAdded)
                     }
