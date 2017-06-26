@@ -1,3 +1,11 @@
+Version 0.4.2
+-------------
+    * Fix memory leak
+    * Fix potential NPE in benchmark parameters configuration
+
+Version 0.4.1
+-------------
+    * Fix classloading issue in worker process
 Version 0.4.0
 -------------
     * Requires Gradle 4+
