@@ -74,61 +74,67 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
                 urls,
                 this.getClass().getClassLoader());
 
-        Thread.currentThread().setContextClassLoader(amendedCL);
+        ClassLoader ocl = Thread.currentThread().getContextClassLoader();
+        
+        try {
+            Thread.currentThread().setContextClassLoader(amendedCL);
 
-        FileSystemDestination destination = new FileSystemDestination(outputResourceDirectory, outputSourceDirectory);
+            FileSystemDestination destination = new FileSystemDestination(outputResourceDirectory, outputSourceDirectory);
 
-        Map<File, Collection<File>> allClasses = new HashMap<File, Collection<File>>(urls.length);
-        for (File compiledBytecodeDirectory : compiledBytecodeDirectories) {
-            Collection<File> classes = FileUtils.getClasses(compiledBytecodeDirectory);
-            System.out.println("Processing " + classes.size() + " classes from " + compiledBytecodeDirectory + " with \"" + generatorType + "\" generator");
-            allClasses.put(compiledBytecodeDirectory, classes);
-        }
-        System.out.println("Writing out Java source to " + outputSourceDirectory + " and resources to " + outputResourceDirectory);
+            Map<File, Collection<File>> allClasses = new HashMap<File, Collection<File>>(urls.length);
+            for (File compiledBytecodeDirectory : compiledBytecodeDirectories) {
+                Collection<File> classes = FileUtils.getClasses(compiledBytecodeDirectory);
+                System.out.println("Processing " + classes.size() + " classes from " + compiledBytecodeDirectory + " with \"" + generatorType + "\" generator");
+                allClasses.put(compiledBytecodeDirectory, classes);
+            }
+            System.out.println("Writing out Java source to " + outputSourceDirectory + " and resources to " + outputResourceDirectory);
 
-        for (Map.Entry<File, Collection<File>> entry : allClasses.entrySet()) {
-            File compiledBytecodeDirectory = entry.getKey();
-            Collection<File> classes = entry.getValue();
-            GeneratorSource source = null;
-            if (generatorType.equalsIgnoreCase(GENERATOR_TYPE_ASM)) {
-                ASMGeneratorSource src = new ASMGeneratorSource();
-                try {
-                    src.processClasses(classes);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                source = src;
-            } else if (generatorType.equalsIgnoreCase(GENERATOR_TYPE_REFLECTION)) {
-                RFGeneratorSource src = new RFGeneratorSource();
-                for (File f : classes) {
-                    String name = f.getAbsolutePath().substring(compiledBytecodeDirectory.getAbsolutePath().length() + 1);
-                    name = name.replaceAll("\\\\", ".");
-                    name = name.replaceAll("/", ".");
-                    if (name.endsWith(".class")) {
-                        try {
-                            src.processClasses(Class.forName(name.substring(0, name.length() - 6), false, amendedCL));
-                        } catch (ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+            for (Map.Entry<File, Collection<File>> entry : allClasses.entrySet()) {
+                File compiledBytecodeDirectory = entry.getKey();
+                Collection<File> classes = entry.getValue();
+                GeneratorSource source = null;
+                if (generatorType.equalsIgnoreCase(GENERATOR_TYPE_ASM)) {
+                    ASMGeneratorSource src = new ASMGeneratorSource();
+                    try {
+                        src.processClasses(classes);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    source = src;
+                } else if (generatorType.equalsIgnoreCase(GENERATOR_TYPE_REFLECTION)) {
+                    RFGeneratorSource src = new RFGeneratorSource();
+                    for (File f : classes) {
+                        String name = f.getAbsolutePath().substring(compiledBytecodeDirectory.getAbsolutePath().length() + 1);
+                        name = name.replaceAll("\\\\", ".");
+                        name = name.replaceAll("/", ".");
+                        if (name.endsWith(".class")) {
+                            try {
+                                src.processClasses(Class.forName(name.substring(0, name.length() - 6), false, amendedCL));
+                            } catch (ClassNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     }
+                    source = src;
                 }
-                source = src;
+
+                BenchmarkGenerator gen = new BenchmarkGenerator();
+                gen.generate(source, destination);
+                gen.complete(source, destination);
             }
 
-            BenchmarkGenerator gen = new BenchmarkGenerator();
-            gen.generate(source, destination);
-            gen.complete(source, destination);
-        }
 
-
-        if (destination.hasErrors()) {
-            int errCount = 0;
-            StringBuilder sb = new StringBuilder();
-            for (SourceError e : destination.getErrors()) {
-                errCount++;
-                sb.append("  - ").append(e.toString()).append("\n");
+            if (destination.hasErrors()) {
+                int errCount = 0;
+                StringBuilder sb = new StringBuilder();
+                for (SourceError e : destination.getErrors()) {
+                    errCount++;
+                    sb.append("  - ").append(e.toString()).append("\n");
+                }
+                throw new RuntimeException("Generation of JMH bytecode failed with " + errCount + "errors:\n" + sb);
             }
-            throw new RuntimeException("Generation of JMH bytecode failed with " + errCount + "errors:\n" + sb);
+        } finally {
+            Thread.currentThread().setContextClassLoader(ocl);
         }
     }
 }
