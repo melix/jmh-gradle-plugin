@@ -1,6 +1,6 @@
 = JMH Gradle Plugin
-:jmh-version: 1.17.4
-:plugin-version: 0.4.1
+:jmh-version: 1.19
+:plugin-version: 0.4.2
 
 image:http://img.shields.io/travis/melix/jmh-gradle-plugin/master.svg["Build Status (travis)", link="https://travis-ci.org/melix/jmh-gradle-plugin"]
 image:http://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]

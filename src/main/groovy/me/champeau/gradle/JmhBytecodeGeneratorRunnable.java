@@ -75,7 +75,7 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
                 this.getClass().getClassLoader());
 
         ClassLoader ocl = Thread.currentThread().getContextClassLoader();
-        
+
         try {
             Thread.currentThread().setContextClassLoader(amendedCL);
 
