@@ -1,3 +1,7 @@
+Version 0.4.3
+-------------
+    * Fix to make sure tests are not executed concurrently when multiple JMH tasks exist in the project
+
 Version 0.4.2
 -------------
     * Fix memory leak

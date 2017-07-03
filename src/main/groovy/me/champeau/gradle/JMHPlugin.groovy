@@ -116,17 +116,20 @@ class JMHPlugin implements Plugin<Project> {
 
     @CompileStatic
     private static ensureTasksNotExecutedConcurrently(Project project) {
-        AtomicReference<JMHTask> lastAddedRef = (AtomicReference<JMHTask>) project.rootProject.properties.get('jmhLastAddedTask')
-        if (lastAddedRef == null) {
-            lastAddedRef = new AtomicReference<>()
-            project.rootProject.properties['jmhLastAddedTask'] = lastAddedRef
-        }
+        def rootExtra = project
+                .rootProject
+                .extensions
+                .extraProperties
+        AtomicReference<JMHTask> lastAddedRef = rootExtra.has('jmhLastAddedTask') ?
+                (AtomicReference<JMHTask>)rootExtra.get('jmhLastAddedTask') : new AtomicReference<>()
+        rootExtra.set('jmhLastAddedTask', lastAddedRef)
 
         project.tasks.whenTaskAdded(new Action<Task>() {
             @Override
             void execute(final Task task) {
                 if (task instanceof JMHTask) {
                     def lastAdded = lastAddedRef.getAndSet(task)
+                    System.err.println("Task ${task.path} Last added: $lastAdded")
                     if (lastAdded) {
                         task.mustRunAfter(lastAdded)
                     }
