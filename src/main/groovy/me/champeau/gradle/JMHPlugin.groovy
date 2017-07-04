@@ -129,7 +129,6 @@ class JMHPlugin implements Plugin<Project> {
             void execute(final Task task) {
                 if (task instanceof JMHTask) {
                     def lastAdded = lastAddedRef.getAndSet(task)
-                    System.err.println("Task ${task.path} Last added: $lastAdded")
                     if (lastAdded) {
                         task.mustRunAfter(lastAdded)
                     }
