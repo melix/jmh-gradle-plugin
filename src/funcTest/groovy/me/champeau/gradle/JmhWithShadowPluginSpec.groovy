@@ -36,7 +36,7 @@ class JmhWithShadowPluginSpec extends Specification {
         BuildResult project = GradleRunner.create()
             .withProjectDir(projectDir)
             .withPluginClasspath(pluginClasspath)
-            .withArguments("clean", "jmh")
+            .withArguments("-S", "clean", "jmh")
             .build();
 
         when:

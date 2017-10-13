@@ -37,10 +37,11 @@ class MultiLanguageSpec extends Specification {
             .withProjectDir(projectDir)
             .withPluginClasspath(pluginClasspath)
             .withArguments('-S', "clean", "jmh")
+            .forwardOutput()
             .build();
 
         when:
-        BuildTask taskResult = project.task(":jmh");
+        BuildTask taskResult = project.task(":jmh")
         String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
 
         then:

@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.provider.PropertyState
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.workers.IsolationMode
 import org.gradle.workers.WorkerConfiguration
@@ -13,7 +13,7 @@ import org.gradle.workers.WorkerExecutor
 @CompileStatic
 class JmhBytecodeGeneratorTask extends DefaultTask {
     private final SourceSetContainer sourceSets = project.convention.getPlugin(JavaPluginConvention).sourceSets
-    private final PropertyState<Boolean> includeTestsState = project.property(Boolean)
+    private final Property<Boolean> includeTestsState = project.getObjects().property(Boolean)
 
     @InputFiles
     FileCollection runtimeClasspath = sourceSets.getByName('jmh').runtimeClasspath
@@ -42,7 +42,7 @@ class JmhBytecodeGeneratorTask extends DefaultTask {
         includeTestsState.get()
     }
 
-    void setIncludeTests(PropertyState<Boolean> state) {
+    void setIncludeTests(Property<Boolean> state) {
         includeTestsState.set(state);
     }
 

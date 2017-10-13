@@ -121,7 +121,7 @@ class JMHPlugin implements Plugin<Project> {
                 .extensions
                 .extraProperties
         AtomicReference<JMHTask> lastAddedRef = rootExtra.has('jmhLastAddedTask') ?
-                (AtomicReference<JMHTask>)rootExtra.get('jmhLastAddedTask') : new AtomicReference<>()
+                (AtomicReference<JMHTask>) rootExtra.get('jmhLastAddedTask') : new AtomicReference<>()
         rootExtra.set('jmhLastAddedTask', lastAddedRef)
 
         project.tasks.whenTaskAdded(new Action<Task>() {
@@ -219,7 +219,7 @@ class JMHPlugin implements Plugin<Project> {
         project.tasks.create(name: JMH_JAR_TASK_NAME, type: Jar) {
             group JMH_GROUP
             dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
-            inputs.dir project.sourceSets.jmh.output
+            inputs.files project.sourceSets.jmh.output
             from(runtimeConfiguration) {
                 exclude metaInfExcludes
             }

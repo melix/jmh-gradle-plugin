@@ -17,7 +17,7 @@ package me.champeau.gradle;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.DuplicatesStrategy;
-import org.gradle.api.provider.PropertyState;
+import org.gradle.api.provider.Property;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class JMHPluginExtension {
     private final Project project;
 
     private String jmhVersion = "1.17.4";
-    private final PropertyState<Boolean> includeTestState;
+    private final Property<Boolean> includeTestState;
 
     private List<String> include = new ArrayList<String>();
     private List<String> exclude = new ArrayList<String>();
@@ -70,7 +70,7 @@ public class JMHPluginExtension {
 
     public JMHPluginExtension(final Project project) {
         this.project = project;
-        includeTestState = project.property(Boolean.class);
+        includeTestState = project.getObjects().property(Boolean.class);
         setIncludeTests(true);
     }
 
@@ -385,7 +385,7 @@ public class JMHPluginExtension {
         this.includeTestState.set(includeTests);
     }
 
-    PropertyState<Boolean> getIncludeTestsProvider() {
+    Property<Boolean> getIncludeTestsProvider() {
         return includeTestState;
     }
 

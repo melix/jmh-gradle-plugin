@@ -1,6 +1,6 @@
 = JMH Gradle Plugin
 :jmh-version: 1.19
-:plugin-version: 0.4.3
+:plugin-version: 0.4.5
 
 image:http://img.shields.io/travis/melix/jmh-gradle-plugin/master.svg["Build Status (travis)", link="https://travis-ci.org/melix/jmh-gradle-plugin"]
 image:http://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]
@@ -40,6 +40,16 @@ plugins {
   id "me.champeau.gradle.jmh" version "{plugin-version}"
 }
 ----
+
+== What plugin version to use?
+
+[options="header"]
+|===
+|Gradle|Plugin version
+|4.3|0.4.5
+|4.2|incompatible
+|4.1|0.4.4
+|===
 
 == Configuration
 
