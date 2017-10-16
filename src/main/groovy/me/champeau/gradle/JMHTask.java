@@ -35,6 +35,8 @@ import java.io.File;
  * This runner will read the options from the serialized file and execute JMH using them.
  */
 public class JMHTask extends DefaultTask {
+    private final static String JAVA_IO_TMPDIR = "java.io.tmpdir";
+
     private final WorkerExecutor workerExecutor;
 
     @Inject
@@ -59,6 +61,7 @@ public class JMHTask extends DefaultTask {
                 }
                 workerConfiguration.classpath(classpath);
                 workerConfiguration.params(options.asSerializable());
+                workerConfiguration.getForkOptions().getSystemProperties().put(JAVA_IO_TMPDIR, getTemporaryDir());
             }
         });
     }
