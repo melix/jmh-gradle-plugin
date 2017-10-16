@@ -1,6 +1,7 @@
 Version 0.4.5
 -------------
     * Update compatibility with Gradle 4.3
+    * Fix compatibility with Windows 10
 Version 0.4.4
 -------------
     * Removed accidental logging
