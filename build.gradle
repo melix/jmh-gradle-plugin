@@ -15,7 +15,7 @@
  */
 
 plugins {
-    id 'com.gradle.build-scan' version '1.9.1'
+    id 'com.gradle.build-scan' version '1.10'
     id 'me.champeau.buildscan-recipes' version '0.2.0'
     id 'com.jfrog.bintray' version '1.7.3'
     id 'com.jfrog.artifactory' version '4.4.12'
@@ -35,7 +35,7 @@ buildScan {
 }
 
 buildScanRecipes {
-    recipes 'git-status', 'travis-ci', 'disk-usage', 'gc-stats'
+    recipes 'git-status', 'travis-ci'
     recipe 'git-commit', baseUrl: 'https://github.com/melix/jmh-gradle-plugin/tree'
 }
 
