@@ -34,7 +34,6 @@ import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
 import org.gradle.plugins.ide.idea.IdeaPlugin
 
 import java.util.concurrent.atomic.AtomicReference
-
 /**
  * Configures the JMH Plugin.
  */
@@ -45,6 +44,7 @@ class JMHPlugin implements Plugin<Project> {
     public static final String JMH_NAME = 'jmh'
     public static final String JMH_JAR_TASK_NAME = 'jmhJar'
     public static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
+    public static String JHM_RUNTIME_CONFIGURATION = 'jmhRuntime'
 
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
@@ -267,7 +267,10 @@ class JMHPlugin implements Plugin<Project> {
 
     @CompileStatic
     private static Configuration createJmhRuntimeConfiguration(Project project, JMHPluginExtension extension) {
-        def newConfig = project.configurations.detachedConfiguration().setVisible(false)
+        def newConfig = project.configurations.create(JHM_RUNTIME_CONFIGURATION)
+        newConfig.setCanBeConsumed(false)
+        newConfig.setCanBeResolved(true)
+        newConfig.setVisible(false)
         newConfig.dependencies.addAll(project.configurations.getByName('jmh').allDependencies)
         newConfig.dependencies.addAll(project.configurations.getByName('runtime').allDependencies)
         project.afterEvaluate {
