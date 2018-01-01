@@ -30,7 +30,7 @@ import java.util.Map;
 public class JMHPluginExtension {
     private final Project project;
 
-    private String jmhVersion = "1.17.4";
+    private String jmhVersion = "1.19";
     private final Property<Boolean> includeTestState;
 
     private List<String> include = new ArrayList<String>();
