@@ -52,7 +52,7 @@ class JMHPlugin implements Plugin<Project> {
         final Configuration configuration = project.configurations.create(JMH_NAME)
         final Configuration runtimeConfiguration = createJmhRuntimeConfiguration(project, extension)
         configuration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
-            DependencyHandler dependencyHandler = project.getDependencies();
+            DependencyHandler dependencyHandler = project.getDependencies()
             def dependencies = configuration.getDependencies()
             dependencies.add(dependencyHandler.create("${JMH_CORE_DEPENDENCY}${extension.jmhVersion}"))
             dependencies.add(dependencyHandler.create("${JMH_GENERATOR_DEPENDENCY}${extension.jmhVersion}"))
@@ -68,15 +68,16 @@ class JMHPlugin implements Plugin<Project> {
 
         def jmhGeneratedSourcesDir = project.file("$project.buildDir/jmh-generated-sources")
         def jmhGeneratedClassesDir = project.file("$project.buildDir/jmh-generated-classes")
-        createJmhRunBytecodeGeneratorTask(project, jmhGeneratedSourcesDir, extension, jmhGeneratedClassesDir)
+        def jmhGeneratedResourcesDir = project.file("$project.buildDir/jmh-generated-resources")
+        createJmhRunBytecodeGeneratorTask(project, jmhGeneratedSourcesDir, extension, jmhGeneratedResourcesDir)
 
         createJmhCompileGeneratedClassesTask(project, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, extension)
 
         def metaInfExcludes = ['META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
         if (hasShadow) {
-            createShadowJmhJar(project, extension, jmhGeneratedClassesDir, metaInfExcludes, runtimeConfiguration)
+            createShadowJmhJar(project, extension, jmhGeneratedResourcesDir, jmhGeneratedClassesDir, metaInfExcludes, runtimeConfiguration)
         } else {
-            createStandardJmhJar(project, extension, metaInfExcludes, jmhGeneratedClassesDir, runtimeConfiguration)
+            createStandardJmhJar(project, extension, metaInfExcludes, jmhGeneratedResourcesDir, jmhGeneratedClassesDir, runtimeConfiguration)
         }
 
         project.tasks.create(name: JMH_NAME, type: JMHTask) {
@@ -141,24 +142,22 @@ class JMHPlugin implements Plugin<Project> {
         project.tasks.create(name: JMH_TASK_COMPILE_GENERATED_CLASSES_NAME, type: JavaCompile) {
             group JMH_GROUP
             dependsOn 'jmhRunBytecodeGenerator'
-            inputs.dir jmhGeneratedSourcesDir
-            outputs.dir jmhGeneratedClassesDir
 
             classpath = project.sourceSets.jmh.runtimeClasspath
             if (extension.includeTests) {
                 classpath += project.sourceSets.test.output + project.sourceSets.test.runtimeClasspath
             }
-            source = project.fileTree(jmhGeneratedSourcesDir)
+            source = jmhGeneratedSourcesDir
             destinationDir = jmhGeneratedClassesDir
         }
     }
 
-    private Task createJmhRunBytecodeGeneratorTask(Project project, File jmhGeneratedSourcesDir, JMHPluginExtension extension, File jmhGeneratedClassesDir) {
+    private Task createJmhRunBytecodeGeneratorTask(Project project, File jmhGeneratedSourcesDir, JMHPluginExtension extension, File jmhGeneratedResourcesDir) {
         project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JmhBytecodeGeneratorTask) {
             group JMH_GROUP
             dependsOn 'jmhClasses'
             includeTests = extension.includeTestsProvider
-            generatedClassesDir = jmhGeneratedClassesDir
+            generatedClassesDir = jmhGeneratedResourcesDir
             generatedSourcesDir = jmhGeneratedSourcesDir
         }
     }
@@ -174,7 +173,7 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    private void createShadowJmhJar(Project project, JMHPluginExtension extension, File jmhGeneratedClassesDir, List<String> metaInfExcludes, Configuration runtimeConfiguration) {
+    private void createShadowJmhJar(Project project, JMHPluginExtension extension, File jmhGeneratedResourcesDir, File jmhGeneratedClassesDir, List<String> metaInfExcludes, Configuration runtimeConfiguration) {
         def shadow = project.tasks.create(name: JMH_JAR_TASK_NAME, type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar', true, JMHPlugin.classLoader))
         shadow.group = JMH_GROUP
         shadow.dependsOn(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME)
@@ -209,13 +208,14 @@ class JMHPlugin implements Plugin<Project> {
         }
         shadow.from(project.sourceSets.jmh.output)
         shadow.from(project.sourceSets.main.output)
+        shadow.from(project.file(jmhGeneratedResourcesDir))
         shadow.from(project.file(jmhGeneratedClassesDir))
 
         shadow.exclude(metaInfExcludes)
         shadow.configurations = []
     }
 
-    private Task createStandardJmhJar(Project project, JMHPluginExtension extension, List<String> metaInfExcludes, File jmhGeneratedClassesDir, Configuration runtimeConfiguration) {
+    private Task createStandardJmhJar(Project project, JMHPluginExtension extension, List<String> metaInfExcludes, File jmhGeneratedResourcesDir, File jmhGeneratedClassesDir, Configuration runtimeConfiguration) {
         project.tasks.create(name: JMH_JAR_TASK_NAME, type: Jar) {
             group JMH_GROUP
             dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
@@ -226,6 +226,7 @@ class JMHPlugin implements Plugin<Project> {
             doFirst {
                 from(project.sourceSets.jmh.output)
                 from(project.sourceSets.main.output)
+                from(project.file(jmhGeneratedResourcesDir))
                 from(project.file(jmhGeneratedClassesDir))
                 if (extension.includeTests) {
                     from(project.sourceSets.test.output)
