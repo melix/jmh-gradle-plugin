@@ -15,7 +15,7 @@
  */
 
 plugins {
-    id 'com.gradle.build-scan' version '1.11'
+    id 'com.gradle.build-scan' version '1.13.4'
     id 'me.champeau.buildscan-recipes' version '0.2.3'
     id 'com.jfrog.bintray' version '1.8.0'
     id 'com.jfrog.artifactory' version '4.6.0'

@@ -12,4 +12,3 @@
  */
 
 rootProject.name = 'jmh-gradle-plugin'
-include 'runner'
