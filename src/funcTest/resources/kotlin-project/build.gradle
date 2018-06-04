@@ -18,7 +18,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.1'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.0'
     }
 }
 
@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.0.1'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.0'
 }
 
 jmh {
