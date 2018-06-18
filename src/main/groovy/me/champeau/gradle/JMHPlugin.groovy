@@ -208,8 +208,8 @@ class JMHPlugin implements Plugin<Project> {
         }
         shadow.from(project.sourceSets.jmh.output)
         shadow.from(project.sourceSets.main.output)
-        shadow.from(project.file(jmhGeneratedResourcesDir))
         shadow.from(project.file(jmhGeneratedClassesDir))
+        shadow.from(project.file(jmhGeneratedResourcesDir))
 
         shadow.exclude(metaInfExcludes)
         shadow.configurations = []
@@ -226,8 +226,8 @@ class JMHPlugin implements Plugin<Project> {
             doFirst {
                 from(project.sourceSets.jmh.output)
                 from(project.sourceSets.main.output)
-                from(project.file(jmhGeneratedResourcesDir))
                 from(project.file(jmhGeneratedClassesDir))
+                from(project.file(jmhGeneratedResourcesDir))
                 if (extension.includeTests) {
                     from(project.sourceSets.test.output)
                 }
