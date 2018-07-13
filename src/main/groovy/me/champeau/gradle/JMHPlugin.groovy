@@ -32,12 +32,15 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.plugins.ide.eclipse.EclipsePlugin
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
 import org.gradle.plugins.ide.idea.IdeaPlugin
+import org.gradle.util.GradleVersion
 
 import java.util.concurrent.atomic.AtomicReference
 /**
  * Configures the JMH Plugin.
  */
 class JMHPlugin implements Plugin<Project> {
+    private static boolean IS_GRADLE_MIN_49 = GradleVersion.current().compareTo(GradleVersion.version("4.9-rc-1"))>=0
+
     public static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
     public static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
     public static final String JMH_GROUP = 'jmh'
@@ -80,9 +83,9 @@ class JMHPlugin implements Plugin<Project> {
             createStandardJmhJar(project, extension, metaInfExcludes, jmhGeneratedResourcesDir, jmhGeneratedClassesDir, runtimeConfiguration)
         }
 
-        project.tasks.create(name: JMH_NAME, type: JMHTask) {
-            group JMH_GROUP
-            dependsOn project.jmhJar
+        createTask(project, JMH_NAME, JMHTask) {
+            it.group JMH_GROUP
+            it.dependsOn project.jmhJar
         }
 
         configureIDESupport(project)
@@ -139,26 +142,26 @@ class JMHPlugin implements Plugin<Project> {
     }
 
     private Task createJmhCompileGeneratedClassesTask(Project project, File jmhGeneratedSourcesDir, File jmhGeneratedClassesDir, JMHPluginExtension extension) {
-        project.tasks.create(name: JMH_TASK_COMPILE_GENERATED_CLASSES_NAME, type: JavaCompile) {
-            group JMH_GROUP
-            dependsOn 'jmhRunBytecodeGenerator'
+        createTask(project, JMH_TASK_COMPILE_GENERATED_CLASSES_NAME, JavaCompile) {
+            it.group JMH_GROUP
+            it.dependsOn 'jmhRunBytecodeGenerator'
 
-            classpath = project.sourceSets.jmh.runtimeClasspath
+            it.classpath = project.sourceSets.jmh.runtimeClasspath
             if (extension.includeTests) {
-                classpath += project.sourceSets.test.output + project.sourceSets.test.runtimeClasspath
+                it.classpath += project.sourceSets.test.output + project.sourceSets.test.runtimeClasspath
             }
-            source = jmhGeneratedSourcesDir
-            destinationDir = jmhGeneratedClassesDir
+            it.source = jmhGeneratedSourcesDir
+            it.destinationDir = jmhGeneratedClassesDir
         }
     }
 
     private Task createJmhRunBytecodeGeneratorTask(Project project, File jmhGeneratedSourcesDir, JMHPluginExtension extension, File jmhGeneratedResourcesDir) {
-        project.tasks.create(name: 'jmhRunBytecodeGenerator', type: JmhBytecodeGeneratorTask) {
-            group JMH_GROUP
-            dependsOn 'jmhClasses'
-            includeTests = extension.includeTestsProvider
-            generatedClassesDir = jmhGeneratedResourcesDir
-            generatedSourcesDir = jmhGeneratedSourcesDir
+        createTask(project, 'jmhRunBytecodeGenerator', JmhBytecodeGeneratorTask) {
+            it.group JMH_GROUP
+            it.dependsOn 'jmhClasses'
+            it.includeTests = extension.includeTestsProvider
+            it.generatedClassesDir = jmhGeneratedResourcesDir
+            it.generatedSourcesDir = jmhGeneratedSourcesDir
         }
     }
 
@@ -174,56 +177,57 @@ class JMHPlugin implements Plugin<Project> {
     }
 
     private void createShadowJmhJar(Project project, JMHPluginExtension extension, File jmhGeneratedResourcesDir, File jmhGeneratedClassesDir, List<String> metaInfExcludes, Configuration runtimeConfiguration) {
-        def shadow = project.tasks.create(name: JMH_JAR_TASK_NAME, type: Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar', true, JMHPlugin.classLoader))
-        shadow.group = JMH_GROUP
-        shadow.dependsOn(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME)
-        shadow.description = 'Create a combined JAR of project and runtime dependencies'
-        shadow.conventionMapping.with {
-            map('classifier') {
-                JMH_NAME
-            }
-        }
-        shadow.manifest.inheritFrom project.tasks.jar.manifest
-        shadow.manifest.attributes 'Main-Class': 'org.openjdk.jmh.Main'
-        shadow.from(runtimeConfiguration)
-        shadow.doFirst { task ->
-            def processLibs = { files ->
-                if (files) {
-                    def libs = [task.manifest.attributes.get('Class-Path')]
-                    libs.addAll files.collect { it.name }
-                    task.manifest.attributes 'Class-Path': libs.unique().join(' ')
+        createTask(project, JMH_JAR_TASK_NAME, Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar', true, JMHPlugin.classLoader)) {
+            it.group = JMH_GROUP
+            it.dependsOn(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME)
+            it.description = 'Create a combined JAR of project and runtime dependencies'
+            it.conventionMapping.with {
+                map('classifier') {
+                    JMH_NAME
                 }
             }
-            processLibs project.configurations.jmh.files
-            processLibs project.configurations.shadow.files
+            it.manifest.inheritFrom project.tasks.jar.manifest
+            it.manifest.attributes 'Main-Class': 'org.openjdk.jmh.Main'
+            it.from(runtimeConfiguration)
+            it.doFirst { task ->
+                def processLibs = { files ->
+                    if (files) {
+                        def libs = [task.manifest.attributes.get('Class-Path')]
+                        libs.addAll files.collect { it.name }
+                        task.manifest.attributes 'Class-Path': libs.unique().join(' ')
+                    }
+                }
+                processLibs project.configurations.jmh.files
+                processLibs project.configurations.shadow.files
 
-            if (extension.includeTests) {
-                task.from(project.sourceSets.test.output)
-            }
-            task.eachFile { FileCopyDetails f ->
-                if (f.name.endsWith('.class')) {
-                    f.setDuplicatesStrategy(extension.duplicateClassesStrategy)
+                if (extension.includeTests) {
+                    task.from(project.sourceSets.test.output)
+                }
+                task.eachFile { FileCopyDetails f ->
+                    if (f.name.endsWith('.class')) {
+                        f.setDuplicatesStrategy(extension.duplicateClassesStrategy)
+                    }
                 }
             }
-        }
-        shadow.from(project.sourceSets.jmh.output)
-        shadow.from(project.sourceSets.main.output)
-        shadow.from(project.file(jmhGeneratedClassesDir))
-        shadow.from(project.file(jmhGeneratedResourcesDir))
+            it.from(project.sourceSets.jmh.output)
+            it.from(project.sourceSets.main.output)
+            it.from(project.file(jmhGeneratedClassesDir))
+            it.from(project.file(jmhGeneratedResourcesDir))
 
-        shadow.exclude(metaInfExcludes)
-        shadow.configurations = []
+            it.exclude(metaInfExcludes)
+            it.configurations = []
+        }
     }
 
     private Task createStandardJmhJar(Project project, JMHPluginExtension extension, List<String> metaInfExcludes, File jmhGeneratedResourcesDir, File jmhGeneratedClassesDir, Configuration runtimeConfiguration) {
-        project.tasks.create(name: JMH_JAR_TASK_NAME, type: Jar) {
-            group JMH_GROUP
-            dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
-            inputs.files project.sourceSets.jmh.output
-            from(runtimeConfiguration) {
+        createTask(project, JMH_JAR_TASK_NAME, Jar) {
+            it.group JMH_GROUP
+            it.dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
+            it.inputs.files project.sourceSets.jmh.output
+            it.from(runtimeConfiguration) {
                 exclude metaInfExcludes
             }
-            doFirst {
+            it.doFirst {
                 from(project.sourceSets.jmh.output)
                 from(project.sourceSets.main.output)
                 from(project.file(jmhGeneratedClassesDir))
@@ -238,11 +242,11 @@ class JMHPlugin implements Plugin<Project> {
                 }
             }
 
-            manifest {
+            it.manifest {
                 attributes 'Main-Class': 'org.openjdk.jmh.Main'
             }
 
-            classifier = JMH_NAME
+            it.classifier = JMH_NAME
         }
     }
 
@@ -280,5 +284,14 @@ class JMHPlugin implements Plugin<Project> {
             }
         }
         newConfig
+    }
+
+    @CompileStatic
+    private static <T extends Task> void createTask(Project project, String name, Class<T> type, Action<? super T> configuration) {
+        if (IS_GRADLE_MIN_49) {
+            project.tasks.register(name, type, configuration)
+        } else {
+            project.tasks.create(name, type, configuration)
+        }
     }
 }
