@@ -54,6 +54,10 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
 
 
     public void run() {
+
+        cleanup(outputSourceDirectory);
+        cleanup(outputResourceDirectory);
+
         String generatorType = this.generatorType;
         if (generatorType.equals(GENERATOR_TYPE_DEFAULT)) {
             generatorType = DEFAULT_GENERATOR_TYPE;
@@ -135,6 +139,18 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
             }
         } finally {
             Thread.currentThread().setContextClassLoader(ocl);
+        }
+    }
+
+    private static void cleanup(final File file) {
+        if (file.exists()) {
+            File[] listing = file.listFiles();
+            if (listing != null) {
+                for (File sub : listing) {
+                    cleanup(sub);
+                }
+            }
+            file.delete();
         }
     }
 }
