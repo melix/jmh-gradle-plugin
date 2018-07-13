@@ -1,3 +1,9 @@
+Version 0.4.7
+    * Fix empty benchmark list
+Version 0.4.6
+-------------
+    * Upgrade to JMH 1.21
+    * Avoid overlapping outputs
 Version 0.4.5
 -------------
     * Update compatibility with Gradle 4.3
