@@ -11,6 +11,7 @@ import org.gradle.workers.WorkerConfiguration
 import org.gradle.workers.WorkerExecutor
 
 @CompileStatic
+@CacheableTask
 class JmhBytecodeGeneratorTask extends DefaultTask {
     private final SourceSetContainer sourceSets = project.convention.getPlugin(JavaPluginConvention).sourceSets
     private final Property<Boolean> includeTestsState = project.getObjects().property(Boolean)
