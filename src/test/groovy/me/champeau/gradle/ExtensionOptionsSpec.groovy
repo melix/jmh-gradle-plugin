@@ -67,6 +67,8 @@ class ExtensionOptionsSpec extends Specification {
         'getWarmupTime'            | 'setWarmup'                | '1ns'                   || TimeValue.nanoseconds(1)
         'getMeasurementIterations' | 'setIterations'            | null                    || null
         'getMeasurementIterations' | 'setIterations'            | 100                     || 100
+        'getTimeout'               | 'setTimeout'               | null                    || null
+        'getTimeout'               | 'setTimeout'               | '60s'                   || TimeValue.seconds(60)
     }
 
     def "Verify option #optionMethod with #value as #result (direct)"() {
