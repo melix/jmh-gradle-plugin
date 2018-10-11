@@ -88,6 +88,8 @@ class ExtensionOptionsSpec extends Specification {
         'getOperationsPerInvocation'  | 'setOperationsPerInvocation'  | 10                      || 10
         'getMeasurementTime'          | 'setTimeOnIteration'          | null                    || null
         'getMeasurementTime'          | 'setTimeOnIteration'          | '1s'                    || TimeValue.seconds(1)
+        'getTimeout'                  | 'setTimeout'                  | null                    || null
+        'getTimeout'                  | 'setTimeout'                  | '60s'                   || TimeValue.seconds(60)
         'getTimeUnit'                 | 'setTimeUnit'                 | null                    || null
         'getTimeUnit'                 | 'setTimeUnit'                 | 'ms'                    || TimeUnit.MILLISECONDS
         'getWarmupBatchSize'          | 'setWarmupBatchSize'          | null                    || null

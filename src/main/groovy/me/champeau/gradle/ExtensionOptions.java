@@ -258,7 +258,7 @@ class ExtensionOptions implements Options {
     @Override
     public Optional<TimeValue> getTimeout() {
         if (extension.getTimeout() != null) {
-            return Optional.of(TimeValue.fromString(extension.getTimeOnIteration()));
+            return Optional.of(TimeValue.fromString(extension.getTimeout()));
         }
         return Optional.none();
     }
