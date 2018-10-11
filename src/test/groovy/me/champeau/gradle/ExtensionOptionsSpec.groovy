@@ -21,9 +21,12 @@ import org.openjdk.jmh.results.format.ResultFormatType
 import org.openjdk.jmh.runner.options.ProfilerConfig
 import org.openjdk.jmh.runner.options.TimeValue
 import org.openjdk.jmh.runner.options.VerboseMode
+import org.openjdk.jmh.runner.options.WarmupMode
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.util.concurrent.TimeUnit;
 
 @Unroll
 class ExtensionOptionsSpec extends Specification {
@@ -67,6 +70,32 @@ class ExtensionOptionsSpec extends Specification {
         'getWarmupTime'            | 'setWarmup'                | '1ns'                   || TimeValue.nanoseconds(1)
         'getMeasurementIterations' | 'setIterations'            | null                    || null
         'getMeasurementIterations' | 'setIterations'            | 100                     || 100
+        'getMeasurementBatchSize'     | 'setBatchSize'                | null                    || null
+        'getMeasurementBatchSize'     | 'setBatchSize'                | 1                       || 1
+        'getForkCount'                | 'setFork'                     | null                    || null
+        'getForkCount'                | 'setFork'                     | 2                       || 2
+        'getJvm'                      | 'setJvm'                      | null                    || null
+        'getJvm'                      | 'setJvm'                      | 'myjvm'                 || 'myjvm'
+        'getJvmArgs'                  | 'setJvmArgs'                  | null                    || null
+        'getJvmArgs'                  | 'setJvmArgs'                  | ['Custom JVM args']     || ['Custom JVM args']
+        'getJvmArgsAppend'            | 'setJvmArgsAppend'            | null                    || null
+        'getJvmArgsAppend'            | 'setJvmArgsAppend'            | ['Custom JVM args']     || ['Custom JVM args']
+        'getJvmArgsPrepend'           | 'setJvmArgsPrepend'           | null                    || null
+        'getJvmArgsPrepend'           | 'setJvmArgsPrepend'           | ['Custom JVM args']     || ['Custom JVM args']
+        'getResult'                   | 'setResultsFile'              | null                    || null
+        'getResult'                   | 'setResultsFile'              | project.file('res.txt') || project.file('res.txt').absolutePath
+        'getOperationsPerInvocation'  | 'setOperationsPerInvocation'  | null                    || null
+        'getOperationsPerInvocation'  | 'setOperationsPerInvocation'  | 10                      || 10
+        'getMeasurementTime'          | 'setTimeOnIteration'          | null                    || null
+        'getMeasurementTime'          | 'setTimeOnIteration'          | '1s'                    || TimeValue.seconds(1)
+        'getTimeUnit'                 | 'setTimeUnit'                 | null                    || null
+        'getTimeUnit'                 | 'setTimeUnit'                 | 'ms'                    || TimeUnit.MILLISECONDS
+        'getWarmupBatchSize'          | 'setWarmupBatchSize'          | null                    || null
+        'getWarmupBatchSize'          | 'setWarmupBatchSize'          | 10                      || 10
+        'getWarmupForkCount'          | 'setWarmupForks'              | null                    || null
+        'getWarmupForkCount'          | 'setWarmupForks'              | 0                       || 0
+        'getWarmupMode'               | 'setWarmupMode'               | null                    || null
+        'getWarmupMode'               | 'setWarmupMode'               | 'INDI'                  || WarmupMode.INDI
     }
 
     def "Verify option #optionMethod with #value as #result (direct)"() {
