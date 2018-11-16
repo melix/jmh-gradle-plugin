@@ -25,11 +25,11 @@ class ProjectWithTestDependenciesSpec extends Specification {
     def "Run project with dependencies on test sources"() {
         given:
         File projectDir = new File("src/funcTest/resources/java-project-with-test-dependencies")
-        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
+        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
         }
-        List<String> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+        List<File> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
 
         BuildResult project = GradleRunner.create()
             .withProjectDir(projectDir)

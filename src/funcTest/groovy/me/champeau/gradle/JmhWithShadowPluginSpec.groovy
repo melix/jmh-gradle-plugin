@@ -26,12 +26,12 @@ import spock.lang.Unroll
 class JmhWithShadowPluginSpec extends Specification {
     def "Run #language benchmarks that are packaged with Shadow plugin"() {
         given:
-        File projectDir = new File("src/funcTest/resources/${language.toLowerCase()}-project")
-        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
+        File projectDir = new File("src/funcTest/resources/${language.toLowerCase()}-shadow-project")
+        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
         }
-        List<String> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+        List<File> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
 
         BuildResult project = GradleRunner.create()
             .withProjectDir(projectDir)

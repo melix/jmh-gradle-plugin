@@ -27,11 +27,11 @@ class MultiProjectLanguageSpec extends Specification {
     def "Should not execute JMH tests from different projects concurrently"() {
         given:
         File projectDir = new File("src/funcTest/resources/java-multi-project")
-        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
+        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
         }
-        List<String> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+        List<File> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
 
         BuildResult project = GradleRunner.create()
             .withProjectDir(projectDir)
