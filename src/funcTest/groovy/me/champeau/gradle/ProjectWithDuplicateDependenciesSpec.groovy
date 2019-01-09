@@ -30,7 +30,7 @@ class ProjectWithDuplicateDependenciesSpec extends Specification {
         projectDir = new File("src/funcTest/resources/java-project-with-duplicate-dependencies")
         buildFile = new File(projectDir, 'build.gradle')
         assert buildFile.createNewFile()
-        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
+        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
             throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
         }
