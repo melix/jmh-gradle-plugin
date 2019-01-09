@@ -135,7 +135,7 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
                     errCount++;
                     sb.append("  - ").append(e.toString()).append("\n");
                 }
-                throw new RuntimeException("Generation of JMH bytecode failed with " + errCount + "errors:\n" + sb);
+                throw new RuntimeException("Generation of JMH bytecode failed with " + errCount + " errors:\n" + sb);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(ocl);
