@@ -74,6 +74,7 @@ dependencies {
 tasks {
     register("release") {
         description = "Releases a version of the plugin on Artifactory and Bintray"
+        dependsOn("build")
         dependsOn("artifactoryPublish")
         dependsOn("bintrayUpload")
     }
