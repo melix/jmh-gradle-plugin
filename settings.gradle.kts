@@ -11,4 +11,4 @@
  * limitations under the License.
  */
 
-rootProject.name = 'jmh-gradle-plugin'
+rootProject.name = "jmh-gradle-plugin"
