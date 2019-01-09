@@ -38,6 +38,8 @@ public class IsolatedRunner implements Runnable {
             runner.run();
         } catch (RunnerException e) {
             throw new GradleException("Error during execution of benchmarks", e);
+        } finally {
+            runner.runSystemGC();
         }
     }
 }
