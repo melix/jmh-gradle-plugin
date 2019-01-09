@@ -168,8 +168,9 @@ class JMHPlugin implements Plugin<Project> {
             jmh {
                 java.srcDir 'src/jmh/java'
                 resources.srcDir 'src/jmh/resources'
-                compileClasspath += project.configurations.jmh + project.configurations.compile + main.output
-                runtimeClasspath += project.configurations.jmh + project.configurations.runtime + main.output
+                // TODO: CC this is not quite right, we shouldn't use "jmh" directly here
+                compileClasspath += project.configurations.jmh + project.configurations.compileClasspath + main.output
+                runtimeClasspath += project.configurations.jmh + project.configurations.runtimeClasspath + main.output
             }
         }
     }
