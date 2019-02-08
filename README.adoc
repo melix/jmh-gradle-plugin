@@ -98,7 +98,7 @@ The project will add several tasks:
 * `jmhClasses`                 : compiles raw benchmark code
 * `jmhRunBytecodeGenerator`    : runs bytecode generator over raw benchmark code and generates actual benchmarks
 * `jmhCompileGeneratedClasses` : compiles generated benchmarks
-* `jmhJar`                     : builds the JMH jar containing the JHM runtime and your compiled benchmark classes
+* `jmhJar`                     : builds the JMH jar containing the JMH runtime and your compiled benchmark classes
 * `jmh`                        : executes the benchmarks
     
 The `jmh` task is the main task and depends on the others so it is in general sufficient to execute this task:
