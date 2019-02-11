@@ -139,6 +139,13 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
             }
         } finally {
             Thread.currentThread().setContextClassLoader(ocl);
+            try {
+                amendedCL.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodError e) {
+                // ignored; URLClassLoader#close() requires Java >= 1.7
+            }
         }
     }
 
