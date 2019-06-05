@@ -66,7 +66,7 @@ class ProjectWithDuplicateClassesSpec extends Specification {
         return GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath(pluginClasspath)
-                .withArguments("clean", "jmh")
+                .withArguments("-S", "clean", "jmh")
     }
 
     def "Fail the build while executing jmhJar task when Shadow plugin applied"() {
