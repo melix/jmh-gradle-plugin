@@ -28,5 +28,6 @@ dependencies {
 
 jmh {
     resultFormat = 'csv'
+    verbosity = 'EXTRA'
     resultsFile = file('build/reports/benchmarks.csv')
 }

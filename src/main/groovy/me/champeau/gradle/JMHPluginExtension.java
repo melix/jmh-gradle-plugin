@@ -18,14 +18,25 @@ package me.champeau.gradle;
 import org.gradle.api.Project;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.provider.Property;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.ProfilerConfig;
+import org.openjdk.jmh.runner.options.TimeValue;
+import org.openjdk.jmh.runner.options.VerboseMode;
+import org.openjdk.jmh.runner.options.WarmupMode;
+import org.openjdk.jmh.util.Optional;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class JMHPluginExtension {
     private final Project project;
@@ -70,6 +81,7 @@ public class JMHPluginExtension {
 
     public JMHPluginExtension(final Project project) {
         this.project = project;
+
         includeTestState = project.getObjects().property(Boolean.class);
         setIncludeTests(true);
     }
@@ -82,10 +94,152 @@ public class JMHPluginExtension {
         this.jmhVersion = jmhVersion;
     }
 
-    void resolveArgs() {
+    Options resolveArgs() {
         resolveResultExtension();
         resolveResultFormat();
         resolveResultsFile();
+
+        // TODO: Maybe the extension can just set the options as we go instead of building this up at the end.
+        OptionsBuilder optionsBuilder = new OptionsBuilder();
+
+        if (profilers != null) {
+            for (String profiler : profilers) {
+                int idx = profiler.indexOf(":");
+                String profName = (idx == -1) ? profiler : profiler.substring(0, idx);
+                String params = (idx == -1) ? "" : profiler.substring(idx + 1);
+                optionsBuilder.addProfiler(profName, params);
+            }
+        }
+
+        for (String pattern : include) {
+            optionsBuilder.include(pattern);
+        }
+
+        for (String pattern : exclude) {
+            optionsBuilder.exclude(pattern);
+        }
+
+        if (humanOutputFile != null) {
+            optionsBuilder.output(humanOutputFile.getAbsolutePath());
+        }
+
+        if (resultFormat != null) {
+            optionsBuilder.resultFormat(org.openjdk.jmh.results.format.ResultFormatType.valueOf(resultFormat.toUpperCase()));
+        }
+
+        if (resultsFile != null) {
+            optionsBuilder.result(resultsFile.getAbsolutePath());
+        }
+
+        if (forceGC != null) {
+            optionsBuilder.shouldDoGC(forceGC);
+        }
+
+        if (verbosity != null) {
+            optionsBuilder.verbosity(VerboseMode.valueOf(verbosity.toUpperCase()));
+        }
+
+        if (failOnError != null) {
+            optionsBuilder.shouldFailOnError(failOnError);
+        }
+
+        if (threads != null) {
+            optionsBuilder.threads(threads);
+        }
+
+        if (threadGroups != null) {
+            int[] arr = new int[threadGroups.size()];
+            Iterator<Integer> it = threadGroups.iterator();
+            for (int i = 0; i < arr.length; i++) {
+                arr[i] = it.next();
+            }
+            optionsBuilder.threadGroups(arr);
+        }
+
+        if (synchronizeIterations != null) {
+            optionsBuilder.syncIterations(synchronizeIterations);
+        }
+
+        if (warmupIterations != null) {
+            optionsBuilder.warmupIterations(warmupIterations);
+        }
+
+        if (warmup != null) {
+            optionsBuilder.warmupTime(TimeValue.fromString(warmup));
+        }
+
+        if (warmupBatchSize != null) {
+            optionsBuilder.warmupBatchSize(warmupBatchSize);
+        }
+
+        if (warmupMode != null) {
+            optionsBuilder.warmupMode(WarmupMode.valueOf(warmupMode));
+        }
+
+        if (warmupBenchmarks != null) {
+            for (String pattern : warmupBenchmarks) {
+                optionsBuilder.includeWarmup(pattern);
+            }
+        }
+
+        if (iterations != null) {
+            optionsBuilder.measurementIterations(iterations);
+        }
+
+        if (timeOnIteration != null) {
+            optionsBuilder.measurementTime(TimeValue.fromString(timeOnIteration));
+        }
+
+        if (batchSize != null) {
+            optionsBuilder.measurementBatchSize(batchSize);
+        }
+
+        if (benchmarkMode != null) {
+            for (String benchMode : benchmarkMode) {
+                optionsBuilder.mode(Mode.deepValueOf(benchMode));
+            }
+        }
+
+        if (timeUnit != null) {
+            optionsBuilder.timeUnit(toTimeUnit(timeUnit));
+        }
+
+        if (operationsPerInvocation != null) {
+            optionsBuilder.operationsPerInvocation(operationsPerInvocation);
+        }
+
+        if (fork != null) {
+            optionsBuilder.forks(fork);
+        }
+
+        if (warmupForks != null) {
+            optionsBuilder.warmupForks(warmupForks);
+        }
+
+        if (jvm != null) {
+            optionsBuilder.jvm(jvm);
+        }
+
+        if (jvmArgs != null) {
+            optionsBuilder.jvmArgs(jvmArgs.toArray(new String[0]));
+        }
+        if (jvmArgsAppend != null) {
+            optionsBuilder.jvmArgsAppend(jvmArgsAppend.toArray(new String[0]));
+        }
+        if (jvmArgsPrepend != null) {
+            optionsBuilder.jvmArgsPrepend(jvmArgsPrepend.toArray(new String[0]));
+        }
+
+        if (timeout != null) {
+            optionsBuilder.timeout(TimeValue.fromString(timeout));
+        }
+
+        if (benchmarkParameters != null) {
+            for (Map.Entry<String, Collection<String>> params : benchmarkParameters.entrySet()) {
+                optionsBuilder.param(params.getKey(), params.getValue().toArray(new String[0]));
+            }
+        }
+        return optionsBuilder.build();
     }
 
     private void resolveResultsFile() {
@@ -98,6 +252,26 @@ public class JMHPluginExtension {
 
     private void resolveResultFormat() {
         resultFormat = resultFormat != null ? resultFormat : "text";
+    }
+
+    private TimeUnit toTimeUnit(String str) {
+        TimeUnit tu;
+        if (str.equalsIgnoreCase("ns")) {
+            tu = TimeUnit.NANOSECONDS;
+        } else if (str.equalsIgnoreCase("us")) {
+            tu = TimeUnit.MICROSECONDS;
+        } else if (str.equalsIgnoreCase("ms")) {
+            tu = TimeUnit.MILLISECONDS;
+        } else if (str.equalsIgnoreCase("s")) {
+            tu = TimeUnit.SECONDS;
+        } else if (str.equalsIgnoreCase("m")) {
+            tu = TimeUnit.MINUTES;
+        } else if (str.equalsIgnoreCase("h")) {
+            tu = TimeUnit.HOURS;
+        } else {
+            throw new IllegalArgumentException("Unknown time unit: " + str);
+        }
+        return tu;
     }
 
     private String parseResultFormat() {
