@@ -35,11 +35,12 @@ import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.util.GradleVersion
 
 import java.util.concurrent.atomic.AtomicReference
+
 /**
  * Configures the JMH Plugin.
  */
 class JMHPlugin implements Plugin<Project> {
-    private static boolean IS_GRADLE_MIN_49 = GradleVersion.current().compareTo(GradleVersion.version("4.9-rc-1"))>=0
+    private static boolean IS_GRADLE_MIN_55 = GradleVersion.current().compareTo(GradleVersion.version("5.5-rc-1")) >= 0
 
     public static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
     public static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
@@ -50,6 +51,9 @@ class JMHPlugin implements Plugin<Project> {
     public static String JHM_RUNTIME_CONFIGURATION = 'jmhRuntime'
 
     void apply(Project project) {
+        if (!IS_GRADLE_MIN_55) {
+            throw new RuntimeException("This version of the JMH Gradle plugin requires Gradle 5.5+. Please upgrade Gradle or use an older version of the plugin.");
+        }
         project.plugins.apply(JavaPlugin)
         final JMHPluginExtension extension = project.extensions.create(JMH_NAME, JMHPluginExtension, project)
         final Configuration configuration = project.configurations.create(JMH_NAME)
@@ -287,10 +291,6 @@ class JMHPlugin implements Plugin<Project> {
 
     @CompileStatic
     private static <T extends Task> void createTask(Project project, String name, Class<T> type, Action<? super T> configuration) {
-        if (IS_GRADLE_MIN_49) {
-            project.tasks.register(name, type, configuration)
-        } else {
-            project.tasks.create(name, type, configuration)
-        }
+        project.tasks.register(name, type, configuration)
     }
 }
