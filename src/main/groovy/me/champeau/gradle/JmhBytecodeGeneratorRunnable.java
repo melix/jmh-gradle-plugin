@@ -138,6 +138,11 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
                 throw new RuntimeException("Generation of JMH bytecode failed with " + errCount + " errors:\n" + sb);
             }
         } finally {
+            try {
+                amendedCL.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Thread.currentThread().setContextClassLoader(ocl);
         }
     }
