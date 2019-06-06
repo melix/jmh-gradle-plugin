@@ -58,9 +58,9 @@ class JMHPlugin implements Plugin<Project> {
         final JMHPluginExtension extension = project.extensions.create(JMH_NAME, JMHPluginExtension, project)
         final Configuration configuration = project.configurations.create(JMH_NAME)
         final Configuration runtimeConfiguration = createJmhRuntimeConfiguration(project, extension)
-        configuration.incoming.beforeResolve { ResolvableDependencies resolvableDependencies ->
-            DependencyHandler dependencyHandler = project.getDependencies()
-            def dependencies = configuration.getDependencies()
+
+        DependencyHandler dependencyHandler = project.getDependencies()
+        configuration.withDependencies {dependencies ->
             dependencies.add(dependencyHandler.create("${JMH_CORE_DEPENDENCY}${extension.jmhVersion}"))
             dependencies.add(dependencyHandler.create("${JMH_GENERATOR_DEPENDENCY}${extension.jmhVersion}"))
         }
@@ -200,7 +200,7 @@ class JMHPlugin implements Plugin<Project> {
                         task.manifest.attributes 'Class-Path': libs.unique().join(' ')
                     }
                 }
-                processLibs project.configurations.jmh.files
+                processLibs runtimeConfiguration.files
                 processLibs project.configurations.shadow.files
 
                 if (extension.includeTests) {
@@ -261,8 +261,8 @@ class JMHPlugin implements Plugin<Project> {
                 if (extension.includeTests) {
                     project.sourceSets {
                         jmh {
-                            compileClasspath += test.output + project.configurations.testCompile
-                            runtimeClasspath += test.output + project.configurations.testRuntime
+                            compileClasspath += test.output + project.configurations.testCompileClasspath
+                            runtimeClasspath += test.output + project.configurations.testRuntimeClasspath
                         }
                     }
                 }
@@ -279,11 +279,11 @@ class JMHPlugin implements Plugin<Project> {
         newConfig.setCanBeConsumed(false)
         newConfig.setCanBeResolved(true)
         newConfig.setVisible(false)
-        newConfig.dependencies.addAll(project.configurations.getByName('jmh').allDependencies)
-        newConfig.dependencies.addAll(project.configurations.getByName('runtime').allDependencies)
+        newConfig.extendsFrom(project.configurations.getByName('jmh'))
+        newConfig.extendsFrom(project.configurations.getByName('runtimeOnly'))
         project.afterEvaluate {
             if (extension.includeTests) {
-                newConfig.dependencies.addAll(project.configurations.getByName('testRuntime').allDependencies)
+                newConfig.extendsFrom(project.configurations.getByName('testRuntimeOnly'))
             }
         }
         newConfig
