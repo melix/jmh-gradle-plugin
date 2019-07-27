@@ -79,7 +79,7 @@ class JMHPlugin implements Plugin<Project> {
 
         createJmhCompileGeneratedClassesTask(project, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, extension)
 
-        def metaInfExcludes = ['META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
+        def metaInfExcludes = ['module-info.class', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
         if (hasShadow) {
             createShadowJmhJar(project, extension, jmhGeneratedResourcesDir, jmhGeneratedClassesDir, metaInfExcludes, runtimeConfiguration)
         } else {
@@ -226,9 +226,15 @@ class JMHPlugin implements Plugin<Project> {
             it.group JMH_GROUP
             it.dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
             it.inputs.files project.sourceSets.jmh.output
-            it.from(runtimeConfiguration) {
-                exclude metaInfExcludes
+            it.inputs.files project.sourceSets.main.output
+            if (extension.includeTests) {
+                it.inputs.files project.sourceSets.test.output
             }
+            it.from {
+                runtimeConfiguration.asFileTree.collect { File f ->
+                    f.isDirectory() ? f : project.zipTree(f)
+                }
+            }.exclude(metaInfExcludes)
             it.doFirst {
                 from(project.sourceSets.jmh.output)
                 from(project.sourceSets.main.output)
@@ -248,7 +254,7 @@ class JMHPlugin implements Plugin<Project> {
                 attributes 'Main-Class': 'org.openjdk.jmh.Main'
             }
 
-            it.classifier = JMH_NAME
+            it.archiveClassifier = JMH_NAME
         }
     }
 
@@ -279,10 +285,10 @@ class JMHPlugin implements Plugin<Project> {
         newConfig.setCanBeResolved(true)
         newConfig.setVisible(false)
         newConfig.extendsFrom(project.configurations.getByName('jmh'))
-        newConfig.extendsFrom(project.configurations.getByName('runtimeOnly'))
+        newConfig.extendsFrom(project.configurations.getByName('runtimeClasspath'))
         project.afterEvaluate {
             if (extension.includeTests) {
-                newConfig.extendsFrom(project.configurations.getByName('testRuntimeOnly'))
+                newConfig.extendsFrom(project.configurations.getByName('testRuntimeClasspath'))
             }
         }
         newConfig
