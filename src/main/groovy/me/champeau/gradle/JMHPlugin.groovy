@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicReference
  * Configures the JMH Plugin.
  */
 class JMHPlugin implements Plugin<Project> {
-    private static boolean IS_GRADLE_MIN_55 = GradleVersion.current().compareTo(GradleVersion.version("5.5-rc-1")) >= 0
+    private static boolean IS_GRADLE_MIN_55 = GradleVersion.current().compareTo(GradleVersion.version("5.5.0")) >= 0
 
     public static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
     public static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
