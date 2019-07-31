@@ -15,16 +15,23 @@
  */
 package me.champeau.gradle;
 
+import java.util.List;
+
 import org.gradle.api.DefaultTask;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.options.Option;
 import org.gradle.jvm.tasks.Jar;
 import org.gradle.workers.IsolationMode;
 import org.gradle.workers.WorkerExecutor;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.ThreadsValueConverter;
 
 import javax.inject.Inject;
 
@@ -39,6 +46,8 @@ public class JMHTask extends DefaultTask {
 
     private final WorkerExecutor workerExecutor;
 
+    private final OptionsBuilder optionsBuilder = new OptionsBuilder();
+
     @Inject
     public JMHTask(final WorkerExecutor workerExecutor) {
         this.workerExecutor = workerExecutor;
@@ -47,7 +56,8 @@ public class JMHTask extends DefaultTask {
     @TaskAction
     public void before() {
         final JMHPluginExtension extension = getProject().getExtensions().getByType(JMHPluginExtension.class);
-        final Options options = extension.resolveArgs();
+        final Options options = optionsBuilder.parent(extension.resolveArgs()).build();
+
         extension.getResultsFile().getParentFile().mkdirs();
 
         workerExecutor.submit(IsolatedRunner.class, workerConfiguration -> {
@@ -74,6 +84,18 @@ public class JMHTask extends DefaultTask {
 
     private Provider<RegularFile> getJarArchive() {
         return ((Jar)getProject().getTasks().getByName(JMHPlugin.JMH_JAR_TASK_NAME)).getArchiveFile();
+    }
+
+    @Option(option = "include", description = "Benchmarks to run (regexp+).")
+    public void setIncludes(final List<String> includes) {
+        for (String include : includes) {
+            optionsBuilder.include(include);
+        }
+    }
+
+    @Option(option = "threads", description = "Number of worker threads to run with. 'max' means the maximum number of hardware threads available on the machine, figured out by JMH itself.")
+    public void setThreads(final String threads) {
+        optionsBuilder.threads(new ThreadsValueConverter().convert(threads));
     }
 
 }
