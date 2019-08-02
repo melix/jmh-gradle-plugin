@@ -36,8 +36,8 @@ task createClasspathManifest {
 }
 
 dependencies {
-    functionalTestCompile gradleTestKit()
-    functionalTestCompile files(createClasspathManifest)
+    functionalTestImplementation gradleTestKit()
+    functionalTestImplementation files(createClasspathManifest)
 }
 
 compileFunctionalTestJava.dependsOn createClasspathManifest
@@ -62,6 +62,6 @@ idea.module {
         testSourceDirs += it
     }
 
-    scopes.TEST.plus += [configurations.functionalTestCompile]
-    scopes.TEST.plus += [configurations.functionalTestRuntime]
+    scopes.TEST.plus += [configurations.functionalTestCompileClasspath]
+    scopes.TEST.plus += [configurations.functionalTestRuntimeClasspath]
 }

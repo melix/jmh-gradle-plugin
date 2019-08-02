@@ -77,9 +77,9 @@ class ProjectWithDuplicateDependenciesSpec extends Specification {
         }
 
         dependencies {
-            compile 'org.apache.commons:commons-lang3:3.0.1'
-            testCompile 'junit:junit:4.12'
-            testCompile 'org.apache.commons:commons-lang3:3.2'
+            implementation 'org.apache.commons:commons-lang3:3.0.1'
+            testImplementation 'junit:junit:4.12'
+            testImplementation 'org.apache.commons:commons-lang3:3.2'
             jmh 'org.apache.commons:commons-lang3:3.4'
         }
 

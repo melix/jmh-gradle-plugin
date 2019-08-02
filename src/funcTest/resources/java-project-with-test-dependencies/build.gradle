@@ -23,8 +23,8 @@ repositories {
 }
 
 dependencies {
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.apache.commons:commons-lang3:3.4'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.apache.commons:commons-lang3:3.4'
 }
 
 jmh {
