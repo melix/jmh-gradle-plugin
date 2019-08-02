@@ -38,6 +38,10 @@ class JMHPluginTest {
         def task = project.tasks.findByName('jmh')
         assert task instanceof JMHTask
 
+        def jmhConfigurations = project.configurations*.name.findAll { it.startsWith('jmh') }
+        println(jmhConfigurations)
+        println project.configurations.jmhCompileClasspath.extendsFrom
+        println project.configurations.jmhCompileClasspath.files
     }
 
     @Test

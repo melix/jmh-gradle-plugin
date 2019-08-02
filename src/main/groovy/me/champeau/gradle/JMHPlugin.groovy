@@ -171,10 +171,17 @@ class JMHPlugin implements Plugin<Project> {
             jmh {
                 java.srcDir 'src/jmh/java'
                 resources.srcDir 'src/jmh/resources'
-                // TODO: CC this is not quite right, we shouldn't use "jmh" directly here
-                compileClasspath += project.configurations.jmh + project.configurations.compileClasspath + main.output
-                runtimeClasspath += project.configurations.jmh + project.configurations.runtimeClasspath + main.output
+                compileClasspath += main.output
+                runtimeClasspath += main.output
             }
+        }
+        project.configurations.with {
+            // the following line is for backwards compatibility
+            // no one should really add directly to the "jmh" configuration
+            jmhImplementation.extendsFrom(jmh)
+
+            jmhCompileClasspath.extendsFrom(implementation, compileOnly)
+            jmhRuntimeClasspath.extendsFrom(implementation, runtimeOnly)
         }
     }
 
@@ -278,6 +285,9 @@ class JMHPlugin implements Plugin<Project> {
         })
     }
 
+    // TODO: This is really bad. We shouldn't use "runtime", but use the configurations provided by Gradle
+    // automatically when creating a source set. That is to say, "jmhRuntimeOnly" for example and wire
+    // our classpath properly
     @CompileStatic
     private static Configuration createJmhRuntimeConfiguration(Project project, JMHPluginExtension extension) {
         def newConfig = project.configurations.create(JHM_RUNTIME_CONFIGURATION)
