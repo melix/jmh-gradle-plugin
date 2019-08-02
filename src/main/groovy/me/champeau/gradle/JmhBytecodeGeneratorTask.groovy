@@ -16,20 +16,16 @@ class JmhBytecodeGeneratorTask extends DefaultTask {
     private final SourceSetContainer sourceSets = project.convention.getPlugin(JavaPluginConvention).sourceSets
     private final Property<Boolean> includeTestsState = project.getObjects().property(Boolean).convention(false)
 
-    @InputFiles
-    @PathSensitive(PathSensitivity.RELATIVE)
+    @Classpath
     FileCollection runtimeClasspath = sourceSets.getByName('jmh').runtimeClasspath
 
-    @InputFiles
-    @PathSensitive(PathSensitivity.RELATIVE)
+    @Classpath
     FileCollection testClasses = sourceSets.getByName('test').output
 
-    @InputFiles
-    @PathSensitive(PathSensitivity.RELATIVE)
+    @Classpath
     FileCollection testRuntimeClasspath = sourceSets.getByName('test').runtimeClasspath
 
-    @InputFiles
-    @PathSensitive(PathSensitivity.RELATIVE)
+    @Classpath
     FileCollection classesDirs = sourceSets.getByName('jmh').output.classesDirs
 
     @OutputDirectory
