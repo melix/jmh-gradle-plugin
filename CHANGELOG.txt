@@ -4,6 +4,7 @@ Version 0.5.0
     * Require Java 8 minimally
     * Fix compatibility with the Shadow plugin
     * JMH jar is now a fatjar following the recommendation from JMH (#154)
+    * Fix relocation of JmhBytecodeGeneratorTask
 Version 0.4.8
 -------------
     * Support for Gradle 5+

@@ -14,18 +14,22 @@ import org.gradle.workers.WorkerExecutor
 @CacheableTask
 class JmhBytecodeGeneratorTask extends DefaultTask {
     private final SourceSetContainer sourceSets = project.convention.getPlugin(JavaPluginConvention).sourceSets
-    private final Property<Boolean> includeTestsState = project.getObjects().property(Boolean)
+    private final Property<Boolean> includeTestsState = project.getObjects().property(Boolean).convention(false)
 
     @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
     FileCollection runtimeClasspath = sourceSets.getByName('jmh').runtimeClasspath
 
     @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
     FileCollection testClasses = sourceSets.getByName('test').output
 
     @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
     FileCollection testRuntimeClasspath = sourceSets.getByName('test').runtimeClasspath
 
     @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
     FileCollection classesDirs = sourceSets.getByName('jmh').output.classesDirs
 
     @OutputDirectory
@@ -39,12 +43,8 @@ class JmhBytecodeGeneratorTask extends DefaultTask {
     String generatorType = 'default'
 
     @Input
-    boolean getIncludeTests() {
-        includeTestsState.get()
-    }
-
-    void setIncludeTests(Property<Boolean> state) {
-        includeTestsState.set(state);
+    Property<Boolean> getIncludeTests() {
+        includeTestsState
     }
 
     @TaskAction
