@@ -36,16 +36,19 @@ import java.util.Map;
 import static org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator.*;
 
 public class JmhBytecodeGeneratorRunnable implements Runnable {
+    private final File[] classpath;
     private final File[] compiledBytecodeDirectories;
     private final File outputSourceDirectory;
     private final File outputResourceDirectory;
     private final String generatorType;
 
     @Inject
-    public JmhBytecodeGeneratorRunnable(final File[] compiledBytecodeDirectories,
+    public JmhBytecodeGeneratorRunnable(final File[] classpath,
+                                        final File[] compiledBytecodeDirectories,
                                         final File outputSourceDirectory,
                                         final File outputResourceDirectory,
                                         final String generatorType) {
+        this.classpath = classpath;
         this.compiledBytecodeDirectories = compiledBytecodeDirectories;
         this.outputSourceDirectory = outputSourceDirectory;
         this.outputResourceDirectory = outputResourceDirectory;
@@ -63,25 +66,27 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
             generatorType = DEFAULT_GENERATOR_TYPE;
         }
 
-        URL[] urls = new URL[compiledBytecodeDirectories.length];
+        URL[] urls = new URL[classpath.length + compiledBytecodeDirectories.length];
+        for (int i = 0; i < classpath.length; i++) {
+            try {
+                urls[i] = classpath[i].toURI().toURL();
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         for (int i = 0; i < compiledBytecodeDirectories.length; i++) {
             try {
-                urls[i] = compiledBytecodeDirectories[i].toURI().toURL();
+                urls[i + classpath.length] = compiledBytecodeDirectories[i].toURI().toURL();
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        // Include compiled bytecode on classpath, in case we need to
-        // resolve the cross-class dependencies
-        URLClassLoader amendedCL = new URLClassLoader(
-                urls,
-                this.getClass().getClassLoader());
-
+        URLClassLoader loader = new URLClassLoader(urls, this.getClass().getClassLoader());
         ClassLoader ocl = Thread.currentThread().getContextClassLoader();
 
         try {
-            Thread.currentThread().setContextClassLoader(amendedCL);
+            Thread.currentThread().setContextClassLoader(loader);
 
             FileSystemDestination destination = new FileSystemDestination(outputResourceDirectory, outputSourceDirectory);
 
@@ -113,7 +118,7 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
                         name = name.replaceAll("/", ".");
                         if (name.endsWith(".class")) {
                             try {
-                                src.processClasses(Class.forName(name.substring(0, name.length() - 6), false, amendedCL));
+                                src.processClasses(Class.forName(name.substring(0, name.length() - 6), false, loader));
                             } catch (ClassNotFoundException e) {
                                 throw new RuntimeException(e);
                             }
@@ -139,7 +144,7 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
             }
         } finally {
             try {
-                amendedCL.close();
+                loader.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -27,6 +27,7 @@ import org.gradle.workers.WorkerExecutor;
 import org.openjdk.jmh.runner.options.Options;
 
 import javax.inject.Inject;
+import java.io.File;
 
 /**
  * The JMH task converts our {@link JMHPluginExtension extension configuration} into JMH specific
@@ -39,6 +40,9 @@ public class JMHTask extends DefaultTask {
 
     private final WorkerExecutor workerExecutor;
 
+    private File benchmarkList;
+    private File compilerHints;
+
     @Inject
     public JMHTask(final WorkerExecutor workerExecutor) {
         this.workerExecutor = workerExecutor;
@@ -48,21 +52,18 @@ public class JMHTask extends DefaultTask {
     public void before() {
         final JMHPluginExtension extension = getProject().getExtensions().getByType(JMHPluginExtension.class);
         final Options options = extension.resolveArgs();
+
         extension.getResultsFile().getParentFile().mkdirs();
 
         workerExecutor.submit(IsolatedRunner.class, workerConfiguration -> {
             workerConfiguration.setIsolationMode(IsolationMode.PROCESS);
             ConfigurationContainer configurations = getProject().getConfigurations();
-            FileCollection classpath = configurations.getByName("jmh").plus(getProject().files(getJarArchive()));
+            workerConfiguration.classpath(configurations.getByName("jmh"));
+            FileCollection benchmarkClasspath = configurations.getByName("jmh").plus(getProject().files(getJarArchive()));
             if (extension.isIncludeTests()) {
-                classpath = classpath.plus(configurations.getByName("testRuntimeClasspath"));
+                benchmarkClasspath = benchmarkClasspath.plus(configurations.getByName("testRuntimeClasspath"));
             }
-            // TODO: This isn't quite right.  JMH is already a part of the worker classpath,
-            // but we need it to be part of the "classpath under test" too.
-            // We only need the jar for the benchmarks on the classpath so that the BenchmarkList resource reader
-            // can find the BenchmarkList file in the jar.
-            workerConfiguration.classpath(classpath);
-            workerConfiguration.params(options, classpath.getFiles());
+            workerConfiguration.params(options, benchmarkClasspath.getFiles(), benchmarkList, compilerHints, extension.getJmhVersion());
             workerConfiguration.getForkOptions().getSystemProperties().put(JAVA_IO_TMPDIR, getTemporaryDir());
         });
     }
@@ -76,4 +77,11 @@ public class JMHTask extends DefaultTask {
         return ((Jar)getProject().getTasks().getByName(JMHPlugin.JMH_JAR_TASK_NAME)).getArchiveFile();
     }
 
+    public void setBenchmarkList(File benchmarkList) {
+        this.benchmarkList = benchmarkList;
+    }
+
+    public void setCompilerHints(File compilerHints) {
+        this.compilerHints = compilerHints;
+    }
 }

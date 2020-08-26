@@ -19,14 +19,11 @@ import org.gradle.api.Project;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.provider.Property;
 import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.openjdk.jmh.runner.options.ProfilerConfig;
 import org.openjdk.jmh.runner.options.TimeValue;
 import org.openjdk.jmh.runner.options.VerboseMode;
 import org.openjdk.jmh.runner.options.WarmupMode;
-import org.openjdk.jmh.util.Optional;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 public class JMHPluginExtension {
     private final Project project;
 
-    private String jmhVersion = "1.24";
+    private String jmhVersion = "1.25";
     private final Property<Boolean> includeTestState;
 
     private List<String> include = new ArrayList<String>();

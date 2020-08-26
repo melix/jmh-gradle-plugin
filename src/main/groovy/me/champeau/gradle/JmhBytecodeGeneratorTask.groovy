@@ -34,7 +34,6 @@ class JmhBytecodeGeneratorTask extends DefaultTask {
     @OutputDirectory
     File generatedSourcesDir
 
-
     @Input
     String generatorType = 'default'
 
@@ -48,12 +47,12 @@ class JmhBytecodeGeneratorTask extends DefaultTask {
         def workerExecutor = getServices().get(WorkerExecutor)
         workerExecutor.submit(JmhBytecodeGeneratorRunnable) { WorkerConfiguration config ->
             config.isolationMode = IsolationMode.PROCESS
-            def classpath = runtimeClasspath.files
+            config.classpath = project.configurations.getByName("jmh");
+            def benchmarkClasspath = runtimeClasspath.files
             if (includeTests) {
-                classpath += testClasses.files + testRuntimeClasspath.files
+                benchmarkClasspath += testClasses.files + testRuntimeClasspath.files
             }
-            config.classpath = classpath
-            config.params(classesDirs.files as File[], generatedSourcesDir, generatedClassesDir, generatorType)
+            config.params(benchmarkClasspath as File[], classesDirs.files as File[], generatedSourcesDir, generatedClassesDir, generatorType)
         }
     }
 

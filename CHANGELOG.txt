@@ -1,3 +1,7 @@
+Version 0.5.1
+-------------
+    * Fix jars being locked under Windows preventing use of the daemon
+    * Update to JMH 1.25
 Version 0.5.0
 -------------
     * Support for Gradle 5.5+
@@ -17,7 +21,7 @@ Version 0.4.7
     * Cache the code generation task
 Version 0.4.6
 -------------
-    * Upgrade to JMH 1.21
+    * Upgrade to JMH 1.25
     * Avoid overlapping outputs
 Version 0.4.5
 -------------
