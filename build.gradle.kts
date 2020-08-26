@@ -15,10 +15,9 @@
  */
 
 plugins {
-    id("com.gradle.build-scan") version "2.1"
     id("me.champeau.buildscan-recipes") version "0.2.3"
     id("com.jfrog.bintray") version "1.8.0"
-    id("com.jfrog.artifactory") version "4.6.0"
+    id("com.jfrog.artifactory") version "4.16.1"
     id("com.github.hierynomus.license") version "0.14.0"
     id("net.nemerosa.versioning") version "2.6.1"
     id("com.github.ben-manes.versions") version "0.17.0"
@@ -29,12 +28,16 @@ plugins {
     id("java-gradle-plugin")
 }
 
-buildScan {
-    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-    termsOfServiceAgree = "yes"
-
-    publishAlways()
+buildscript {
+    repositories {
+        mavenLocal()
+    }
+    dependencies {
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.16.2-SNAPSHOT")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.16.2-SNAPSHOT")
+    }
 }
+
 
 buildScanRecipes {
     recipes("git-status", "travis-ci")
@@ -86,6 +89,10 @@ tasks {
     }
 }
 
+java {
+   withSourcesJar()
+   withJavadocJar()
+}
 
 jacoco {
     toolVersion = jacocoVersion

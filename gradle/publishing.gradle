@@ -19,11 +19,6 @@ import java.text.SimpleDateFormat
 // configuration of the Maven artifacts
 apply plugin: 'maven-publish'
 
-// add javadoc/source jar tasks as artifacts
-artifacts {
-    archives sourcesJar, javadocJar
-}
-
 Date buildTimeAndDate = new Date()
 ext {
     buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
@@ -51,18 +46,11 @@ jar {
     }
 }
 
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-
-            artifact sourcesJar {
-                classifier "sources"
-            }
-
-            artifact javadocJar {
-                classifier "javadoc"
-            }
 
             pom.withXml {
                 def Node root = asNode()
