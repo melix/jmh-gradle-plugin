@@ -33,8 +33,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.16.2-SNAPSHOT")
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.16.2-SNAPSHOT")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.17.1")
     }
 }
 
