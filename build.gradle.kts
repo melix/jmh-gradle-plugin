@@ -21,7 +21,7 @@ plugins {
     id("com.github.hierynomus.license") version "0.14.0"
     id("net.nemerosa.versioning") version "2.6.1"
     id("com.github.ben-manes.versions") version "0.17.0"
-    id("com.gradle.plugin-publish") version "0.9.9"
+    id("com.gradle.plugin-publish") version "0.12.0"
     id("com.github.kt3k.coveralls") version "2.8.2"
     id("jacoco")
     id("idea")
