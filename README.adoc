@@ -1,5 +1,5 @@
 = JMH Gradle Plugin
-:jmh-version: 1.21
+:jmh-version: 1.25
 :plugin-version: 0.5.0
 
 image:http://img.shields.io/travis/melix/jmh-gradle-plugin/master.svg["Build Status (travis)", link="https://travis-ci.org/melix/jmh-gradle-plugin"]
