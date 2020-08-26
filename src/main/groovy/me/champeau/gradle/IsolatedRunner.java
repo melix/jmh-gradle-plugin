@@ -34,13 +34,19 @@ public class IsolatedRunner implements Runnable {
     private final Set<File> classpathUnderTest;
     private final File benchmarkList;
     private final File compilerHints;
+    private final String jmhVersion;
 
     @Inject
-    public IsolatedRunner(final Options options, final Set<File> classpathUnderTest, File benchmarkList, File compilerHints) {
+    public IsolatedRunner(Options options,
+                          Set<File> classpathUnderTest,
+                          File benchmarkList,
+                          File compilerHints,
+                          String jmhVersion) {
         this.options = options;
         this.classpathUnderTest = classpathUnderTest;
         this.benchmarkList = benchmarkList;
         this.compilerHints = compilerHints;
+        this.jmhVersion = jmhVersion;
     }
 
     @Override
@@ -67,33 +73,35 @@ public class IsolatedRunner implements Runnable {
 
     private void updateBenchmarkList(Runner runner) {
         BenchmarkList benchmarkList = BenchmarkList.fromFile(this.benchmarkList.getAbsolutePath());
-        try {
-            Field listField = runner.getClass().getDeclaredField("list");
-            makeWriteable(listField);
-            listField.set(runner, benchmarkList);
-        } catch (Exception e) {
-            throw new GradleException("Error instantiating benchmarks", e);
-        }
-    }
-    private void updateCompilerHints() {
-        CompilerHints compilerHints = CompilerHints.fromFile(this.compilerHints.getAbsolutePath());
-        try {
-            Field listField = CompilerHints.class.getDeclaredField("defaultList");
-            makeWriteable(listField);
-            listField.set(null, compilerHints);
-        } catch (Exception e) {
-            throw new GradleException("Error instantiating benchmarks", e);
-        }
+        tryUpdateFieldViaReflection(runner.getClass(), runner, "list", benchmarkList);
     }
 
-    private void makeWriteable(Field listField) throws NoSuchFieldException, IllegalAccessException {
+    private void updateCompilerHints() {
+        CompilerHints compilerHints = CompilerHints.fromFile(this.compilerHints.getAbsolutePath());
+        tryUpdateFieldViaReflection(CompilerHints.class, null, "defaultList", compilerHints);
+    }
+
+    private static void makeWriteable(Field listField) throws NoSuchFieldException, IllegalAccessException {
         listField.setAccessible(true);
         Field modifiersField = Field.class.getDeclaredField("modifiers");
         modifiersField.setAccessible(true);
         modifiersField.setInt(listField, listField.getModifiers() & ~Modifier.FINAL);
     }
 
-    private String toPath(Set<File> classpathUnderTest) {
+    private void tryUpdateFieldViaReflection(Class<?> clazz, Object target, String fieldName, Object value) {
+        try {
+            Field listField = clazz.getDeclaredField(fieldName);
+            makeWriteable(listField);
+            listField.set(target, value);
+        } catch (Exception e) {
+            throw new GradleException(
+                    "Error while instantiating tests: unable to set '" + fieldName + "' on " + clazz.getSimpleName() +
+                            ". This plugin version doesn't seem to be compatible with JMH " + jmhVersion +
+                            ". Please report to the plugin authors at https://github.com/melix/jmh-gradle-plugin/.", e);
+        }
+    }
+
+    private static String toPath(Set<File> classpathUnderTest) {
         StringBuilder sb = new StringBuilder();
         for (File entry : classpathUnderTest) {
             sb.append(entry.getAbsolutePath());

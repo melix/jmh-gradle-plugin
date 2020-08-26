@@ -63,7 +63,7 @@ public class JMHTask extends DefaultTask {
             if (extension.isIncludeTests()) {
                 benchmarkClasspath = benchmarkClasspath.plus(configurations.getByName("testRuntimeClasspath"));
             }
-            workerConfiguration.params(options, benchmarkClasspath.getFiles(), benchmarkList, compilerHints);
+            workerConfiguration.params(options, benchmarkClasspath.getFiles(), benchmarkList, compilerHints, extension.getJmhVersion());
             workerConfiguration.getForkOptions().getSystemProperties().put(JAVA_IO_TMPDIR, getTemporaryDir());
         });
     }
