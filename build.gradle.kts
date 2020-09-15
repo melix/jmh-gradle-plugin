@@ -30,9 +30,6 @@ plugins {
 }
 
 buildscript {
-    repositories {
-        mavenLocal()
-    }
     dependencies {
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.17.1")
     }
