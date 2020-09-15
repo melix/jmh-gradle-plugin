@@ -23,6 +23,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.JavaPlugin
@@ -47,7 +48,7 @@ class JMHPlugin implements Plugin<Project> {
     public static final String JMH_NAME = 'jmh'
     public static final String JMH_JAR_TASK_NAME = 'jmhJar'
     public static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
-    public static String JHM_RUNTIME_CONFIGURATION = 'jmhRuntime'
+    public static final String JHM_RUNTIME_CONFIGURATION = 'jmhRuntime'
 
     void apply(Project project) {
         if (!IS_GRADLE_MIN_55) {
@@ -89,6 +90,7 @@ class JMHPlugin implements Plugin<Project> {
         createTask(project, JMH_NAME, JMHTask) {
             it.group JMH_GROUP
             it.dependsOn project.jmhJar
+            it.jarArchive = project.jmhJar.archiveFile
             it.benchmarkList = new File(jmhGeneratedResourcesDir, "META-INF/BenchmarkList")
             it.compilerHints = new File(jmhGeneratedResourcesDir, "/META-INF/CompilerHints")
         }
@@ -162,6 +164,7 @@ class JMHPlugin implements Plugin<Project> {
         createTask(project, 'jmhRunBytecodeGenerator', JmhBytecodeGeneratorTask) {
             it.group JMH_GROUP
             it.dependsOn 'jmhClasses'
+            it.jmhClasspath = project.configurations.jmh
             it.includeTests = extension.includeTestsProvider
             it.generatedClassesDir = jmhGeneratedResourcesDir
             it.generatedSourcesDir = jmhGeneratedSourcesDir
@@ -187,7 +190,7 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    private void createShadowJmhJar(Project project, JMHPluginExtension extension, File jmhGeneratedResourcesDir, File jmhGeneratedClassesDir, List<String> metaInfExcludes, Configuration runtimeConfiguration) {
+    private void createShadowJmhJar(Project project, JMHPluginExtension extension, File jmhGeneratedResourcesDir, File jmhGeneratedClassesDir, List<String> metaInfExcludes, FileCollection runtimeConfiguration) {
         createTask(project, JMH_JAR_TASK_NAME, Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar', true, JMHPlugin.classLoader)) {
             it.group = JMH_GROUP
             it.dependsOn(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME)
@@ -200,6 +203,8 @@ class JMHPlugin implements Plugin<Project> {
             it.manifest.inheritFrom project.tasks.jar.manifest
             it.manifest.attributes 'Main-Class': 'org.openjdk.jmh.Main'
             it.from(runtimeConfiguration)
+            FileCollection shadowConfiguration = project.configurations.shadow
+            def testSourceSetOutput = project.sourceSets.test.output
             it.doFirst { task ->
                 def processLibs = { files ->
                     if (files) {
@@ -209,10 +214,10 @@ class JMHPlugin implements Plugin<Project> {
                     }
                 }
                 processLibs runtimeConfiguration.files
-                processLibs project.configurations.shadow.files
+                processLibs shadowConfiguration.files
 
                 if (extension.includeTests) {
-                    task.from(project.sourceSets.test.output)
+                    task.from(testSourceSetOutput)
                 }
                 task.eachFile { FileCopyDetails f ->
                     if (f.name.endsWith('.class')) {
@@ -244,13 +249,16 @@ class JMHPlugin implements Plugin<Project> {
                     f.isDirectory() ? f : project.zipTree(f)
                 }
             }.exclude(metaInfExcludes)
+            def jmhSourceSetOutput = project.sourceSets.jmh.output
+            def mainSourceSetOutput = project.sourceSets.main.output
+            def testSourceSetOutput = project.sourceSets.test.output
             it.doFirst {
-                from(project.sourceSets.jmh.output)
-                from(project.sourceSets.main.output)
-                from(project.file(jmhGeneratedClassesDir))
-                from(project.file(jmhGeneratedResourcesDir))
+                from(jmhSourceSetOutput)
+                from(mainSourceSetOutput)
+                from(jmhGeneratedClassesDir)
+                from(jmhGeneratedResourcesDir)
                 if (extension.includeTests) {
-                    from(project.sourceSets.test.output)
+                    from(testSourceSetOutput)
                 }
                 eachFile { FileCopyDetails f ->
                     if (f.name.endsWith('.class')) {

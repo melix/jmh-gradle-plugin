@@ -17,6 +17,7 @@ package me.champeau.gradle;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.DuplicatesStrategy;
+import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.provider.Property;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.runner.options.Options;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class JMHPluginExtension {
-    private final Project project;
+    private final ProjectLayout layout;
 
     private String jmhVersion = "1.25";
     private final Property<Boolean> includeTestState;
@@ -77,7 +78,7 @@ public class JMHPluginExtension {
     private DuplicatesStrategy duplicateClassesStrategy = DuplicatesStrategy.FAIL;
 
     public JMHPluginExtension(final Project project) {
-        this.project = project;
+        this.layout = project.getLayout();
 
         includeTestState = project.getObjects().property(Boolean.class);
         setIncludeTests(true);
@@ -240,7 +241,7 @@ public class JMHPluginExtension {
     }
 
     private void resolveResultsFile() {
-        resultsFile = resultsFile != null ? resultsFile : project.file(String.valueOf(project.getBuildDir()) + "/reports/jmh/results." + resultExtension);
+        resultsFile = resultsFile != null ? resultsFile : layout.getBuildDirectory().file("reports/jmh/results." + resultExtension).get().getAsFile();
     }
 
     private void resolveResultExtension() {
