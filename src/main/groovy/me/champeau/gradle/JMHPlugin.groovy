@@ -90,7 +90,7 @@ class JMHPlugin implements Plugin<Project> {
         createTask(project, JMH_NAME, JMHTask) {
             it.group JMH_GROUP
             it.dependsOn project.jmhJar
-            it.jarArchive = project.jmhJar.archiveFile
+            it.jarArchive.set(project.jmhJar.archiveFile)
             it.benchmarkList = new File(jmhGeneratedResourcesDir, "META-INF/BenchmarkList")
             it.compilerHints = new File(jmhGeneratedResourcesDir, "/META-INF/CompilerHints")
         }

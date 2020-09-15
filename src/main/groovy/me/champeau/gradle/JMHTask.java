@@ -17,9 +17,8 @@ package me.champeau.gradle;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.file.RegularFile;
+import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.workers.IsolationMode;
@@ -41,18 +40,27 @@ public class JMHTask extends DefaultTask {
     private final ObjectFactory objects;
     private final WorkerExecutor workerExecutor;
     private final JMHPluginExtension extension = getProject().getExtensions().getByType(JMHPluginExtension.class);
+    private final FileCollection jmhClasspath = getProject().getConfigurations().getByName("jmh");
+    private final FileCollection testRuntimeClasspath = getProject().getConfigurations().getByName("testRuntimeClasspath");
+    private final RegularFileProperty jarArchive = getProject().getObjects().fileProperty();
 
     private File benchmarkList;
     private File compilerHints;
 
     @Classpath
-    FileCollection jmhClasspath = getProject().getConfigurations().getByName("jmh");
+    FileCollection getJmhClasspath() {
+        return jmhClasspath;
+    }
 
     @Classpath
-    FileCollection testRuntimeClasspath = getProject().getConfigurations().getByName("testRuntimeClasspath");
+    FileCollection getTestRuntimeClasspath() {
+        return testRuntimeClasspath;
+    }
 
     @Classpath
-    Provider<RegularFile> jarArchive;
+    RegularFileProperty getJarArchive() {
+        return jarArchive;
+    }
 
     @Inject
     public JMHTask(ObjectFactory objects, WorkerExecutor workerExecutor) {
