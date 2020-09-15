@@ -269,22 +269,19 @@ class JMHPlugin implements Plugin<Project> {
 
     private void registerBuildListener(
             final Project project, final JMHPluginExtension extension) {
-        project.gradle.addBuildListener(new BuildAdapter() {
-            @Override
-            void projectsEvaluated(Gradle gradle) {
-                if (extension.includeTests) {
-                    project.sourceSets {
-                        jmh {
-                            compileClasspath += test.output + project.configurations.testCompileClasspath
-                            runtimeClasspath += test.output + project.configurations.testRuntimeClasspath
-                        }
+        project.gradle.projectsEvaluated {
+            if (extension.includeTests) {
+                project.sourceSets {
+                    jmh {
+                        compileClasspath += test.output + project.configurations.testCompileClasspath
+                        runtimeClasspath += test.output + project.configurations.testRuntimeClasspath
                     }
                 }
-
-                def task = project.tasks.findByName(JMH_JAR_TASK_NAME)
-                task.zip64 = extension.zip64
             }
-        })
+
+            def task = project.tasks.findByName(JMH_JAR_TASK_NAME)
+            task.zip64 = extension.zip64
+        }
     }
 
     // TODO: This is really bad. We shouldn't use "runtime", but use the configurations provided by Gradle
