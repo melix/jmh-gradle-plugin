@@ -15,37 +15,23 @@
  */
 package me.champeau.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.BuildTask
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Specification
 import spock.lang.Unroll
 
 @Unroll
-class JmhWithShadowPluginSpec extends Specification {
-    def "Run #language benchmarks that are packaged with Shadow plugin"() {
-        given:
-        File projectDir = new File("src/funcTest/resources/${language.toLowerCase()}-shadow-project")
-        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-        List<File> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+class JmhWithShadowPluginSpec extends AbstractFuncSpec {
 
-        BuildResult project = GradleRunner.create()
-            .withProjectDir(projectDir)
-            .withPluginClasspath(pluginClasspath)
-            .withArguments("-S", "clean", "jmh")
-            .build();
+    def "Run #language benchmarks that are packaged with Shadow plugin"() {
+
+        given:
+        usingSample("${language.toLowerCase()}-shadow-project")
 
         when:
-        BuildTask taskResult = project.task(":jmh");
-        String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
+        def result = build("-S", "clean", "jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains(language + 'Benchmark.sqrtBenchmark')
+        result.task(":jmh").outcome == TaskOutcome.SUCCESS
+        file("build/reports/benchmarks.csv").text.contains(language + 'Benchmark.sqrtBenchmark')
 
         where:
         language << ['Java', 'Scala']

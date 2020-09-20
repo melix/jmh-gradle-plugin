@@ -15,34 +15,20 @@
  */
 package me.champeau.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.BuildTask
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Specification
 
-class ProjectWithTestDependenciesSpec extends Specification {
+class ProjectWithTestDependenciesSpec extends AbstractFuncSpec {
+
     def "Run project with dependencies on test sources"() {
-        given:
-        File projectDir = new File("src/funcTest/resources/java-project-with-test-dependencies")
-        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-        List<File> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
 
-        BuildResult project = GradleRunner.create()
-            .withProjectDir(projectDir)
-            .withPluginClasspath(pluginClasspath)
-            .withArguments("clean", "jmh")
-            .build();
+        given:
+        usingSample('java-project-with-test-dependencies')
 
         when:
-        BuildTask taskResult = project.task(":jmh");
-        String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
+        def result = build("clean", "jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains('JavaBenchmarkThatDependsOnTest.sqrtBenchmark')
+        result.task(":jmh").outcome == TaskOutcome.SUCCESS
+        file("build/reports/benchmarks.csv").text.contains('JavaBenchmarkThatDependsOnTest.sqrtBenchmark')
     }
 }

@@ -15,44 +15,24 @@
  */
 package me.champeau.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.BuildTask
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Specification
-import spock.lang.Unroll
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
-@Unroll
-class MultiProjectLanguageSpec extends Specification {
+class MultiProjectLanguageSpec extends AbstractFuncSpec {
+
     def "Should not execute JMH tests from different projects concurrently"() {
+
         given:
-        File projectDir = new File("src/funcTest/resources/java-multi-project")
-        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-        List<File> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
-
-        BuildResult project = GradleRunner.create()
-            .withProjectDir(projectDir)
-            .withPluginClasspath(pluginClasspath)
-            .withArguments('-S', "clean", "jmh")
-            .build();
+        usingSample('java-multi-project')
 
         when:
-        BuildTask taskResult = project.task(":jmh");
-        String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
+        def result = build('-S', "clean", "jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains("JavaBenchmark.sqrtBenchmark")
+        result.task(":jmh").outcome == SUCCESS
+        file("build/reports/benchmarks.csv").text.contains("JavaBenchmark.sqrtBenchmark")
 
-        when:
-        taskResult = project.task(":subproject:jmh");
-        benchmarkResults = new File(projectDir, "subproject/build/reports/benchmarks.csv").text
-
-        then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains("JavaMultiBenchmark.sqrtBenchmark")
+        and:
+        result.task(":subproject:jmh").outcome == SUCCESS
+        file("subproject/build/reports/benchmarks.csv").text.contains("JavaMultiBenchmark.sqrtBenchmark")
     }
 }

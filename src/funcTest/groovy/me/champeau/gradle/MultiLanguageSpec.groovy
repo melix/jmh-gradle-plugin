@@ -15,38 +15,24 @@
  */
 package me.champeau.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.BuildTask
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Specification
 import spock.lang.Unroll
 
-@Unroll
-class MultiLanguageSpec extends Specification {
-    def "Execute #language benchmarks"() {
-        given:
-        File projectDir = new File("src/funcTest/resources/${language.toLowerCase()}-project")
-        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-        List<File> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
-        BuildResult project = GradleRunner.create()
-            .withProjectDir(projectDir)
-            .withPluginClasspath(pluginClasspath)
-            .withArguments('-S', "clean", "jmh")
-            .forwardOutput()
-            .build();
+@Unroll
+class MultiLanguageSpec extends AbstractFuncSpec {
+
+    def "Execute #language benchmarks"() {
+
+        given:
+        usingSample("${language.toLowerCase()}-project")
 
         when:
-        BuildTask taskResult = project.task(":jmh")
-        String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
+        def result = build('-S', "clean", "jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains(language + 'Benchmark.sqrtBenchmark')
+        result.task(":jmh").outcome == SUCCESS
+        file("build/reports/benchmarks.csv").text.contains(language + 'Benchmark.sqrtBenchmark')
 
         where:
         language << ['Groovy', 'Java', 'Kotlin', 'Scala']

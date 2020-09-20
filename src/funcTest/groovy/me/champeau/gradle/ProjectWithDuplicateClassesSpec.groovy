@@ -15,33 +15,17 @@
  */
 package me.champeau.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.BuildTask
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Specification
+import static org.gradle.testkit.runner.TaskOutcome.FAILED
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
-class ProjectWithDuplicateClassesSpec extends Specification {
-    File projectDir
-    File buildFile
-    List<File> pluginClasspath
+class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
     def setup() {
-        projectDir = new File("src/funcTest/resources/java-project-with-duplicate-classes")
-        buildFile = new File(projectDir, 'build.gradle')
-        assert buildFile.createNewFile()
-        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-        pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
-    }
-
-    def cleanup() {
-        assert buildFile.delete()
+        usingSample('java-project-with-duplicate-classes')
     }
 
     def "Fail the build while executing jmhJar task"() {
+
         given:
         buildFile << """
             plugins {
@@ -52,24 +36,17 @@ class ProjectWithDuplicateClassesSpec extends Specification {
             repositories {
                 jcenter()
             }
-                    """
-        BuildResult project = configure().buildAndFail()
+        """
 
         when:
-        BuildTask taskResult = project.task(":jmhJar")
+        def result = buildAndFail("-S", "clean", "jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.FAILED
-    }
-
-    GradleRunner configure() {
-        return GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath(pluginClasspath)
-                .withArguments("-S", "clean", "jmh")
+        result.task(":jmhJar").outcome == FAILED
     }
 
     def "Fail the build while executing jmhJar task when Shadow plugin applied"() {
+
         given:
         buildFile << """
             plugins {
@@ -81,17 +58,17 @@ class ProjectWithDuplicateClassesSpec extends Specification {
             repositories {
                 jcenter()
             }
-                    """
-        BuildResult project = configure().buildAndFail()
+        """
 
         when:
-        BuildTask taskResult = project.task(":jmhJar")
+        def result = buildAndFail("-S", "clean", "jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.FAILED
+        result.task(":jmhJar").outcome == FAILED
     }
 
     def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used"() {
+
         given:
         buildFile << """
             plugins {
@@ -106,18 +83,18 @@ class ProjectWithDuplicateClassesSpec extends Specification {
             jmh {
                 duplicateClassesStrategy = 'warn'
             }
-                    """
-        BuildResult project = configure().build()
+        """
 
         when:
-        BuildTask taskResult = project.task(":jmh")
+        def result = build("-S", "clean", "jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        project.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+        result.task(":jmh").outcome == SUCCESS
+        result.output.contains('"me/champeau/gradle/jmh/Helper.class"')
     }
 
     def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used and Shadow plugin applied"() {
+
         given:
         buildFile << """
             plugins {
@@ -133,14 +110,13 @@ class ProjectWithDuplicateClassesSpec extends Specification {
             jmh {
                 duplicateClassesStrategy = 'warn'
             }
-                    """
-        BuildResult project = configure().build()
+        """
 
         when:
-        BuildTask taskResult = project.task(":jmh")
+        def result = build("-S", "clean", "jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        project.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+        result.task(":jmh").outcome == SUCCESS
+        result.output.contains('"me/champeau/gradle/jmh/Helper.class"')
     }
 }

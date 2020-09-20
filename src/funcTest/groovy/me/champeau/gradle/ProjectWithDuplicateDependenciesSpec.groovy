@@ -15,33 +15,16 @@
  */
 package me.champeau.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.BuildTask
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Specification
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
-class ProjectWithDuplicateDependenciesSpec extends Specification {
-    File projectDir
-    File buildFile
-    List<File> pluginClasspath
+class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
 
     def setup() {
-        projectDir = new File("src/funcTest/resources/java-project-with-duplicate-dependencies")
-        buildFile = new File(projectDir, 'build.gradle')
-        assert buildFile.createNewFile()
-        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-        pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
-    }
-
-    def cleanup() {
-        assert buildFile.delete()
+        usingSample('java-project-with-duplicate-dependencies')
     }
 
     def "Run project with duplicate dependencies"() {
+
         given:
         createBuildFile("""
             plugins {
@@ -49,23 +32,31 @@ class ProjectWithDuplicateDependenciesSpec extends Specification {
                 id 'me.champeau.gradle.jmh'
             }
         """)
-        BuildResult project = build()
 
         when:
-        BuildTask taskResult = project.task(":jmh");
-        String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
+        def result = build("clean", "jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains('JavaBenchmark.sqrtBenchmark')
+        result.task(":jmh").outcome == SUCCESS
+        file("build/reports/benchmarks.csv").text.contains('JavaBenchmark.sqrtBenchmark')
     }
 
-    BuildResult build() {
-        GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath(pluginClasspath)
-                .withArguments("clean", "jmh")
-                .build()
+    def "Run project with duplicate dependencies with Shadow applied"() {
+        given:
+        createBuildFile("""
+            plugins {
+                id 'java'
+                id 'com.github.johnrengelman.shadow'
+                id 'me.champeau.gradle.jmh'
+            }
+        """)
+
+        when:
+        def result = build("clean", "jmh")
+
+        then:
+        result.task(":jmh").outcome == SUCCESS
+        file("build/reports/benchmarks.csv").text.contains('JavaBenchmark.sqrtBenchmark')
     }
 
     void createBuildFile(String plugins) {
@@ -89,25 +80,4 @@ class ProjectWithDuplicateDependenciesSpec extends Specification {
         }
         """
     }
-
-    def "Run project with duplicate dependencies with Shadow applied"() {
-        given:
-        createBuildFile("""
-            plugins {
-                id 'java'
-                id 'com.github.johnrengelman.shadow'
-                id 'me.champeau.gradle.jmh'
-            }
-        """)
-        BuildResult project = build()
-
-        when:
-        BuildTask taskResult = project.task(":jmh");
-        String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
-
-        then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains('JavaBenchmark.sqrtBenchmark')
-    }
-
 }
