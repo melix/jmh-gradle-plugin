@@ -26,12 +26,10 @@ plugins {
     id("jacoco")
     id("idea")
     id("java-gradle-plugin")
+    id("groovy")
 }
 
 buildscript {
-    repositories {
-        mavenLocal()
-    }
     dependencies {
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.17.1")
     }
@@ -43,14 +41,13 @@ buildScanRecipes {
     recipe(mapOf("baseUrl" to "https://github.com/melix/jmh-gradle-plugin/tree"), "git-commit")
 }
 
-apply(from="gradle/credentials.gradle")
-apply(from="gradle/compile.gradle")
-apply(from="gradle/test.gradle")
-apply(from="gradle/funcTest.gradle")
-apply(from="gradle/publishing.gradle")
-apply(from="gradle/bintray.gradle")
-apply(from="gradle/artifactory.gradle")
-apply(from="gradle/code-quality.gradle")
+apply(from = "gradle/credentials.gradle")
+apply(from = "gradle/test.gradle")
+apply(from = "gradle/funcTest.gradle")
+apply(from = "gradle/publishing.gradle")
+apply(from = "gradle/bintray.gradle")
+apply(from = "gradle/artifactory.gradle")
+apply(from = "gradle/code-quality.gradle")
 
 val jmhVersion: String by project
 val junitVersion: String by project
@@ -89,8 +86,11 @@ tasks {
 }
 
 java {
-   withSourcesJar()
-   withJavadocJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+    withSourcesJar()
+    withJavadocJar()
 }
 
 jacoco {
@@ -108,4 +108,8 @@ tasks.jacocoTestReport {
         csv.isEnabled = false
         html.isEnabled = true
     }
+}
+
+tasks.withType<GroovyCompile>().configureEach {
+    options.encoding = "UTF-8"
 }
