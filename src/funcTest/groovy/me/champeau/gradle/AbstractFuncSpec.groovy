@@ -71,6 +71,8 @@ class AbstractFuncSpec extends Specification {
     }
 
     private List<String> calculateArguments(String... arguments) {
-        ['--stacktrace'] + (arguments as List)
+        (testedGradleVersion >= GradleVersion.version('6.6')
+                ? ['--stacktrace', '--configuration-cache']
+                : ['--stacktrace']) + (arguments as List)
     }
 }
