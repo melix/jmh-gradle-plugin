@@ -39,7 +39,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         """
 
         when:
-        def result = buildAndFail("-S", "clean", "jmh")
+        def result = buildAndFail("jmh")
 
         then:
         result.task(":jmhJar").outcome == FAILED
@@ -61,7 +61,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         """
 
         when:
-        def result = buildAndFail("-S", "clean", "jmh")
+        def result = buildAndFail("jmh")
 
         then:
         result.task(":jmhJar").outcome == FAILED
@@ -86,7 +86,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         """
 
         when:
-        def result = build("-S", "clean", "jmh")
+        def result = build("jmh")
 
         then:
         result.task(":jmh").outcome == SUCCESS
@@ -113,7 +113,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         """
 
         when:
-        def result = build("-S", "clean", "jmh")
+        def result = build("jmh")
 
         then:
         result.task(":jmh").outcome == SUCCESS

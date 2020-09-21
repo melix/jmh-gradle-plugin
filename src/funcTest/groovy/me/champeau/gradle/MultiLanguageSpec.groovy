@@ -28,7 +28,7 @@ class MultiLanguageSpec extends AbstractFuncSpec {
         usingSample("${language.toLowerCase()}-project")
 
         when:
-        def result = build('-S', "clean", "jmh")
+        def result = build("jmh")
 
         then:
         result.task(":jmh").outcome == SUCCESS

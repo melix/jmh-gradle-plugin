@@ -37,18 +37,24 @@ class AbstractFuncSpec extends Specification {
         pluginClasspathResource.readLines().collect { new File(it) }
     }
 
-    protected GradleRunner gradleRunner() {
+    private GradleRunner gradleRunner(List<String> arguments) {
         GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath(pluginClasspath)
+                .withGradleVersion(testedGradleVersion)
                 .forwardOutput()
+                .withPluginClasspath(pluginClasspath)
+                .withProjectDir(projectDir)
+                .withArguments(arguments)
     }
 
     protected BuildResult build(String... arguments) {
-        gradleRunner().withArguments(arguments).build()
+        gradleRunner(calculateArguments(arguments)).build()
     }
 
     protected BuildResult buildAndFail(String... arguments) {
-        gradleRunner().withArguments(arguments).buildAndFail()
+        gradleRunner(calculateArguments(arguments)).buildAndFail()
+    }
+
+    private List<String> calculateArguments(String... arguments) {
+        ['--stacktrace'] + (arguments as List)
     }
 }

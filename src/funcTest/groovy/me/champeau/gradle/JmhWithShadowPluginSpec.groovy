@@ -27,7 +27,7 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
         usingSample("${language.toLowerCase()}-shadow-project")
 
         when:
-        def result = build("-S", "clean", "jmh")
+        def result = build("jmh")
 
         then:
         result.task(":jmh").outcome == TaskOutcome.SUCCESS

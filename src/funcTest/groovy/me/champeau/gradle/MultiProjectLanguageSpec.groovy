@@ -25,7 +25,7 @@ class MultiProjectLanguageSpec extends AbstractFuncSpec {
         usingSample('java-multi-project')
 
         when:
-        def result = build('-S', "clean", "jmh")
+        def result = build("jmh")
 
         then:
         result.task(":jmh").outcome == SUCCESS

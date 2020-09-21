@@ -34,7 +34,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         """)
 
         when:
-        def result = build("clean", "jmh")
+        def result = build("jmh")
 
         then:
         result.task(":jmh").outcome == SUCCESS
@@ -52,7 +52,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         """)
 
         when:
-        def result = build("clean", "jmh")
+        def result = build("jmh")
 
         then:
         result.task(":jmh").outcome == SUCCESS

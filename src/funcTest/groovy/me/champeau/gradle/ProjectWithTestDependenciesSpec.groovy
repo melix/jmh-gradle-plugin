@@ -25,7 +25,7 @@ class ProjectWithTestDependenciesSpec extends AbstractFuncSpec {
         usingSample('java-project-with-test-dependencies')
 
         when:
-        def result = build("clean", "jmh")
+        def result = build("jmh")
 
         then:
         result.task(":jmh").outcome == TaskOutcome.SUCCESS
