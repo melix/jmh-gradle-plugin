@@ -27,7 +27,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         usingSample('java-project-with-duplicate-classes')
     }
 
-    def "Fail the build while executing jmhJar task (Gradle #gradleVersion)"() {
+    def "Fail the build while executing jmhJar task (#gradleVersion)"() {
 
         given:
         usingGradleVersion(gradleVersion)
@@ -54,7 +54,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Fail the build while executing jmhJar task when Shadow plugin applied (Gradle #gradleVersion)"() {
+    def "Fail the build while executing jmhJar task when Shadow plugin applied (#gradleVersion)"() {
 
         given:
         usingGradleVersion(gradleVersion)
@@ -82,7 +82,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used (Gradle #gradleVersion)"() {
+    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used (#gradleVersion)"() {
 
         given:
         usingGradleVersion(gradleVersion)
@@ -114,7 +114,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used and Shadow plugin applied (Gradle #gradleVersion)"() {
+    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used and Shadow plugin applied (#gradleVersion)"() {
 
         given:
         usingGradleVersion(gradleVersion)

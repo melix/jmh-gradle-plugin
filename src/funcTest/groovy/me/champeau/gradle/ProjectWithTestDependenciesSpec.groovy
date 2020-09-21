@@ -21,7 +21,7 @@ import spock.lang.Unroll
 @Unroll
 class ProjectWithTestDependenciesSpec extends AbstractFuncSpec {
 
-    def "Run project with dependencies on test sources (Gradle #gradleVersion)"() {
+    def "Run project with dependencies on test sources (#gradleVersion)"() {
 
         given:
         usingSample('java-project-with-test-dependencies')

@@ -22,7 +22,7 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 @Unroll
 class JmhWithShadowPluginSpec extends AbstractFuncSpec {
 
-    def "Run #language benchmarks that are packaged with Shadow plugin (Gradle #gradleVersion)"() {
+    def "Run #language benchmarks that are packaged with Shadow plugin (#gradleVersion)"() {
 
         given:
         usingSample("${language.toLowerCase()}-shadow-project")

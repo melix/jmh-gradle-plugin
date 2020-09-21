@@ -22,7 +22,7 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 @Unroll
 class MultiProjectLanguageSpec extends AbstractFuncSpec {
 
-    def "Should not execute JMH tests from different projects concurrently (Gradle #gradleVersion)"() {
+    def "Should not execute JMH tests from different projects concurrently (#gradleVersion)"() {
 
         given:
         usingSample('java-multi-project')

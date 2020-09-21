@@ -22,7 +22,7 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 @Unroll
 class MultiLanguageSpec extends AbstractFuncSpec {
 
-    def "Execute #language benchmarks (Gradle #gradleVersion)"() {
+    def "Execute #language benchmarks (#gradleVersion)"() {
 
         given:
         usingSample("${language.toLowerCase()}-project")

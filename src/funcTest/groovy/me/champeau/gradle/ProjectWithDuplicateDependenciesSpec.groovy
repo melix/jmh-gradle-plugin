@@ -26,7 +26,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         usingSample('java-project-with-duplicate-dependencies')
     }
 
-    def "Run project with duplicate dependencies (Gradle #gradleVersion)"() {
+    def "Run project with duplicate dependencies (#gradleVersion)"() {
 
         given:
         usingGradleVersion(gradleVersion)
@@ -50,7 +50,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Run project with duplicate dependencies with Shadow applied (Gradle #gradleVersion)"() {
+    def "Run project with duplicate dependencies with Shadow applied (#gradleVersion)"() {
 
         given:
         usingGradleVersion(gradleVersion)

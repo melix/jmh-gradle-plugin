@@ -10,14 +10,17 @@ import spock.lang.Specification
 
 class AbstractFuncSpec extends Specification {
 
-    protected static final List<String> TESTED_GRADLE_VERSIONS = ['5.5', GradleVersion.current().version]
+    protected static final List<GradleVersion> TESTED_GRADLE_VERSIONS = [
+            GradleVersion.version('5.5'),
+            GradleVersion.current()
+    ]
 
     @Rule
     TemporaryFolder temporaryFolder = new TemporaryFolder()
 
-    private String testedGradleVersion = GradleVersion.current().version
+    private GradleVersion testedGradleVersion = GradleVersion.current()
 
-    protected void usingGradleVersion(String gradleVersion) {
+    protected void usingGradleVersion(GradleVersion gradleVersion) {
         testedGradleVersion = gradleVersion
     }
 
@@ -52,7 +55,7 @@ class AbstractFuncSpec extends Specification {
 
     private GradleRunner gradleRunner(List<String> arguments) {
         GradleRunner.create()
-                .withGradleVersion(testedGradleVersion)
+                .withGradleVersion(testedGradleVersion.version)
                 .forwardOutput()
                 .withPluginClasspath(pluginClasspath)
                 .withProjectDir(projectDir)
