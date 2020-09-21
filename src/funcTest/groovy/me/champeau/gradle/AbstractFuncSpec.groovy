@@ -20,8 +20,14 @@ class AbstractFuncSpec extends Specification {
 
     private GradleVersion testedGradleVersion = GradleVersion.current()
 
+    private String noConfigurationCacheReason
+
     protected void usingGradleVersion(GradleVersion gradleVersion) {
         testedGradleVersion = gradleVersion
+    }
+
+    protected void withoutConfigurationCache(String reason) {
+        noConfigurationCacheReason = reason
     }
 
     File getProjectDir() {
@@ -71,7 +77,11 @@ class AbstractFuncSpec extends Specification {
     }
 
     private List<String> calculateArguments(String... arguments) {
-        (testedGradleVersion >= GradleVersion.version('6.6')
+        def gradleVersionWithConfigurationCache = testedGradleVersion >= GradleVersion.version('6.6')
+        if (gradleVersionWithConfigurationCache && noConfigurationCacheReason) {
+            println("Configuration cache disabled: $noConfigurationCacheReason")
+        }
+        (gradleVersionWithConfigurationCache && !noConfigurationCacheReason
                 ? ['--stacktrace', '--configuration-cache']
                 : ['--stacktrace']) + (arguments as List)
     }

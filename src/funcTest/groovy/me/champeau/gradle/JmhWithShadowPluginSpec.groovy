@@ -27,6 +27,7 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
         given:
         usingSample("${language.toLowerCase()}-shadow-project")
         usingGradleVersion(gradleVersion)
+        withoutConfigurationCache('shadow plugin unsupported')
 
         when:
         def result = build("jmh")

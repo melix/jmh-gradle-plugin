@@ -54,6 +54,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
 
         given:
         usingGradleVersion(gradleVersion)
+        withoutConfigurationCache('shadow plugin unsupported')
 
         and:
         createBuildFile("""
