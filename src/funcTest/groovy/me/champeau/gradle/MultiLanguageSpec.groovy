@@ -27,6 +27,7 @@ class MultiLanguageSpec extends AbstractFuncSpec {
         given:
         usingSample("${language.toLowerCase()}-project")
         usingGradleVersion(gradleVersion)
+        if (language == 'Kotlin') withoutConfigurationCache('kotlin plugin unsupported')
 
         when:
         def result = build("jmh")
