@@ -33,7 +33,7 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmh").outcome == SUCCESS
-        file("build/reports/benchmarks.csv").text.contains(language + 'Benchmark.sqrtBenchmark')
+        benchmarksCsv.text.contains(language + 'Benchmark.sqrtBenchmark')
 
         where:
         [language, gradleVersion] << [

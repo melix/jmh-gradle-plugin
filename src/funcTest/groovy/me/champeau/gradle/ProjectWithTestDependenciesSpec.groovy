@@ -32,7 +32,7 @@ class ProjectWithTestDependenciesSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmh").outcome == TaskOutcome.SUCCESS
-        file("build/reports/benchmarks.csv").text.contains('JavaBenchmarkThatDependsOnTest.sqrtBenchmark')
+        benchmarksCsv.text.contains('JavaBenchmarkThatDependsOnTest.sqrtBenchmark')
 
         where:
         gradleVersion << TESTED_GRADLE_VERSIONS

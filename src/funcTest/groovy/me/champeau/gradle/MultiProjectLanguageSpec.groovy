@@ -33,7 +33,7 @@ class MultiProjectLanguageSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmh").outcome == SUCCESS
-        file("build/reports/benchmarks.csv").text.contains("JavaBenchmark.sqrtBenchmark")
+        benchmarksCsv.text.contains("JavaBenchmark.sqrtBenchmark")
 
         and:
         result.task(":subproject:jmh").outcome == SUCCESS

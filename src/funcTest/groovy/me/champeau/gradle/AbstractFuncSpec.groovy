@@ -29,6 +29,10 @@ class AbstractFuncSpec extends Specification {
         file('build.gradle')
     }
 
+    File getBenchmarksCsv() {
+        file("build/reports/benchmarks.csv")
+    }
+
     protected void usingSample(String name) {
         File sampleDir = new File("src/funcTest/resources/$name")
         GFileUtils.copyDirectory(sampleDir, projectDir)

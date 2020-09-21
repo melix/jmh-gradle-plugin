@@ -44,7 +44,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmh").outcome == SUCCESS
-        file("build/reports/benchmarks.csv").text.contains('JavaBenchmark.sqrtBenchmark')
+        benchmarksCsv.text.contains('JavaBenchmark.sqrtBenchmark')
 
         where:
         gradleVersion << TESTED_GRADLE_VERSIONS
@@ -69,7 +69,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmh").outcome == SUCCESS
-        file("build/reports/benchmarks.csv").text.contains('JavaBenchmark.sqrtBenchmark')
+        benchmarksCsv.text.contains('JavaBenchmark.sqrtBenchmark')
 
         where:
         gradleVersion << TESTED_GRADLE_VERSIONS
