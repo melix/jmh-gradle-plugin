@@ -135,7 +135,7 @@ class JMHPlugin implements Plugin<Project> {
                 (AtomicReference<JMHTask>) rootExtra.get('jmhLastAddedTask') : new AtomicReference<JMHTask>()
         rootExtra.set('jmhLastAddedTask', lastAddedRef)
 
-        project.tasks.withType(JMHTask, new Action<JMHTask>() {
+        project.tasks.withType(JMHTask).configureEach(new Action<JMHTask>() {
             @Override
             void execute(final JMHTask task) {
                 def lastAdded = lastAddedRef.getAndSet(task)
