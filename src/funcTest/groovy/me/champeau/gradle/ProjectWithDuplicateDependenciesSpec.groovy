@@ -15,17 +15,23 @@
  */
 package me.champeau.gradle
 
+import spock.lang.Unroll
+
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
+@Unroll
 class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
 
     def setup() {
         usingSample('java-project-with-duplicate-dependencies')
     }
 
-    def "Run project with duplicate dependencies"() {
+    def "Run project with duplicate dependencies (Gradle #gradleVersion)"() {
 
         given:
+        usingGradleVersion(gradleVersion)
+
+        and:
         createBuildFile("""
             plugins {
                 id 'java'
@@ -39,10 +45,17 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         then:
         result.task(":jmh").outcome == SUCCESS
         file("build/reports/benchmarks.csv").text.contains('JavaBenchmark.sqrtBenchmark')
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Run project with duplicate dependencies with Shadow applied"() {
+    def "Run project with duplicate dependencies with Shadow applied (Gradle #gradleVersion)"() {
+
         given:
+        usingGradleVersion(gradleVersion)
+
+        and:
         createBuildFile("""
             plugins {
                 id 'java'
@@ -57,6 +70,9 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         then:
         result.task(":jmh").outcome == SUCCESS
         file("build/reports/benchmarks.csv").text.contains('JavaBenchmark.sqrtBenchmark')
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
     void createBuildFile(String plugins) {

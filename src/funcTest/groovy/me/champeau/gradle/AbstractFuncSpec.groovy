@@ -3,14 +3,23 @@ package me.champeau.gradle
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GFileUtils
+import org.gradle.util.GradleVersion
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 class AbstractFuncSpec extends Specification {
 
+    protected static final List<String> TESTED_GRADLE_VERSIONS = ['5.5', GradleVersion.current().version]
+
     @Rule
     TemporaryFolder temporaryFolder = new TemporaryFolder()
+
+    private String testedGradleVersion = GradleVersion.current().version
+
+    protected void usingGradleVersion(String gradleVersion) {
+        testedGradleVersion = gradleVersion
+    }
 
     File getProjectDir() {
         temporaryFolder.root

@@ -22,10 +22,11 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 @Unroll
 class MultiLanguageSpec extends AbstractFuncSpec {
 
-    def "Execute #language benchmarks"() {
+    def "Execute #language benchmarks (Gradle #gradleVersion)"() {
 
         given:
         usingSample("${language.toLowerCase()}-project")
+        usingGradleVersion(gradleVersion)
 
         when:
         def result = build("jmh")
@@ -35,6 +36,9 @@ class MultiLanguageSpec extends AbstractFuncSpec {
         file("build/reports/benchmarks.csv").text.contains(language + 'Benchmark.sqrtBenchmark')
 
         where:
-        language << ['Groovy', 'Java', 'Kotlin', 'Scala']
+        [language, gradleVersion] << [
+                ['Groovy', 'Java', 'Kotlin', 'Scala'],
+                TESTED_GRADLE_VERSIONS
+        ].combinations()
     }
 }

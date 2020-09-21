@@ -16,13 +16,16 @@
 package me.champeau.gradle
 
 import org.gradle.testkit.runner.TaskOutcome
+import spock.lang.Unroll
 
+@Unroll
 class ProjectWithTestDependenciesSpec extends AbstractFuncSpec {
 
-    def "Run project with dependencies on test sources"() {
+    def "Run project with dependencies on test sources (Gradle #gradleVersion)"() {
 
         given:
         usingSample('java-project-with-test-dependencies')
+        usingGradleVersion(gradleVersion)
 
         when:
         def result = build("jmh")
@@ -30,5 +33,8 @@ class ProjectWithTestDependenciesSpec extends AbstractFuncSpec {
         then:
         result.task(":jmh").outcome == TaskOutcome.SUCCESS
         file("build/reports/benchmarks.csv").text.contains('JavaBenchmarkThatDependsOnTest.sqrtBenchmark')
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
     }
 }

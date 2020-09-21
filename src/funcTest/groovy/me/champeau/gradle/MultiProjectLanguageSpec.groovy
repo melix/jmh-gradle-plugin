@@ -15,14 +15,18 @@
  */
 package me.champeau.gradle
 
+import spock.lang.Unroll
+
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
+@Unroll
 class MultiProjectLanguageSpec extends AbstractFuncSpec {
 
-    def "Should not execute JMH tests from different projects concurrently"() {
+    def "Should not execute JMH tests from different projects concurrently (Gradle #gradleVersion)"() {
 
         given:
         usingSample('java-multi-project')
+        usingGradleVersion(gradleVersion)
 
         when:
         def result = build("jmh")
@@ -34,5 +38,8 @@ class MultiProjectLanguageSpec extends AbstractFuncSpec {
         and:
         result.task(":subproject:jmh").outcome == SUCCESS
         file("subproject/build/reports/benchmarks.csv").text.contains("JavaMultiBenchmark.sqrtBenchmark")
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
     }
 }

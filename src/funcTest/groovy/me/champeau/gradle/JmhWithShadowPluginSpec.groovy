@@ -15,25 +15,30 @@
  */
 package me.champeau.gradle
 
-import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Unroll
+
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 @Unroll
 class JmhWithShadowPluginSpec extends AbstractFuncSpec {
 
-    def "Run #language benchmarks that are packaged with Shadow plugin"() {
+    def "Run #language benchmarks that are packaged with Shadow plugin (Gradle #gradleVersion)"() {
 
         given:
         usingSample("${language.toLowerCase()}-shadow-project")
+        usingGradleVersion(gradleVersion)
 
         when:
         def result = build("jmh")
 
         then:
-        result.task(":jmh").outcome == TaskOutcome.SUCCESS
+        result.task(":jmh").outcome == SUCCESS
         file("build/reports/benchmarks.csv").text.contains(language + 'Benchmark.sqrtBenchmark')
 
         where:
-        language << ['Java', 'Scala']
+        [language, gradleVersion] << [
+                ['Java', 'Scala'],
+                TESTED_GRADLE_VERSIONS
+        ].combinations()
     }
 }
