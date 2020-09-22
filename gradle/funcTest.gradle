@@ -49,6 +49,10 @@ task functionalTest(type: Test, dependsOn: [jar]) {
     classpath = sourceSets.functionalTest.runtimeClasspath
     mustRunAfter test
 
+    // This shouldn't be necessary, possibly a but in 6.7-rc-1
+    javaLauncher.set javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
     reports {
         html.destination = project.file("$html.destination/functional")
         junitXml.destination = project.file("$junitXml.destination/functional")
