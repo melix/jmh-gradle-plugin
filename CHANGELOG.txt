@@ -1,3 +1,6 @@
+Version 0.5.2
+-------------
+    * Add support for the Gradle configuration cache
 Version 0.5.1
 -------------
     * Fix jars being locked under Windows preventing use of the daemon
