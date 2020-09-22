@@ -13,8 +13,11 @@ import org.gradle.workers.WorkerExecutor
 @CompileStatic
 @CacheableTask
 class JmhBytecodeGeneratorTask extends DefaultTask {
-    private final SourceSetContainer sourceSets = project.convention.getPlugin(JavaPluginConvention).sourceSets
+    private final transient SourceSetContainer sourceSets = project.convention.getPlugin(JavaPluginConvention).sourceSets
     private final Property<Boolean> includeTestsState = project.getObjects().property(Boolean).convention(false)
+
+    @Classpath
+    FileCollection jmhClasspath
 
     @Classpath
     FileCollection runtimeClasspath = sourceSets.getByName('jmh').runtimeClasspath
@@ -47,7 +50,7 @@ class JmhBytecodeGeneratorTask extends DefaultTask {
         def workerExecutor = getServices().get(WorkerExecutor)
         workerExecutor.submit(JmhBytecodeGeneratorRunnable) { WorkerConfiguration config ->
             config.isolationMode = IsolationMode.PROCESS
-            config.classpath = project.configurations.getByName("jmh");
+            config.classpath = jmhClasspath
             def benchmarkClasspath = runtimeClasspath.files
             if (includeTests) {
                 benchmarkClasspath += testClasses.files + testRuntimeClasspath.files

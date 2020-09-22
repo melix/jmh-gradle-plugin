@@ -15,39 +15,31 @@
  */
 package me.champeau.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.BuildTask
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Specification
 import spock.lang.Unroll
 
-@Unroll
-class JmhWithShadowPluginSpec extends Specification {
-    def "Run #language benchmarks that are packaged with Shadow plugin"() {
-        given:
-        File projectDir = new File("src/funcTest/resources/${language.toLowerCase()}-shadow-project")
-        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-        List<File> pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
-        BuildResult project = GradleRunner.create()
-            .withProjectDir(projectDir)
-            .withPluginClasspath(pluginClasspath)
-            .withArguments("-S", "clean", "jmh")
-            .build();
+@Unroll
+class JmhWithShadowPluginSpec extends AbstractFuncSpec {
+
+    def "Run #language benchmarks that are packaged with Shadow plugin (#gradleVersion)"() {
+
+        given:
+        usingSample("${language.toLowerCase()}-shadow-project")
+        usingGradleVersion(gradleVersion)
+        withoutConfigurationCache('shadow plugin unsupported')
 
         when:
-        BuildTask taskResult = project.task(":jmh");
-        String benchmarkResults = new File(projectDir, "build/reports/benchmarks.csv").text
+        def result = build("jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        benchmarkResults.contains(language + 'Benchmark.sqrtBenchmark')
+        result.task(":jmh").outcome == SUCCESS
+        benchmarksCsv.text.contains(language + 'Benchmark.sqrtBenchmark')
 
         where:
-        language << ['Java', 'Scala']
+        [language, gradleVersion] << [
+                ['Java', 'Scala'],
+                TESTED_GRADLE_VERSIONS
+        ].combinations()
     }
 }

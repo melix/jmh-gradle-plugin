@@ -15,34 +15,24 @@
  */
 package me.champeau.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.BuildTask
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Specification
+import spock.lang.Unroll
 
-class ProjectWithDuplicateClassesSpec extends Specification {
-    File projectDir
-    File buildFile
-    List<File> pluginClasspath
+import static org.gradle.testkit.runner.TaskOutcome.FAILED
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+
+@Unroll
+class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
     def setup() {
-        projectDir = new File("src/funcTest/resources/java-project-with-duplicate-classes")
-        buildFile = new File(projectDir, 'build.gradle')
-        assert buildFile.createNewFile()
-        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-        pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+        usingSample('java-project-with-duplicate-classes')
     }
 
-    def cleanup() {
-        assert buildFile.delete()
-    }
+    def "Fail the build while executing jmhJar task (#gradleVersion)"() {
 
-    def "Fail the build while executing jmhJar task"() {
         given:
+        usingGradleVersion(gradleVersion)
+
+        and:
         buildFile << """
             plugins {
                 id 'java'
@@ -52,25 +42,25 @@ class ProjectWithDuplicateClassesSpec extends Specification {
             repositories {
                 jcenter()
             }
-                    """
-        BuildResult project = configure().buildAndFail()
+        """
 
         when:
-        BuildTask taskResult = project.task(":jmhJar")
+        def result = buildAndFail("jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.FAILED
+        result.task(":jmhJar").outcome == FAILED
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    GradleRunner configure() {
-        return GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath(pluginClasspath)
-                .withArguments("-S", "clean", "jmh")
-    }
+    def "Fail the build while executing jmhJar task when Shadow plugin applied (#gradleVersion)"() {
 
-    def "Fail the build while executing jmhJar task when Shadow plugin applied"() {
         given:
+        usingGradleVersion(gradleVersion)
+        withoutConfigurationCache('shadow plugin unsupported')
+
+        and:
         buildFile << """
             plugins {
                 id 'java'
@@ -81,18 +71,24 @@ class ProjectWithDuplicateClassesSpec extends Specification {
             repositories {
                 jcenter()
             }
-                    """
-        BuildResult project = configure().buildAndFail()
+        """
 
         when:
-        BuildTask taskResult = project.task(":jmhJar")
+        def result = buildAndFail("jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.FAILED
+        result.task(":jmhJar").outcome == FAILED
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used"() {
+    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used (#gradleVersion)"() {
+
         given:
+        usingGradleVersion(gradleVersion)
+
+        and:
         buildFile << """
             plugins {
                 id 'java'
@@ -106,19 +102,26 @@ class ProjectWithDuplicateClassesSpec extends Specification {
             jmh {
                 duplicateClassesStrategy = 'warn'
             }
-                    """
-        BuildResult project = configure().build()
+        """
 
         when:
-        BuildTask taskResult = project.task(":jmh")
+        def result = build("jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        project.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+        result.task(":jmh").outcome == SUCCESS
+        result.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used and Shadow plugin applied"() {
+    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used and Shadow plugin applied (#gradleVersion)"() {
+
         given:
+        usingGradleVersion(gradleVersion)
+        withoutConfigurationCache('shadow plugin unsupported')
+
+        and:
         buildFile << """
             plugins {
                 id 'java'
@@ -133,14 +136,16 @@ class ProjectWithDuplicateClassesSpec extends Specification {
             jmh {
                 duplicateClassesStrategy = 'warn'
             }
-                    """
-        BuildResult project = configure().build()
+        """
 
         when:
-        BuildTask taskResult = project.task(":jmh")
+        def result = build("jmh")
 
         then:
-        taskResult.outcome == TaskOutcome.SUCCESS
-        project.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+        result.task(":jmh").outcome == SUCCESS
+        result.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
     }
 }

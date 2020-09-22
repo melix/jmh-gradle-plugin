@@ -16,12 +16,11 @@
 package me.champeau.gradle;
 
 import org.gradle.api.DefaultTask;
-import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.file.RegularFile;
-import org.gradle.api.provider.Provider;
+import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.jvm.tasks.Jar;
 import org.gradle.workers.IsolationMode;
 import org.gradle.workers.WorkerExecutor;
 import org.openjdk.jmh.runner.options.Options;
@@ -38,30 +37,49 @@ import java.io.File;
 public class JMHTask extends DefaultTask {
     private final static String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
+    private final ObjectFactory objects;
     private final WorkerExecutor workerExecutor;
+    private final JMHPluginExtension extension = getProject().getExtensions().getByType(JMHPluginExtension.class);
+    private final FileCollection jmhClasspath = getProject().getConfigurations().getByName("jmh");
+    private final FileCollection testRuntimeClasspath = getProject().getConfigurations().getByName("testRuntimeClasspath");
+    private final RegularFileProperty jarArchive = getProject().getObjects().fileProperty();
 
     private File benchmarkList;
     private File compilerHints;
 
+    @Classpath
+    FileCollection getJmhClasspath() {
+        return jmhClasspath;
+    }
+
+    @Classpath
+    FileCollection getTestRuntimeClasspath() {
+        return testRuntimeClasspath;
+    }
+
+    @Classpath
+    RegularFileProperty getJarArchive() {
+        return jarArchive;
+    }
+
     @Inject
-    public JMHTask(final WorkerExecutor workerExecutor) {
+    public JMHTask(ObjectFactory objects, WorkerExecutor workerExecutor) {
+        this.objects = objects;
         this.workerExecutor = workerExecutor;
     }
 
     @TaskAction
     public void before() {
-        final JMHPluginExtension extension = getProject().getExtensions().getByType(JMHPluginExtension.class);
         final Options options = extension.resolveArgs();
 
         extension.getResultsFile().getParentFile().mkdirs();
 
         workerExecutor.submit(IsolatedRunner.class, workerConfiguration -> {
             workerConfiguration.setIsolationMode(IsolationMode.PROCESS);
-            ConfigurationContainer configurations = getProject().getConfigurations();
-            workerConfiguration.classpath(configurations.getByName("jmh"));
-            FileCollection benchmarkClasspath = configurations.getByName("jmh").plus(getProject().files(getJarArchive()));
+            workerConfiguration.classpath(jmhClasspath);
+            FileCollection benchmarkClasspath = jmhClasspath.plus(objects.fileCollection().from(jarArchive));
             if (extension.isIncludeTests()) {
-                benchmarkClasspath = benchmarkClasspath.plus(configurations.getByName("testRuntimeClasspath"));
+                benchmarkClasspath = benchmarkClasspath.plus(testRuntimeClasspath);
             }
             workerConfiguration.params(options, benchmarkClasspath.getFiles(), benchmarkList, compilerHints, extension.getJmhVersion());
             workerConfiguration.getForkOptions().getSystemProperties().put(JAVA_IO_TMPDIR, getTemporaryDir());
@@ -71,10 +89,6 @@ public class JMHTask extends DefaultTask {
     @Override
     public void setDidWork(final boolean didWork) {
         super.setDidWork(didWork);
-    }
-
-    private Provider<RegularFile> getJarArchive() {
-        return ((Jar)getProject().getTasks().getByName(JMHPlugin.JMH_JAR_TASK_NAME)).getArchiveFile();
     }
 
     public void setBenchmarkList(File benchmarkList) {
