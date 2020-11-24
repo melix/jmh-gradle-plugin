@@ -2,12 +2,12 @@
 :jmh-version: 1.25
 :plugin-version: 0.5.2
 
-image:http://img.shields.io/travis/melix/jmh-gradle-plugin/master.svg["Build Status (travis)", link="https://travis-ci.org/melix/jmh-gradle-plugin"]
-image:http://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]
+image:https://github.com/melix/jmh-gradle-plugin/workflows/Main/badge.svg["Build Status", link="https://github.com/melix/jmh-gradle-plugin/actions?query=workflow%3AMain"]
+image:https://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]
 image:https://img.shields.io/maven-metadata/v.svg?metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fme%2Fchampeau%2Fgradle%2Fjmh%2Fme.champeau.gradle.jmh.gradle.plugin%2Fmaven-metadata.xml&label=plugin%20portal[Download, link="https://plugins.gradle.org/plugin/me.champeau.gradle.jmh"]
-image:http://img.shields.io/badge/license-ASF2-blue.svg["Apache License 2", link="http://www.apache.org/licenses/LICENSE-2.0.txt"]
+image:https://img.shields.io/badge/license-ASF2-blue.svg["Apache License 2", link="https://www.apache.org/licenses/LICENSE-2.0.txt"]
 
-This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
+This plugin integrates the https://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
 
 == Usage
 
