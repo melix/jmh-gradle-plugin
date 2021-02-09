@@ -1,3 +1,8 @@
+Version 0.5.3
+-------------
+    * Support for Gradle 7
+    * Default duplicates strategy is now INCLUDE instead of FAIL, for backwards compatibility
+    * Rename `jmhRuntime` to `jmhRuntimeClaspath` for clarity
 Version 0.5.2
 -------------
     * Add support for the Gradle configuration cache

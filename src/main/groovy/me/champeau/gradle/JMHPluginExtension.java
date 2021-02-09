@@ -75,7 +75,7 @@ public class JMHPluginExtension {
     private String warmupMode;
     private List<String> warmupBenchmarks;
     private boolean zip64 = false;
-    private DuplicatesStrategy duplicateClassesStrategy = DuplicatesStrategy.FAIL;
+    private DuplicatesStrategy duplicateClassesStrategy = DuplicatesStrategy.INCLUDE;
 
     public JMHPluginExtension(final Project project) {
         this.layout = project.getLayout();

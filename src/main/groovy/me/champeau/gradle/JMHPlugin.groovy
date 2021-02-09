@@ -48,7 +48,7 @@ class JMHPlugin implements Plugin<Project> {
     public static final String JMH_NAME = 'jmh'
     public static final String JMH_JAR_TASK_NAME = 'jmhJar'
     public static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
-    public static final String JHM_RUNTIME_CONFIGURATION = 'jmhRuntime'
+    public static final String JHM_RUNTIME_CONFIGURATION = 'jmhRuntimeClasspath'
 
     void apply(Project project) {
         if (!IS_GRADLE_MIN_55) {
@@ -241,6 +241,7 @@ class JMHPlugin implements Plugin<Project> {
             it.dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
             it.inputs.files project.sourceSets.jmh.output
             it.inputs.files project.sourceSets.main.output
+            it.duplicatesStrategy = extension.duplicateClassesStrategy
             if (extension.includeTests) {
                 it.inputs.files project.sourceSets.test.output
             }
@@ -252,19 +253,13 @@ class JMHPlugin implements Plugin<Project> {
             def jmhSourceSetOutput = project.sourceSets.jmh.output
             def mainSourceSetOutput = project.sourceSets.main.output
             def testSourceSetOutput = project.sourceSets.test.output
-            it.doFirst {
-                from(jmhSourceSetOutput)
-                from(mainSourceSetOutput)
-                from(jmhGeneratedClassesDir)
-                from(jmhGeneratedResourcesDir)
-                if (extension.includeTests) {
-                    from(testSourceSetOutput)
-                }
-                eachFile { FileCopyDetails f ->
-                    if (f.name.endsWith('.class')) {
-                        f.setDuplicatesStrategy(extension.duplicateClassesStrategy)
-                    }
-                }
+
+            it.from(jmhSourceSetOutput)
+            it.from(mainSourceSetOutput)
+            it.from(jmhGeneratedClassesDir)
+            it.from(jmhGeneratedResourcesDir)
+            if (extension.includeTests) {
+                it.from(testSourceSetOutput)
             }
 
             it.manifest {

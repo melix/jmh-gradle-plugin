@@ -42,6 +42,10 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             repositories {
                 mavenCentral()
             }
+            
+            jmh {
+                duplicateClassesStrategy = 'fail'
+            }
         """
 
         when:
@@ -70,6 +74,10 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
             repositories {
                 mavenCentral()
+            }
+            
+            jmh {
+                duplicateClassesStrategy = 'fail'
             }
         """
 

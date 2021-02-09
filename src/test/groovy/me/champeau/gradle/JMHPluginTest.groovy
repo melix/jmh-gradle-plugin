@@ -28,7 +28,6 @@ class JMHPluginTest {
     void testPluginIsApplied() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
-            mavenLocal()
             mavenCentral()
         }
         project.apply plugin: 'java'
@@ -48,7 +47,6 @@ class JMHPluginTest {
     void testPluginIsAppliedWithGroovy() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
-            mavenLocal()
             mavenCentral()
         }
         project.apply plugin: 'groovy'
@@ -64,7 +62,6 @@ class JMHPluginTest {
     void testPluginIsAppliedWithoutZip64() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
-            mavenLocal()
             mavenCentral()
         }
         project.apply plugin: 'groovy'
@@ -82,7 +79,6 @@ class JMHPluginTest {
     void testPluginIsAppliedWithZip64() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
-            mavenLocal()
             mavenCentral()
         }
         project.apply plugin: 'groovy'
@@ -101,7 +97,6 @@ class JMHPluginTest {
     void testAllJmhTasksBelongToJmhGroup() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
-            mavenLocal()
             mavenCentral()
         }
         project.apply plugin: 'java'
@@ -116,7 +111,6 @@ class JMHPluginTest {
     void testPluginIsAppliedTogetherWithShadow() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
-            mavenLocal()
             mavenCentral()
         }
         project.apply plugin: 'java'
@@ -128,15 +122,14 @@ class JMHPluginTest {
     }
 
     @Test
-    void testDuplicateClassesStrategyIsSetToFailByDefault() {
+    void testDuplicateClassesStrategyIsSetToIncludeByDefault() {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
-            mavenLocal()
             mavenCentral()
         }
         project.apply plugin: 'java'
         project.apply plugin: 'me.champeau.gradle.jmh'
 
-        assert project.jmh.duplicateClassesStrategy == DuplicatesStrategy.FAIL
+        assert project.jmh.duplicateClassesStrategy == DuplicatesStrategy.INCLUDE
     }
 }
