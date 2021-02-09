@@ -29,7 +29,7 @@ class JMHPluginTest {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenLocal()
-            jcenter()
+            mavenCentral()
         }
         project.apply plugin: 'java'
         project.apply plugin: 'me.champeau.gradle.jmh'
@@ -49,7 +49,7 @@ class JMHPluginTest {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenLocal()
-            jcenter()
+            mavenCentral()
         }
         project.apply plugin: 'groovy'
         project.apply plugin: 'me.champeau.gradle.jmh'
@@ -65,7 +65,7 @@ class JMHPluginTest {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenLocal()
-            jcenter()
+            mavenCentral()
         }
         project.apply plugin: 'groovy'
         project.apply plugin: 'me.champeau.gradle.jmh'
@@ -83,7 +83,7 @@ class JMHPluginTest {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenLocal()
-            jcenter()
+            mavenCentral()
         }
         project.apply plugin: 'groovy'
         project.apply plugin: 'me.champeau.gradle.jmh'
@@ -102,7 +102,7 @@ class JMHPluginTest {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenLocal()
-            jcenter()
+            mavenCentral()
         }
         project.apply plugin: 'java'
         project.apply plugin: 'me.champeau.gradle.jmh'
@@ -117,7 +117,7 @@ class JMHPluginTest {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenLocal()
-            jcenter()
+            mavenCentral()
         }
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.johnrengelman.shadow'
@@ -132,7 +132,7 @@ class JMHPluginTest {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenLocal()
-            jcenter()
+            mavenCentral()
         }
         project.apply plugin: 'java'
         project.apply plugin: 'me.champeau.gradle.jmh'

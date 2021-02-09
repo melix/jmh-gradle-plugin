@@ -20,7 +20,7 @@ plugins {
 apply plugin: 'me.champeau.gradle.jmh'
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 jmh {

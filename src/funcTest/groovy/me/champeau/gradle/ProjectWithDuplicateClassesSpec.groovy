@@ -40,7 +40,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
         """
 
@@ -69,7 +69,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
         """
 
@@ -96,7 +96,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             jmh {
@@ -130,7 +130,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             jmh {

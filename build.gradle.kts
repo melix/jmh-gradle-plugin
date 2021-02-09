@@ -16,8 +16,6 @@
 
 plugins {
     id("me.champeau.buildscan-recipes") version "0.2.3"
-    id("com.jfrog.bintray") version "1.8.0"
-    id("com.jfrog.artifactory") version "4.16.1"
     id("com.github.hierynomus.license") version "0.14.0"
     id("net.nemerosa.versioning") version "2.6.1"
     id("com.github.ben-manes.versions") version "0.17.0"
@@ -29,24 +27,14 @@ plugins {
     id("groovy")
 }
 
-buildscript {
-    dependencies {
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.17.1")
-    }
-}
-
-
 buildScanRecipes {
     recipes("git-status", "travis-ci")
     recipe(mapOf("baseUrl" to "https://github.com/melix/jmh-gradle-plugin/tree"), "git-commit")
 }
 
-apply(from = "gradle/credentials.gradle")
 apply(from = "gradle/test.gradle")
 apply(from = "gradle/funcTest.gradle")
 apply(from = "gradle/publishing.gradle")
-apply(from = "gradle/bintray.gradle")
-apply(from = "gradle/artifactory.gradle")
 apply(from = "gradle/code-quality.gradle")
 
 val jmhVersion: String by project
@@ -69,20 +57,6 @@ dependencies {
 
     "testImplementation"("org.openjdk.jmh:jmh-core:$jmhVersion")
     "testImplementation"("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
-}
-
-tasks {
-    register("release") {
-        description = "Releases a version of the plugin on Artifactory and Bintray"
-        dependsOn("build")
-        dependsOn("artifactoryPublish")
-        dependsOn("bintrayUpload")
-    }
-
-    register("publishRelease") {
-        dependsOn("bintrayUpload")
-        dependsOn("publishPlugins")
-    }
 }
 
 java {

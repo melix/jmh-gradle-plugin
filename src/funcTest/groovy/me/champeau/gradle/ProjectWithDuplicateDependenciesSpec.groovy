@@ -81,7 +81,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         buildFile << """
 
         repositories {
-            jcenter()
+            mavenCentral()
         }
 
         dependencies {

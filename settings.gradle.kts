@@ -25,3 +25,10 @@ gradleEnterprise {
 		publishAlways()
     }
 }
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal() // for dependency on the shadow plugin
+    }
+}
