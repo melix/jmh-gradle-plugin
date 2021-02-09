@@ -16,7 +16,7 @@
 
 plugins {
     id("me.champeau.buildscan-recipes") version "0.2.3"
-    id("com.github.hierynomus.license") version "0.15.0"
+    id("org.nosphere.apache.rat") version "0.7.0"
     id("net.nemerosa.versioning") version "2.6.1"
     id("com.github.ben-manes.versions") version "0.17.0"
     id("com.gradle.plugin-publish") version "0.12.0"
@@ -35,7 +35,6 @@ buildScanRecipes {
 apply(from = "gradle/test.gradle")
 apply(from = "gradle/funcTest.gradle")
 apply(from = "gradle/publishing.gradle")
-apply(from = "gradle/code-quality.gradle")
 
 val jmhVersion: String by project
 val junitVersion: String by project
@@ -86,4 +85,20 @@ tasks.jacocoTestReport {
 
 tasks.withType<GroovyCompile>().configureEach {
     options.encoding = "UTF-8"
+}
+
+tasks.rat {
+    excludes.apply {
+        add("**/build/**")
+        add(".github/**")
+        add(".idea/**")
+        add("**/*.iws")
+        add("**/*.iml")
+        add("**/*.ipr")
+        add("gradle.properties")
+        add("gradlew")
+        add("gradlew.bat")
+        add("gradle/wrapper/gradle-wrapper.properties")
+    }
+
 }
