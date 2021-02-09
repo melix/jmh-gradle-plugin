@@ -16,7 +16,7 @@
 
 plugins {
     id("me.champeau.buildscan-recipes") version "0.2.3"
-    id("com.github.hierynomus.license") version "0.14.0"
+    id("com.github.hierynomus.license") version "0.15.0"
     id("net.nemerosa.versioning") version "2.6.1"
     id("com.github.ben-manes.versions") version "0.17.0"
     id("com.gradle.plugin-publish") version "0.12.0"
