@@ -26,7 +26,7 @@ import spock.lang.Specification
 class AbstractFuncSpec extends Specification {
 
     protected static final List<GradleVersion> TESTED_GRADLE_VERSIONS = [
-            GradleVersion.version('5.5'),
+            GradleVersion.version('6.8'),
             GradleVersion.current()
     ]
 

@@ -17,17 +17,23 @@ package me.champeau.gradle
 
 import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.IsolationMode
 import org.gradle.workers.WorkerConfiguration
 import org.gradle.workers.WorkerExecutor
 
 @CompileStatic
 @CacheableTask
-class JmhBytecodeGeneratorTask extends DefaultTask {
+abstract class JmhBytecodeGeneratorTask extends DefaultTask {
     private final transient SourceSetContainer sourceSets = project.convention.getPlugin(JavaPluginConvention).sourceSets
     private final Property<Boolean> includeTestsState = project.getObjects().property(Boolean).convention(false)
 
@@ -47,10 +53,10 @@ class JmhBytecodeGeneratorTask extends DefaultTask {
     FileCollection classesDirs = sourceSets.getByName('jmh').output.classesDirs
 
     @OutputDirectory
-    File generatedClassesDir
+    abstract DirectoryProperty getGeneratedClassesDir()
 
     @OutputDirectory
-    File generatedSourcesDir
+    abstract DirectoryProperty getGeneratedSourcesDir()
 
     @Input
     String generatorType = 'default'
@@ -70,7 +76,7 @@ class JmhBytecodeGeneratorTask extends DefaultTask {
             if (includeTests) {
                 benchmarkClasspath += testClasses.files + testRuntimeClasspath.files
             }
-            config.params(benchmarkClasspath as File[], classesDirs.files as File[], generatedSourcesDir, generatedClassesDir, generatorType)
+            config.params(benchmarkClasspath as File[], classesDirs.files as File[], generatedSourcesDir.getAsFile().get(), generatedClassesDir.getAsFile().get(), generatorType)
         }
     }
 

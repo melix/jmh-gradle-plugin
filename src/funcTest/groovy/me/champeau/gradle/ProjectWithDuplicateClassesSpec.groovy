@@ -44,7 +44,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             }
             
             jmh {
-                duplicateClassesStrategy = 'fail'
+                duplicateClassesStrategy = DuplicatesStrategy.FAIL
             }
         """
 
@@ -77,7 +77,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             }
             
             jmh {
-                duplicateClassesStrategy = 'fail'
+                duplicateClassesStrategy = DuplicatesStrategy.FAIL
             }
         """
 
@@ -108,7 +108,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             }
 
             jmh {
-                duplicateClassesStrategy = 'warn'
+                duplicateClassesStrategy = DuplicatesStrategy.WARN
             }
         """
 
@@ -142,7 +142,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             }
 
             jmh {
-                duplicateClassesStrategy = 'warn'
+                duplicateClassesStrategy = DuplicatesStrategy.WARN
             }
         """
 

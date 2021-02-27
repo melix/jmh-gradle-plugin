@@ -130,6 +130,6 @@ class JMHPluginTest {
         project.apply plugin: 'java'
         project.apply plugin: 'me.champeau.gradle.jmh'
 
-        assert project.jmh.duplicateClassesStrategy == DuplicatesStrategy.INCLUDE
+        assert project.jmh.duplicateClassesStrategy.get() == DuplicatesStrategy.INCLUDE
     }
 }

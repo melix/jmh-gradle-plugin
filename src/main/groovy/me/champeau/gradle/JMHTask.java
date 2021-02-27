@@ -16,17 +16,19 @@
 package me.champeau.gradle;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.workers.IsolationMode;
-import org.gradle.workers.WorkerExecutor;
-import org.openjdk.jmh.runner.options.Options;
+import org.gradle.process.ExecOperations;
 
 import javax.inject.Inject;
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The JMH task converts our {@link JMHPluginExtension extension configuration} into JMH specific
@@ -34,68 +36,49 @@ import java.io.File;
  * JVM is created and a runner is executed using the JMH version that was used to compile the benchmarks.
  * This runner will read the options from the serialized file and execute JMH using them.
  */
-public class JMHTask extends DefaultTask {
+public abstract class JMHTask extends DefaultTask implements JmhParameters {
     private final static String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
-    private final ObjectFactory objects;
-    private final WorkerExecutor workerExecutor;
-    private final JMHPluginExtension extension = getProject().getExtensions().getByType(JMHPluginExtension.class);
-    private final FileCollection jmhClasspath = getProject().getConfigurations().getByName("jmh");
-    private final FileCollection testRuntimeClasspath = getProject().getConfigurations().getByName("testRuntimeClasspath");
-    private final RegularFileProperty jarArchive = getProject().getObjects().fileProperty();
-
-    private File benchmarkList;
-    private File compilerHints;
-
-    @Classpath
-    FileCollection getJmhClasspath() {
-        return jmhClasspath;
-    }
-
-    @Classpath
-    FileCollection getTestRuntimeClasspath() {
-        return testRuntimeClasspath;
-    }
-
-    @Classpath
-    RegularFileProperty getJarArchive() {
-        return jarArchive;
-    }
+    @Inject
+    public abstract ExecOperations getExecOperations();
 
     @Inject
-    public JMHTask(ObjectFactory objects, WorkerExecutor workerExecutor) {
-        this.objects = objects;
-        this.workerExecutor = workerExecutor;
-    }
+    public abstract ObjectFactory getObjects();
+
+    @Classpath
+    public abstract ConfigurableFileCollection getJmhClasspath();
+
+    @Classpath
+    public abstract ConfigurableFileCollection getTestRuntimeClasspath();
+
+    @InputFile
+    public abstract RegularFileProperty getJarArchive();
+
+
+    @OutputFile
+    public abstract RegularFileProperty getHumanOutputFile();
+
+    @OutputFile
+    public abstract RegularFileProperty getResultsFile();
 
     @TaskAction
-    public void before() {
-        final Options options = extension.resolveArgs();
-
-        extension.getResultsFile().getParentFile().mkdirs();
-
-        workerExecutor.submit(IsolatedRunner.class, workerConfiguration -> {
-            workerConfiguration.setIsolationMode(IsolationMode.PROCESS);
-            workerConfiguration.classpath(jmhClasspath);
-            FileCollection benchmarkClasspath = jmhClasspath.plus(objects.fileCollection().from(jarArchive));
-            if (extension.isIncludeTests()) {
-                benchmarkClasspath = benchmarkClasspath.plus(testRuntimeClasspath);
-            }
-            workerConfiguration.params(options, benchmarkClasspath.getFiles(), benchmarkList, compilerHints, extension.getJmhVersion());
-            workerConfiguration.getForkOptions().getSystemProperties().put(JAVA_IO_TMPDIR, getTemporaryDir());
+    public void callJmh() {
+        List<String> jmhArgs = new ArrayList<>();
+        ParameterConverter.collectParameters(this, jmhArgs);
+        getExecOperations().javaexec(spec -> {
+            spec.setClasspath(computeClasspath());
+            spec.getMainClass().set("org.openjdk.jmh.Main");
+            spec.args(jmhArgs);
+            spec.systemProperty(JAVA_IO_TMPDIR, getTemporaryDir().getAbsolutePath());
         });
     }
 
-    @Override
-    public void setDidWork(final boolean didWork) {
-        super.setDidWork(didWork);
+    private FileCollection computeClasspath() {
+        ConfigurableFileCollection classpath = getObjects().fileCollection();
+        classpath.from(getJmhClasspath());
+        classpath.from(getJarArchive());
+        classpath.from(getTestRuntimeClasspath());
+        return classpath;
     }
 
-    public void setBenchmarkList(File benchmarkList) {
-        this.benchmarkList = benchmarkList;
-    }
-
-    public void setCompilerHints(File compilerHints) {
-        this.compilerHints = compilerHints;
-    }
 }

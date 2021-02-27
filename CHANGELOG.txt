@@ -1,3 +1,8 @@
+Version 0.6.0
+-------------
+    * Rewritten to use the CLI instead of the JMH API
+    * Full migration to the lazy-configuration API
+    * Requires Gradle 6.8+
 Version 0.5.3
 -------------
     * Support for Gradle 7

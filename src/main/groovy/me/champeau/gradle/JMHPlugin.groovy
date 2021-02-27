@@ -16,17 +16,17 @@
 package me.champeau.gradle
 
 import groovy.transform.CompileStatic
-import org.gradle.BuildAdapter
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.invocation.Gradle
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.plugins.ide.eclipse.EclipsePlugin
@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicReference
  * Configures the JMH Plugin.
  */
 class JMHPlugin implements Plugin<Project> {
-    private static boolean IS_GRADLE_MIN_55 = GradleVersion.current() >= GradleVersion.version('5.5')
+    private static boolean IS_GRADLE_MIN = GradleVersion.current() >= GradleVersion.version('6.8')
 
     public static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
     public static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
@@ -48,22 +48,19 @@ class JMHPlugin implements Plugin<Project> {
     public static final String JMH_NAME = 'jmh'
     public static final String JMH_JAR_TASK_NAME = 'jmhJar'
     public static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
-    public static final String JHM_RUNTIME_CONFIGURATION = 'jmhRuntimeClasspath'
+    public static final String JHM_RUNTIME_CLASSPATH_CONFIGURATION = 'jmhRuntimeClasspath'
 
     void apply(Project project) {
-        if (!IS_GRADLE_MIN_55) {
-            throw new RuntimeException("This version of the JMH Gradle plugin requires Gradle 5.5+, you are using ${GradleVersion.current().version}. Please upgrade Gradle or use an older version of the plugin.");
-        }
+        assertMinimalGradleVersion()
         project.plugins.apply(JavaPlugin)
-        final JMHPluginExtension extension = project.extensions.create(JMH_NAME, JMHPluginExtension, project)
+        final JmhParameters extension = project.extensions.create(JMH_NAME, JmhParameters)
+        DefaultsConfigurer.configureDefaults(extension)
         final Configuration configuration = project.configurations.create(JMH_NAME)
-        final Configuration runtimeConfiguration = createJmhRuntimeConfiguration(project, extension)
+        final Configuration runtimeConfiguration = createJmhRuntimeClasspathConfiguration(project, extension)
 
         DependencyHandler dependencyHandler = project.getDependencies()
-        configuration.withDependencies {dependencies ->
-            dependencies.add(dependencyHandler.create("${JMH_CORE_DEPENDENCY}${extension.jmhVersion}"))
-            dependencies.add(dependencyHandler.create("${JMH_GENERATOR_DEPENDENCY}${extension.jmhVersion}"))
-        }
+        dependencyHandler.addProvider(JMH_NAME, project.providers.provider { "${JMH_CORE_DEPENDENCY}${extension.jmhVersion.get()}" }) {}
+        dependencyHandler.addProvider(JMH_NAME, project.providers.provider { "${JMH_GENERATOR_DEPENDENCY}${extension.jmhVersion.get()}" }) {}
 
         ensureTasksNotExecutedConcurrently(project)
 
@@ -73,29 +70,49 @@ class JMHPlugin implements Plugin<Project> {
 
         registerBuildListener(project, extension)
 
-        def jmhGeneratedSourcesDir = project.file("$project.buildDir/jmh-generated-sources")
-        def jmhGeneratedClassesDir = project.file("$project.buildDir/jmh-generated-classes")
-        def jmhGeneratedResourcesDir = project.file("$project.buildDir/jmh-generated-resources")
-        createJmhRunBytecodeGeneratorTask(project, jmhGeneratedSourcesDir, extension, jmhGeneratedResourcesDir)
-
-        createJmhCompileGeneratedClassesTask(project, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, extension)
+        def jmhGeneratedSourcesDir = project.layout.buildDirectory.dir("jmh-generated-sources")
+        def jmhGeneratedClassesDir = project.layout.buildDirectory.dir("jmh-generated-classes")
+        def jmhGeneratedResourcesDir = project.layout.buildDirectory.dir("jmh-generated-resources")
+        def runtimeBytecodeGeneraratorTask = createJmhRunBytecodeGeneratorTask(project, jmhGeneratedSourcesDir, extension, jmhGeneratedResourcesDir)
+        def jmhCompileGenerated = createJmhCompileGeneratedClassesTask(project, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, extension)
 
         def metaInfExcludes = ['module-info.class', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
+        TaskProvider<Jar> jmhJar = null
         if (hasShadow) {
-            createShadowJmhJar(project, extension, jmhGeneratedResourcesDir, jmhGeneratedClassesDir, metaInfExcludes, runtimeConfiguration)
+            jmhJar = createShadowJmhJar(project, extension, jmhGeneratedResourcesDir, jmhGeneratedClassesDir, metaInfExcludes, runtimeConfiguration)
         } else {
-            createStandardJmhJar(project, extension, metaInfExcludes, jmhGeneratedResourcesDir, jmhGeneratedClassesDir, runtimeConfiguration)
+            jmhJar = createStandardJmhJar(project, extension, metaInfExcludes, jmhGeneratedResourcesDir, jmhGeneratedClassesDir, runtimeConfiguration)
         }
 
-        createTask(project, JMH_NAME, JMHTask) {
-            it.group JMH_GROUP
-            it.dependsOn project.jmhJar
-            it.jarArchive.set(project.jmhJar.archiveFile)
-            it.benchmarkList = new File(jmhGeneratedResourcesDir, "META-INF/BenchmarkList")
-            it.compilerHints = new File(jmhGeneratedResourcesDir, "/META-INF/CompilerHints")
+        project.tasks.withType(JMHTask).configureEach {
+            DefaultsConfigurer.configureConvention(extension, it)
         }
+
+        project.tasks.register(JMH_NAME, JMHTask) {
+            it.group JMH_GROUP
+            it.jmhClasspath.from(configuration)
+            it.testRuntimeClasspath.from(runtimeConfiguration)
+            it.jarArchive.set(jmhJar.flatMap { it.archiveFile })
+            it.resultsFile.convention(
+                    project.providers.zip(it.resultFormat, project.layout.buildDirectory) { format, dir ->
+                        dir.file("results/jmh/results.$format")
+                    }
+            )
+            it.humanOutputFile.convention(
+                    project.providers.zip(it.resultFormat, project.layout.buildDirectory) { format, dir ->
+                        dir.file("results/jmh/human.$format")
+                    }
+            )
+        }
+
 
         configureIDESupport(project)
+    }
+
+    private static void assertMinimalGradleVersion() {
+        if (!IS_GRADLE_MIN) {
+            throw new RuntimeException("This version of the JMH Gradle plugin requires Gradle 6+, you are using ${GradleVersion.current().version}. Please upgrade Gradle or use an older version of the plugin.");
+        }
     }
 
     private configureIDESupport(Project project) {
@@ -146,28 +163,34 @@ class JMHPlugin implements Plugin<Project> {
         })
     }
 
-    private Task createJmhCompileGeneratedClassesTask(Project project, File jmhGeneratedSourcesDir, File jmhGeneratedClassesDir, JMHPluginExtension extension) {
-        createTask(project, JMH_TASK_COMPILE_GENERATED_CLASSES_NAME, JavaCompile) {
+    private static TaskProvider<JavaCompile> createJmhCompileGeneratedClassesTask(Project project,
+                                                                                  Provider<Directory> jmhGeneratedSourcesDir,
+                                                                                  Provider<Directory> jmhGeneratedClassesDir,
+                                                                                  JmhParameters extension) {
+        project.tasks.register(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME, JavaCompile) {
             it.group JMH_GROUP
             it.dependsOn 'jmhRunBytecodeGenerator'
 
             it.classpath = project.sourceSets.jmh.runtimeClasspath
-            if (extension.includeTests) {
+            if (extension.includeTests.get()) {
                 it.classpath += project.sourceSets.test.output + project.sourceSets.test.runtimeClasspath
             }
-            it.source = jmhGeneratedSourcesDir
-            it.destinationDir = jmhGeneratedClassesDir
+            it.source(jmhGeneratedSourcesDir)
+            it.destinationDirectory.set(jmhGeneratedClassesDir)
         }
     }
 
-    private Task createJmhRunBytecodeGeneratorTask(Project project, File jmhGeneratedSourcesDir, JMHPluginExtension extension, File jmhGeneratedResourcesDir) {
-        createTask(project, 'jmhRunBytecodeGenerator', JmhBytecodeGeneratorTask) {
+    private static TaskProvider<JmhBytecodeGeneratorTask> createJmhRunBytecodeGeneratorTask(Project project,
+                                                                                            Provider<Directory> jmhGeneratedSourcesDir,
+                                                                                            JmhParameters extension,
+                                                                                            Provider<Directory> jmhGeneratedResourcesDir) {
+        project.tasks.register('jmhRunBytecodeGenerator', JmhBytecodeGeneratorTask) {
             it.group JMH_GROUP
             it.dependsOn 'jmhClasses'
             it.jmhClasspath = project.configurations.jmh
-            it.includeTests = extension.includeTestsProvider
-            it.generatedClassesDir = jmhGeneratedResourcesDir
-            it.generatedSourcesDir = jmhGeneratedSourcesDir
+            it.includeTests.convention(extension.includeTests)
+            it.generatedClassesDir.set(jmhGeneratedResourcesDir)
+            it.generatedSourcesDir.set(jmhGeneratedSourcesDir)
         }
     }
 
@@ -190,8 +213,12 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    private void createShadowJmhJar(Project project, JMHPluginExtension extension, File jmhGeneratedResourcesDir, File jmhGeneratedClassesDir, List<String> metaInfExcludes, FileCollection runtimeConfiguration) {
-        createTask(project, JMH_JAR_TASK_NAME, Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar', true, JMHPlugin.classLoader)) {
+    private TaskProvider<Jar> createShadowJmhJar(Project project, JmhParameters extension,
+                                                 Provider<Directory> jmhGeneratedResourcesDir,
+                                                 Provider<Directory> jmhGeneratedClassesDir,
+                                                 List<String> metaInfExcludes,
+                                                 FileCollection runtimeConfiguration) {
+        project.tasks.register(JMH_JAR_TASK_NAME, Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar', true, JMHPlugin.classLoader)) {
             it.group = JMH_GROUP
             it.dependsOn(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME)
             it.description = 'Create a combined JAR of project and runtime dependencies'
@@ -216,12 +243,12 @@ class JMHPlugin implements Plugin<Project> {
                 processLibs runtimeConfiguration.files
                 processLibs shadowConfiguration.files
 
-                if (extension.includeTests) {
+                if (extension.includeTests.get()) {
                     task.from(testSourceSetOutput)
                 }
                 task.eachFile { FileCopyDetails f ->
                     if (f.name.endsWith('.class')) {
-                        f.setDuplicatesStrategy(extension.duplicateClassesStrategy)
+                        f.setDuplicatesStrategy(extension.duplicateClassesStrategy.get())
                     }
                 }
             }
@@ -235,14 +262,19 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    private Task createStandardJmhJar(Project project, JMHPluginExtension extension, List<String> metaInfExcludes, File jmhGeneratedResourcesDir, File jmhGeneratedClassesDir, Configuration runtimeConfiguration) {
-        createTask(project, JMH_JAR_TASK_NAME, Jar) {
+    private TaskProvider<Jar> createStandardJmhJar(Project project,
+                                                   JmhParameters extension,
+                                                   List<String> metaInfExcludes,
+                                                   Provider<Directory> jmhGeneratedResourcesDir,
+                                                   Provider<Directory> jmhGeneratedClassesDir,
+                                                   Configuration runtimeConfiguration) {
+        project.tasks.register(JMH_JAR_TASK_NAME, Jar) {
             it.group JMH_GROUP
             it.dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
             it.inputs.files project.sourceSets.jmh.output
             it.inputs.files project.sourceSets.main.output
-            it.duplicatesStrategy = extension.duplicateClassesStrategy
-            if (extension.includeTests) {
+            it.duplicatesStrategy = extension.duplicateClassesStrategy.get()
+            if (extension.includeTests.get()) {
                 it.inputs.files project.sourceSets.test.output
             }
             it.from {
@@ -258,7 +290,7 @@ class JMHPlugin implements Plugin<Project> {
             it.from(mainSourceSetOutput)
             it.from(jmhGeneratedClassesDir)
             it.from(jmhGeneratedResourcesDir)
-            if (extension.includeTests) {
+            if (extension.includeTests.get()) {
                 it.from(testSourceSetOutput)
             }
 
@@ -271,9 +303,9 @@ class JMHPlugin implements Plugin<Project> {
     }
 
     private void registerBuildListener(
-            final Project project, final JMHPluginExtension extension) {
+            final Project project, final JmhParameters extension) {
         project.gradle.projectsEvaluated {
-            if (extension.includeTests) {
+            if (extension.includeTests.get()) {
                 project.sourceSets {
                     jmh {
                         compileClasspath += test.output + project.configurations.testCompileClasspath
@@ -287,27 +319,19 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    // TODO: This is really bad. We shouldn't use "runtime", but use the configurations provided by Gradle
-    // automatically when creating a source set. That is to say, "jmhRuntimeOnly" for example and wire
-    // our classpath properly
     @CompileStatic
-    private static Configuration createJmhRuntimeConfiguration(Project project, JMHPluginExtension extension) {
-        def newConfig = project.configurations.create(JHM_RUNTIME_CONFIGURATION)
+    private static Configuration createJmhRuntimeClasspathConfiguration(Project project, JmhParameters extension) {
+        def newConfig = project.configurations.create(JHM_RUNTIME_CLASSPATH_CONFIGURATION)
         newConfig.setCanBeConsumed(false)
         newConfig.setCanBeResolved(true)
         newConfig.setVisible(false)
         newConfig.extendsFrom(project.configurations.getByName('jmh'))
         newConfig.extendsFrom(project.configurations.getByName('runtimeClasspath'))
         project.afterEvaluate {
-            if (extension.includeTests) {
+            if (extension.includeTests.get()) {
                 newConfig.extendsFrom(project.configurations.getByName('testRuntimeClasspath'))
             }
         }
         newConfig
-    }
-
-    @CompileStatic
-    private static <T extends Task> void createTask(Project project, String name, Class<T> type, Action<? super T> configuration) {
-        project.tasks.register(name, type, configuration)
     }
 }
