@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package me.champeau.jmh
 
 import spock.lang.Unroll
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 @Unroll
-class MultiLanguageSpec extends AbstractFuncSpec {
+class JmhWithShadowPluginSpec extends AbstractFuncSpec {
 
-    def "Execute #language benchmarks (#gradleVersion)"() {
+    def "Run #language benchmarks that are packaged with Shadow plugin (#gradleVersion)"() {
 
         given:
-        usingSample("${language.toLowerCase()}-project")
+        usingSample("${language.toLowerCase()}-shadow-project")
         usingGradleVersion(gradleVersion)
-        if (language == 'Kotlin') withoutConfigurationCache('kotlin plugin unsupported')
+        withoutConfigurationCache('shadow plugin unsupported')
 
         when:
         def result = build("jmh")
@@ -38,7 +38,7 @@ class MultiLanguageSpec extends AbstractFuncSpec {
 
         where:
         [language, gradleVersion] << [
-                ['Groovy', 'Java', 'Kotlin', 'Scala'],
+                ['Java', 'Scala'],
                 TESTED_GRADLE_VERSIONS
         ].combinations()
     }

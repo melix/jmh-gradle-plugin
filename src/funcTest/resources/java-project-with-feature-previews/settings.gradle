@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+rootProject.name = "with-feature-previews"
 
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-
-class JMHPluginExtensionTest {
-    Project project;
-    JMHPluginExtension extension;
-
-    @Before
-    void setUp() {
-        project = ProjectBuilder.builder().build()
-        extension = new JMHPluginExtension(project)
-    }
-
-}

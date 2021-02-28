@@ -4,7 +4,7 @@
 
 image:http://img.shields.io/travis/melix/jmh-gradle-plugin/master.svg["Build Status (travis)", link="https://travis-ci.org/melix/jmh-gradle-plugin"]
 image:http://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]
-image:https://img.shields.io/maven-metadata/v.svg?metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fme%2Fchampeau%2Fgradle%2Fjmh%2Fme.champeau.gradle.jmh.gradle.plugin%2Fmaven-metadata.xml&label=plugin%20portal[Download, link="https://plugins.gradle.org/plugin/me.champeau.gradle.jmh"]
+image:https://img.shields.io/maven-metadata/v.svg?metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fme%2Fchampeau%2Fgradle%2Fjmh%2Fme.champeau.jmh.gradle.plugin%2Fmaven-metadata.xml&label=plugin%20portal[Download, link="https://plugins.gradle.org/plugin/me.champeau.jmh"]
 image:http://img.shields.io/badge/license-ASF2-blue.svg["Apache License 2", link="http://www.apache.org/licenses/LICENSE-2.0.txt"]
 
 This plugin integrates the http://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
@@ -24,11 +24,11 @@ buildscript {
     }
   }
   dependencies {
-    classpath "me.champeau.gradle:jmh-gradle-plugin:{plugin-version}"
+    classpath "me.champeau.jmh:jmh-gradle-plugin:{plugin-version}"
   }
 }
 
-apply plugin: "me.champeau.gradle.jmh"
+apply plugin: "me.champeau.jmh"
 ----
 
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
@@ -37,9 +37,11 @@ Build script snippet for new, incubating, plugin mechanism introduced in Gradle 
 .build.gradle
 ----
 plugins {
-  id "me.champeau.gradle.jmh" version "{plugin-version}"
+  id "me.champeau.jmh" version "{plugin-version}"
 }
 ----
+
+WARNING: Versions of the plugin prior to 0.6.0 used the `me.champeau.gradle.jmh` plugin id.
 
 == What plugin version to use?
 

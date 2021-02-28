@@ -13,7 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.jmh;
+package me.champeau.jmh
 
-public class Helper {
+import org.gradle.testkit.runner.TaskOutcome
+import spock.lang.Unroll
+
+@Unroll
+class ProjectWithFeaturePreviewSpec extends AbstractFuncSpec {
+
+    def setup() {
+        usingSample('java-project-with-feature-previews')
+    }
+
+    def "successfully executes benchmark which uses feature previews (#gradleVersion)"() {
+        given:
+        usingGradleVersion(gradleVersion)
+
+        when:
+        def result = build("jmh")
+
+        then:
+        result.task(":jmh").outcome == TaskOutcome.SUCCESS
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
+    }
 }

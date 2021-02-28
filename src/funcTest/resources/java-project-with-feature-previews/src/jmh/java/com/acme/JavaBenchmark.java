@@ -13,7 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.jmh;
+package com.acme;
 
-public class Helper {
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
+
+
+@State(Scope.Benchmark)
+@Fork(1)
+@Warmup(iterations = 0)
+@Measurement(iterations = 1)
+public class JavaBenchmark {
+    @Benchmark
+    public void sqrtBenchmark(Blackhole bh){
+        bh.consume(new Person("Cédric", "Champeau", true));
+    }
 }

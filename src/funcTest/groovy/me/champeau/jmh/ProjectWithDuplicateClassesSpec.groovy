@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package me.champeau.jmh
 
 import spock.lang.Unroll
 
@@ -36,7 +36,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         buildFile << """
             plugins {
                 id 'java'
-                id 'me.champeau.gradle.jmh'
+                id 'me.champeau.jmh'
             }
 
             repositories {
@@ -69,7 +69,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             plugins {
                 id 'java'
                 id 'com.github.johnrengelman.shadow'
-                id 'me.champeau.gradle.jmh'
+                id 'me.champeau.jmh'
             }
 
             repositories {
@@ -100,7 +100,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         buildFile << """
             plugins {
                 id 'java'
-                id 'me.champeau.gradle.jmh'
+                id 'me.champeau.jmh'
             }
 
             repositories {
@@ -134,7 +134,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
             plugins {
                 id 'java'
                 id 'com.github.johnrengelman.shadow'
-                id 'me.champeau.gradle.jmh'
+                id 'me.champeau.jmh'
             }
 
             repositories {

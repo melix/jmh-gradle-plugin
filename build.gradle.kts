@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,9 @@ plugins {
     id("org.nosphere.apache.rat") version "0.7.0"
     id("net.nemerosa.versioning") version "2.6.1"
     id("com.github.ben-manes.versions") version "0.17.0"
-    id("com.gradle.plugin-publish") version "0.12.0"
     id("com.github.kt3k.coveralls") version "2.8.2"
+    id("me.champeau.plugin-configuration")
     id("jacoco")
-    id("idea")
-    id("java-gradle-plugin")
     id("groovy")
 }
 
@@ -34,7 +32,6 @@ buildScanRecipes {
 
 apply(from = "gradle/test.gradle")
 apply(from = "gradle/funcTest.gradle")
-apply(from = "gradle/publishing.gradle")
 
 val jmhVersion: String by project
 val junitVersion: String by project

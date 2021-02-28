@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2003-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,5 +15,13 @@
  */
 package me.champeau.jmh;
 
-public class Helper {
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Nested;
+import org.gradle.api.tasks.Optional;
+import org.gradle.jvm.toolchain.JavaLauncher;
+
+public interface WithJavaToolchain {
+    @Nested
+    @Optional
+    Property<JavaLauncher> getJavaLauncher();
 }

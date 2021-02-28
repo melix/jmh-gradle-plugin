@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle;
+package me.champeau.jmh;
 
+import org.gradle.workers.WorkAction;
 import org.openjdk.jmh.generators.asm.ASMGeneratorSource;
 import org.openjdk.jmh.generators.core.BenchmarkGenerator;
 import org.openjdk.jmh.generators.core.FileSystemDestination;
@@ -31,56 +32,40 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import static org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator.*;
+import static org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator.DEFAULT_GENERATOR_TYPE;
+import static org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator.GENERATOR_TYPE_ASM;
+import static org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator.GENERATOR_TYPE_DEFAULT;
+import static org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator.GENERATOR_TYPE_REFLECTION;
 
-public class JmhBytecodeGeneratorRunnable implements Runnable {
-    private final File[] classpath;
-    private final File[] compiledBytecodeDirectories;
-    private final File outputSourceDirectory;
-    private final File outputResourceDirectory;
-    private final String generatorType;
-
-    @Inject
-    public JmhBytecodeGeneratorRunnable(final File[] classpath,
-                                        final File[] compiledBytecodeDirectories,
-                                        final File outputSourceDirectory,
-                                        final File outputResourceDirectory,
-                                        final String generatorType) {
-        this.classpath = classpath;
-        this.compiledBytecodeDirectories = compiledBytecodeDirectories;
-        this.outputSourceDirectory = outputSourceDirectory;
-        this.outputResourceDirectory = outputResourceDirectory;
-        this.generatorType = generatorType;
-    }
-
-
-    public void run() {
-
+public abstract class JmhBytecodeGeneratorRunnable implements WorkAction<BytecodeGeneratorWorkParameters> {
+    @Override
+    public void execute() {
+        BytecodeGeneratorWorkParameters params = getParameters();
+        File outputSourceDirectory = params.getOutputSourceDirectory().getAsFile().get();
+        File outputResourceDirectory = params.getOutputResourceDirectory().getAsFile().get();
         cleanup(outputSourceDirectory);
         cleanup(outputResourceDirectory);
 
-        String generatorType = this.generatorType;
+        String generatorType = params.getGeneratorType().get();
         if (generatorType.equals(GENERATOR_TYPE_DEFAULT)) {
             generatorType = DEFAULT_GENERATOR_TYPE;
         }
 
-        URL[] urls = new URL[classpath.length + compiledBytecodeDirectories.length];
-        for (int i = 0; i < classpath.length; i++) {
-            try {
-                urls[i] = classpath[i].toURI().toURL();
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        for (int i = 0; i < compiledBytecodeDirectories.length; i++) {
-            try {
-                urls[i + classpath.length] = compiledBytecodeDirectories[i].toURI().toURL();
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        Set<File> classpath = (Set<File>) params.getClasspath().getFiles();
+        Set<File> compiledBytecodeDirectories = (Set<File>) params.getClassesDirsToProcess().getFiles();
+        Set<File> allFiles = new HashSet<>();
+        allFiles.addAll(classpath);
+        allFiles.addAll(compiledBytecodeDirectories);
+        URL[] urls = allFiles.stream()
+                .map(JmhBytecodeGeneratorRunnable::toURL)
+                .filter(Objects::nonNull)
+                .toArray(URL[]::new);
 
         URLClassLoader loader = new URLClassLoader(urls, this.getClass().getClassLoader());
         ClassLoader ocl = Thread.currentThread().getContextClassLoader();
@@ -149,6 +134,14 @@ public class JmhBytecodeGeneratorRunnable implements Runnable {
                 e.printStackTrace();
             }
             Thread.currentThread().setContextClassLoader(ocl);
+        }
+    }
+
+    private static URL toURL(File f) {
+        try {
+            return f.toURI().toURL();
+        } catch (MalformedURLException e) {
+            return null;
         }
     }
 

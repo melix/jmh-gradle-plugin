@@ -13,7 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.jmh;
+plugins {
+    `kotlin-dsl`
+}
 
-public class Helper {
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    implementation("com.gradle.publish:plugin-publish-plugin:0.13.0")
 }

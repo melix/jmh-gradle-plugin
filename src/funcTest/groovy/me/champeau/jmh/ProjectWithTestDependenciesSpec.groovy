@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,31 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package me.champeau.jmh
 
+import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Unroll
 
-import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
-
 @Unroll
-class MultiProjectLanguageSpec extends AbstractFuncSpec {
+class ProjectWithTestDependenciesSpec extends AbstractFuncSpec {
 
-    def "Should not execute JMH tests from different projects concurrently (#gradleVersion)"() {
+    def "Run project with dependencies on test sources (#gradleVersion)"() {
 
         given:
-        usingSample('java-multi-project')
+        usingSample('java-project-with-test-dependencies')
         usingGradleVersion(gradleVersion)
 
         when:
         def result = build("jmh")
 
         then:
-        result.task(":jmh").outcome == SUCCESS
-        benchmarksCsv.text.contains("JavaBenchmark.sqrtBenchmark")
-
-        and:
-        result.task(":subproject:jmh").outcome == SUCCESS
-        file("subproject/build/reports/benchmarks.csv").text.contains("JavaMultiBenchmark.sqrtBenchmark")
+        result.task(":jmh").outcome == TaskOutcome.SUCCESS
+        benchmarksCsv.text.contains('JavaBenchmarkThatDependsOnTest.sqrtBenchmark')
 
         where:
         gradleVersion << TESTED_GRADLE_VERSIONS

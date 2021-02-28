@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle;
+package me.champeau.jmh;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.jvm.toolchain.JavaLauncher;
 import org.gradle.process.ExecOperations;
 
 import javax.inject.Inject;
@@ -31,10 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The JMH task converts our {@link JMHPluginExtension extension configuration} into JMH specific
- * {@link org.openjdk.jmh.runner.options.Options Options} then serializes them to disk. Then a forked
- * JVM is created and a runner is executed using the JMH version that was used to compile the benchmarks.
- * This runner will read the options from the serialized file and execute JMH using them.
+ * The JMH task is responsible for launching a JMH benchmark.
  */
 public abstract class JMHTask extends DefaultTask implements JmhParameters {
     private final static String JAVA_IO_TMPDIR = "java.io.tmpdir";
@@ -70,6 +69,10 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
             spec.getMainClass().set("org.openjdk.jmh.Main");
             spec.args(jmhArgs);
             spec.systemProperty(JAVA_IO_TMPDIR, getTemporaryDir().getAbsolutePath());
+            Provider<JavaLauncher> javaLauncher = getJavaLauncher();
+            if (javaLauncher.isPresent()) {
+                spec.executable(javaLauncher.get().getExecutablePath().getAsFile());
+            }
         });
     }
 

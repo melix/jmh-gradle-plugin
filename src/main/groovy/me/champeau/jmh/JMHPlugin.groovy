@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package me.champeau.jmh
 
 import groovy.transform.CompileStatic
-import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -33,8 +32,6 @@ import org.gradle.plugins.ide.eclipse.EclipsePlugin
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.util.GradleVersion
-
-import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Configures the JMH Plugin.
@@ -62,8 +59,6 @@ class JMHPlugin implements Plugin<Project> {
         dependencyHandler.addProvider(JMH_NAME, project.providers.provider { "${JMH_CORE_DEPENDENCY}${extension.jmhVersion.get()}" }) {}
         dependencyHandler.addProvider(JMH_NAME, project.providers.provider { "${JMH_GENERATOR_DEPENDENCY}${extension.jmhVersion.get()}" }) {}
 
-        ensureTasksNotExecutedConcurrently(project)
-
         def hasShadow = project.plugins.findPlugin('com.github.johnrengelman.shadow') != null
 
         createJmhSourceSet(project)
@@ -86,6 +81,7 @@ class JMHPlugin implements Plugin<Project> {
 
         project.tasks.withType(JMHTask).configureEach {
             DefaultsConfigurer.configureConvention(extension, it)
+            usesService(ConcurrentExecutionControlBuildService.restrict(JMHTask, project.gradle))
         }
 
         project.tasks.register(JMH_NAME, JMHTask) {
@@ -95,18 +91,26 @@ class JMHPlugin implements Plugin<Project> {
             it.jarArchive.set(jmhJar.flatMap { it.archiveFile })
             it.resultsFile.convention(
                     project.providers.zip(it.resultFormat, project.layout.buildDirectory) { format, dir ->
-                        dir.file("results/jmh/results.$format")
+                        dir.file("results/jmh/results.${extensionFor(format)}")
                     }
             )
             it.humanOutputFile.convention(
                     project.providers.zip(it.resultFormat, project.layout.buildDirectory) { format, dir ->
-                        dir.file("results/jmh/human.$format")
+                        dir.file("results/jmh/human.${extensionFor(format)}")
                     }
             )
         }
 
 
         configureIDESupport(project)
+    }
+
+    private static String extensionFor(String format) {
+        switch (format.toUpperCase()) {
+            case 'TEXT':
+                return 'txt'
+            return format.toLowerCase()
+        }
     }
 
     private static void assertMinimalGradleVersion() {
@@ -142,27 +146,6 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    @CompileStatic
-    private static ensureTasksNotExecutedConcurrently(Project project) {
-        def rootExtra = project
-                .rootProject
-                .extensions
-                .extraProperties
-        AtomicReference<JMHTask> lastAddedRef = rootExtra.has('jmhLastAddedTask') ?
-                (AtomicReference<JMHTask>) rootExtra.get('jmhLastAddedTask') : new AtomicReference<JMHTask>()
-        rootExtra.set('jmhLastAddedTask', lastAddedRef)
-
-        project.tasks.withType(JMHTask).configureEach(new Action<JMHTask>() {
-            @Override
-            void execute(final JMHTask task) {
-                def lastAdded = lastAddedRef.getAndSet(task)
-                if (lastAdded) {
-                    task.mustRunAfter(lastAdded)
-                }
-            }
-        })
-    }
-
     private static TaskProvider<JavaCompile> createJmhCompileGeneratedClassesTask(Project project,
                                                                                   Provider<Directory> jmhGeneratedSourcesDir,
                                                                                   Provider<Directory> jmhGeneratedClassesDir,
@@ -186,11 +169,16 @@ class JMHPlugin implements Plugin<Project> {
                                                                                             Provider<Directory> jmhGeneratedResourcesDir) {
         project.tasks.register('jmhRunBytecodeGenerator', JmhBytecodeGeneratorTask) {
             it.group JMH_GROUP
-            it.dependsOn 'jmhClasses'
-            it.jmhClasspath = project.configurations.jmh
-            it.includeTests.convention(extension.includeTests)
+            it.jmhClasspath.from(project.configurations.jmh)
+            it.generatorType.convention('default')
             it.generatedClassesDir.set(jmhGeneratedResourcesDir)
             it.generatedSourcesDir.set(jmhGeneratedSourcesDir)
+            it.runtimeClasspath.from(project.sourceSets.jmh.runtimeClasspath)
+            it.classesDirsToProcess.from(project.sourceSets.jmh.output.classesDirs)
+            if (extension.includeTests.get()) {
+                it.runtimeClasspath.from(project.sourceSets.test.runtimeClasspath)
+                it.classesDirsToProcess.from(project.sourceSets.test.output.classesDirs)
+            }
         }
     }
 
