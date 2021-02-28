@@ -38,7 +38,6 @@ public class ParameterConverter {
         addIntOption(into, from.getFork(), "f");
         addBooleanOption(into, from.getFailOnError(), "foe");
         addBooleanOption(into, from.getForceGC(), "gc");
-        addOption(into, from.getIterations(), "i");
         addOption(into, from.getJvm(), "jvm");
         addOption(into, from.getJvmArgs(), "jvmArgs");
         addOption(into, from.getJvmArgsAppend(), "jvmArgsAppend");
@@ -112,7 +111,7 @@ public class ParameterConverter {
     private static void addIntOption(List<String> options, Provider<Integer> i, String option) {
         if (i.isPresent()) {
             options.add("-" + option);
-            options.add(String.valueOf(i));
+            options.add(String.valueOf(i.get()));
         }
 
     }

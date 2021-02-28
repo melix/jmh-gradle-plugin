@@ -64,6 +64,7 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
     public void callJmh() {
         List<String> jmhArgs = new ArrayList<>();
         ParameterConverter.collectParameters(this, jmhArgs);
+        getLogger().info("Running JMH with arguments: " + jmhArgs);
         getExecOperations().javaexec(spec -> {
             spec.setClasspath(computeClasspath());
             spec.getMainClass().set("org.openjdk.jmh.Main");
