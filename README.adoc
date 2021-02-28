@@ -22,6 +22,8 @@ plugins {
 
 WARNING: Versions of the plugin prior to 0.6.0 used the `me.champeau.gradle.jmh` plugin id.
 
+Samples can be found in the https://github.com/melix/jmh-gradle-plugin/tree/master/samples[samples] folder.
+
 == What plugin version to use?
 
 Version 0.6+ requires Gradle 6.8+.

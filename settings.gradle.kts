@@ -32,3 +32,12 @@ dependencyResolutionManagement {
         gradlePluginPortal() // for dependency on the shadow plugin
     }
 }
+
+File(rootDir, "samples").listFiles()?.forEach {
+    val sampleName = it.name
+    it.listFiles()?.forEach { lang ->
+        includeBuild(lang) {
+            name = "${sampleName}-${lang.name}"
+        }
+    }
+}
