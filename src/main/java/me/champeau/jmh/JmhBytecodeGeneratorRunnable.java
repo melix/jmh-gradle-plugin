@@ -24,7 +24,6 @@ import org.openjdk.jmh.generators.core.SourceError;
 import org.openjdk.jmh.generators.reflection.RFGeneratorSource;
 import org.openjdk.jmh.util.FileUtils;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -36,7 +35,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator.DEFAULT_GENERATOR_TYPE;
 import static org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator.GENERATOR_TYPE_ASM;
@@ -57,8 +55,8 @@ public abstract class JmhBytecodeGeneratorRunnable implements WorkAction<Bytecod
             generatorType = DEFAULT_GENERATOR_TYPE;
         }
 
-        Set<File> classpath = (Set<File>) params.getClasspath().getFiles();
-        Set<File> compiledBytecodeDirectories = (Set<File>) params.getClassesDirsToProcess().getFiles();
+        Set<File> classpath = params.getClasspath().getFiles();
+        Set<File> compiledBytecodeDirectories = params.getClassesDirsToProcess().getFiles();
         Set<File> allFiles = new HashSet<>();
         allFiles.addAll(classpath);
         allFiles.addAll(compiledBytecodeDirectories);

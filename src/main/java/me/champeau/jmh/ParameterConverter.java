@@ -15,13 +15,11 @@
  */
 package me.champeau.jmh;
 
-import groovy.lang.Binding;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Provider;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +74,7 @@ public class ParameterConverter {
 
     private static <T> void addOption(List<String> options, final ListProperty<T> values, String option, final String separator) {
         if (values.isPresent()) {
-            List<T> list = (List<T>) values.get();
+            List<T> list = values.get();
             if (!list.isEmpty()) {
                 if (!option.isEmpty()) {
                     options.add("-" + option);
@@ -92,7 +90,7 @@ public class ParameterConverter {
 
     private static <T> void addRepeatableOption(List<String> options, ListProperty<T> values, String option) {
         if (values.isPresent()) {
-            List<T> listOfValues = (List<T>) values.get();
+            List<T> listOfValues = values.get();
             for (Object value : listOfValues) {
                 options.add("-" + option);
                 options.add(String.valueOf(value));
@@ -124,10 +122,9 @@ public class ParameterConverter {
 
     }
 
-    @SuppressWarnings("unchecked")
     private static void addMapOption(List<String> options, MapProperty<String, ListProperty<String>> params, String option) {
         if (params.isPresent()) {
-            Map<String, ListProperty<String>> map = (Map<String, ListProperty<String>>) params.get();
+            Map<String, ListProperty<String>> map = params.get();
             map.forEach((key, listProperty) -> {
                 List<String> value = listProperty.get();
                 for (String str : value) {
