@@ -1,6 +1,6 @@
 = JMH Gradle Plugin
 :jmh-version: 1.25
-:plugin-version: 0.6.0
+:plugin-version: 0.6.1
 
 image:https://github.com/melix/jmh-gradle-plugin/workflows/Run%20Gradle%20on%20PRs/badge.svg["Build Status (GitHub)", link="https://github.com/melix/jmh-gradle-plugin/actions/workflows/on-pr.yml"]
 image:https://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]
