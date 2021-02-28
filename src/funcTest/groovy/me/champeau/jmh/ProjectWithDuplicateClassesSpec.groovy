@@ -117,7 +117,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmh").outcome == SUCCESS
-        result.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+        result.output.contains('"me/champeau/jmh/Helper.class"')
 
         where:
         gradleVersion << TESTED_GRADLE_VERSIONS
@@ -151,7 +151,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmh").outcome == SUCCESS
-        result.output.contains('"me/champeau/gradle/jmh/Helper.class"')
+        result.output.contains('"me/champeau/jmh/Helper.class"')
 
         where:
         gradleVersion << TESTED_GRADLE_VERSIONS

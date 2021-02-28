@@ -39,7 +39,7 @@ tasks.withType(me.champeau.jmh.WithJavaToolchain).configureEach {
 }
 
 // Configure the JMH bytecode generator to support feature previews
-tasks.withType(me.champeau.jmhBytecodeGeneratorTask).configureEach {
+tasks.withType(me.champeau.jmh.JmhBytecodeGeneratorTask).configureEach {
     jvmArgs.set(["--enable-preview"])
 }
 
