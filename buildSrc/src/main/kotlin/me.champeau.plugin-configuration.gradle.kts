@@ -112,6 +112,7 @@ signing {
 gradlePlugin {
     plugins.create("jmh") {
         id = "me.champeau.jmh"
+        displayName = properties.get("project_description").toString()
         implementationClass = "me.champeau.jmh.JMHPlugin"
     }
 }
