@@ -22,7 +22,6 @@ import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.OutputFile;
 
 public interface JmhParameters extends WithJavaToolchain {
     @Input
@@ -146,9 +145,7 @@ public interface JmhParameters extends WithJavaToolchain {
     @Input
     Property<DuplicatesStrategy> getDuplicateClassesStrategy();
 
-    @OutputFile
     RegularFileProperty getHumanOutputFile();
 
-    @OutputFile
     RegularFileProperty getResultsFile();
 }

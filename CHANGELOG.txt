@@ -1,3 +1,6 @@
+Version 0.6.2
+-------------
+    * Fix output file names not being used when configured via extension
 Version 0.6.1
 -------------
     * Fixed duplicate `-i` option on CLI

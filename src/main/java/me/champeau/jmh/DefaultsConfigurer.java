@@ -15,10 +15,12 @@
  */
 package me.champeau.jmh;
 
+import org.gradle.api.Named;
+import org.gradle.api.Project;
 import org.gradle.api.file.DuplicatesStrategy;
 
 class DefaultsConfigurer {
-    public static void configureDefaults(JmhParameters params) {
+    public static void configureDefaults(JmhParameters params, Project project) {
         params.getJmhVersion().convention("1.25");
         params.getIncludeTests().convention(true);
         params.getZip64().convention(false);
@@ -26,6 +28,28 @@ class DefaultsConfigurer {
         params.getFailOnError().convention(false);
         params.getForceGC().convention(false);
         params.getResultFormat().convention("text");
+        params.getResultsFile().convention(
+                project.getProviders().zip(params.getResultFormat(), project.getLayout().getBuildDirectory(), (format, dir) ->
+                        dir.file("results/" + nameOf(params) + "/results." + extensionFor(format)))
+        );
+        params.getHumanOutputFile().convention(
+                project.getProviders().zip(params.getResultFormat(), project.getLayout().getBuildDirectory(), (format, dir) ->
+                        dir.file("results/" + nameOf(params) + "/results." + extensionFor(format)))
+        );
+    }
+
+    private static String nameOf(JmhParameters params) {
+        if (params instanceof Named) {
+            return ((Named) params).getName();
+        }
+        return "jmh";
+    }
+
+    private static String extensionFor(String format) {
+        if ("TEXT".equalsIgnoreCase(format)) {
+            return "txt";
+        }
+        return format.toLowerCase();
     }
 
     public static void configureConvention(JmhParameters from, JmhParameters into) {

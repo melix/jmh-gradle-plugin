@@ -51,7 +51,7 @@ class JMHPlugin implements Plugin<Project> {
         assertMinimalGradleVersion()
         project.plugins.apply(JavaPlugin)
         final JmhParameters extension = project.extensions.create(JMH_NAME, JmhParameters)
-        DefaultsConfigurer.configureDefaults(extension)
+        DefaultsConfigurer.configureDefaults(extension, project)
         final Configuration configuration = project.configurations.create(JMH_NAME)
         final Configuration runtimeConfiguration = createJmhRuntimeClasspathConfiguration(project, extension)
 
@@ -89,28 +89,12 @@ class JMHPlugin implements Plugin<Project> {
             it.jmhClasspath.from(configuration)
             it.testRuntimeClasspath.from(runtimeConfiguration)
             it.jarArchive.set(jmhJar.flatMap { it.archiveFile })
-            it.resultsFile.convention(
-                    project.providers.zip(it.resultFormat, project.layout.buildDirectory) { format, dir ->
-                        dir.file("results/jmh/results.${extensionFor(format)}")
-                    }
-            )
-            it.humanOutputFile.convention(
-                    project.providers.zip(it.resultFormat, project.layout.buildDirectory) { format, dir ->
-                        dir.file("results/jmh/human.${extensionFor(format)}")
-                    }
-            )
+            it.resultsFile.convention(extension.resultsFile)
+            it.humanOutputFile.convention(extension.humanOutputFile)
         }
 
 
         configureIDESupport(project)
-    }
-
-    private static String extensionFor(String format) {
-        switch (format.toUpperCase()) {
-            case 'TEXT':
-                return 'txt'
-            return format.toLowerCase()
-        }
     }
 
     private static void assertMinimalGradleVersion() {
