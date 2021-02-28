@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat
 plugins {
     `maven-publish`
     `java-gradle-plugin`
+    signing
     id("com.gradle.plugin-publish")
 }
 
@@ -96,11 +97,30 @@ publishing {
     }
 }
 
+signing {
+    setRequired {
+        gradle.taskGraph.allTasks.any {
+            it.name.startsWith("publish")
+        }
+    }
+    publishing.publications.configureEach {
+        sign(this)
+    }
+    useGpgCmd()
+}
+
 gradlePlugin {
     plugins.create("jmh") {
         id = "me.champeau.jmh"
         implementationClass = "me.champeau.jmh.JMHPlugin"
     }
+}
+
+pluginBundle {
+    website = properties.get("project_website").toString()
+    vcsUrl = properties.get("project_vcs").toString()
+    description = properties.get("project_description").toString()
+    tags = listOf("jmh")
 }
 
 fun systemProp(name: String) = project
