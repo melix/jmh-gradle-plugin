@@ -1,51 +1,37 @@
 = JMH Gradle Plugin
 :jmh-version: 1.25
-:plugin-version: 0.5.2
+:plugin-version: 0.6.1
 
 image:https://github.com/melix/jmh-gradle-plugin/workflows/Main/badge.svg["Build Status", link="https://github.com/melix/jmh-gradle-plugin/actions?query=workflow%3AMain"]
 image:https://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]
-image:https://img.shields.io/maven-metadata/v.svg?metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fme%2Fchampeau%2Fgradle%2Fjmh%2Fme.champeau.gradle.jmh.gradle.plugin%2Fmaven-metadata.xml&label=plugin%20portal[Download, link="https://plugins.gradle.org/plugin/me.champeau.gradle.jmh"]
+image:https://img.shields.io/maven-metadata/v.svg?metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fme%2Fchampeau%2Fjmh%2Fme.champeau.jmh.gradle.plugin%2Fmaven-metadata.xml&label=plugin%20portal[Download, link="https://plugins.gradle.org/plugin/me.champeau.gradle.jmh"]
 image:https://img.shields.io/badge/license-ASF2-blue.svg["Apache License 2", link="https://www.apache.org/licenses/LICENSE-2.0.txt"]
 
 This plugin integrates the https://openjdk.java.net/projects/code-tools/jmh/[JMH micro-benchmarking framework] with Gradle.
 
 == Usage
 
-Build script snippet for use in all Gradle versions:
-[source,groovy]
-[subs="attributes"]
-.build.gradle
-----
-buildscript {
-  repositories {
-    jcenter()
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "me.champeau.gradle:jmh-gradle-plugin:{plugin-version}"
-  }
-}
-
-apply plugin: "me.champeau.gradle.jmh"
-----
-
-Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 [source,groovy]
 [subs="attributes"]
 .build.gradle
 ----
 plugins {
-  id "me.champeau.gradle.jmh" version "{plugin-version}"
+  id "me.champeau.jmh" version "{plugin-version}"
 }
 ----
 
+WARNING: Versions of the plugin prior to 0.6.0 used the `me.champeau.gradle.jmh` plugin id.
+
+Samples can be found in the https://github.com/melix/jmh-gradle-plugin/tree/master/samples[samples] folder.
+
 == What plugin version to use?
+
+Version 0.6+ requires Gradle 6.8+.
 
 [options="header"]
 |===
 |Gradle|Minimal plugin version
+|7.0|0.5.3
 |5.5|0.5.0
 |5.1|0.4.8
 |4.9|0.4.7 (to benefit from lazy tasks API)
@@ -154,7 +140,7 @@ jmh {
    zip64 = true // Use ZIP64 format for bigger archives
    jmhVersion = '{jmh-version}' // Specifies JMH version
    includeTests = true // Allows to include test sources into generate JMH jar, i.e. use it when benchmarks depend on the test classes.
-   duplicateClassesStrategy = 'fail' // Strategy to apply when encountring duplicate classes during creation of the fat jar (i.e. while executing jmhJar task)
+   duplicateClassesStrategy = DuplicatesStrategy.FAIL // Strategy to apply when encountring duplicate classes during creation of the fat jar (i.e. while executing jmhJar task)
 }
 ----
 
@@ -236,7 +222,7 @@ It is possible to change this behavior by configuring `duplicateClassesStrategy`
 .build.gradle
 ----
 jmh {
-  duplicateClassesStrategy = 'warn'
+  duplicateClassesStrategy = DuplicatesStrategy.WARN
 }
 ----
 However if you do encounter problem with defaut value it means that the classpath or sources in your project do contain
