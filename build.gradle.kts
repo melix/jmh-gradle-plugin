@@ -86,6 +86,7 @@ tasks.withType<GroovyCompile>().configureEach {
 
 tasks.rat {
     excludes.apply {
+        add("README.adoc")
         add("**/build/**")
         add(".github/**")
         add(".idea/**")
