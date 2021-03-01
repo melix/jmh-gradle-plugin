@@ -20,12 +20,11 @@ import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Ignore
-import org.junit.Test
+import spock.lang.Specification
 
-class JMHPluginTest {
-    @Test
-    void testPluginIsApplied() {
+class JMHPluginTest extends Specification {
+    def "plugin is applied"() {
+        when:
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenCentral()
@@ -33,18 +32,13 @@ class JMHPluginTest {
         project.apply plugin: 'java'
         project.apply plugin: 'me.champeau.jmh'
 
-
+        then:
         def task = project.tasks.findByName('jmh')
-        assert task instanceof JMHTask
-
-        def jmhConfigurations = project.configurations*.name.findAll { it.startsWith('jmh') }
-        println(jmhConfigurations)
-        println project.configurations.jmhCompileClasspath.extendsFrom
-        println project.configurations.jmhCompileClasspath.files
+        task instanceof JMHTask
     }
 
-    @Test
-    void testPluginIsAppliedWithGroovy() {
+    def "plugin is applied with Groovy"() {
+        when:
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenCentral()
@@ -52,14 +46,13 @@ class JMHPluginTest {
         project.apply plugin: 'groovy'
         project.apply plugin: 'me.champeau.jmh'
 
-
+        then:
         def task = project.tasks.findByName('jmh')
-        assert task instanceof JMHTask
-
+        task instanceof JMHTask
     }
 
-    @Test
-    void testPluginIsAppliedWithoutZip64() {
+    void "plugin is applied wihtout zip64"() {
+        when:
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenCentral()
@@ -67,16 +60,16 @@ class JMHPluginTest {
         project.apply plugin: 'groovy'
         project.apply plugin: 'me.champeau.jmh'
 
-
+        then:
         def task = project.tasks.findByName('jmhJar')
-        assert task.zip64 == false
-        assert task instanceof Jar
+        task instanceof Jar
+        task.zip64 == false
 
     }
 
-    @Ignore
-    @Test
-    void testPluginIsAppliedWithZip64() {
+    
+    def "plugin is applied with zip64"() {
+        given:
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenCentral()
@@ -84,17 +77,18 @@ class JMHPluginTest {
         project.apply plugin: 'groovy'
         project.apply plugin: 'me.champeau.jmh'
 
-        project.jmh.zip64 = true
+        when:
+        project.jmh.zip64.set(true)
 
-
+        then:
         def task = project.tasks.findByName('jmhJar')
-        assert task instanceof Jar
-        assert task.zip64
+        task instanceof Jar
+        task.zip64
 
     }
 
-    @Test
-    void testAllJmhTasksBelongToJmhGroup() {
+    def "all JMH tasks belong to the JMH group"() {
+        when:
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenCentral()
@@ -102,13 +96,14 @@ class JMHPluginTest {
         project.apply plugin: 'java'
         project.apply plugin: 'me.champeau.jmh'
 
+        then:
         project.tasks.find { it.name.startsWith('jmh') }.each {
             assert it.group == JMHPlugin.JMH_GROUP
         }
     }
 
-    @Test
-    void testPluginIsAppliedTogetherWithShadow() {
+    def "plugin is applied together with shadow"() {
+        when:
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenCentral()
@@ -117,12 +112,13 @@ class JMHPluginTest {
         project.apply plugin: 'com.github.johnrengelman.shadow'
         project.apply plugin: 'me.champeau.jmh'
 
+        then:
         def task = project.tasks.findByName('jmhJar')
-        assert task instanceof ShadowJar
+        task instanceof ShadowJar
     }
-
-    @Test
-    void testDuplicateClassesStrategyIsSetToIncludeByDefault() {
+    
+    void "default duplicates strategy is to include"() {
+        when:
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenCentral()
@@ -130,6 +126,7 @@ class JMHPluginTest {
         project.apply plugin: 'java'
         project.apply plugin: 'me.champeau.jmh'
 
-        assert project.jmh.duplicateClassesStrategy.get() == DuplicatesStrategy.INCLUDE
+        then:
+        project.jmh.duplicateClassesStrategy.get() == DuplicatesStrategy.INCLUDE
     }
 }

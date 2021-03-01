@@ -231,6 +231,7 @@ class JMHPlugin implements Plugin<Project> {
 
             it.exclude(metaInfExcludes)
             it.configurations = []
+            it.zip64 = extension.zip64.get()
         }
     }
 
@@ -271,6 +272,7 @@ class JMHPlugin implements Plugin<Project> {
             }
 
             it.archiveClassifier = JMH_NAME
+            it.zip64 = extension.zip64.get()
         }
     }
 
@@ -285,9 +287,6 @@ class JMHPlugin implements Plugin<Project> {
                     }
                 }
             }
-
-            def task = project.tasks.findByName(JMH_JAR_TASK_NAME)
-            task.zip64 = extension.zip64
         }
     }
 

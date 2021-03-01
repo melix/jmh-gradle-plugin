@@ -34,7 +34,6 @@ apply(from = "gradle/test.gradle")
 apply(from = "gradle/funcTest.gradle")
 
 val jmhVersion: String by project
-val junitVersion: String by project
 val spockVersion: String by project
 val shadowVersion: String by project
 val jacocoVersion: String by project
@@ -45,9 +44,8 @@ dependencies {
     "implementation"("org.openjdk.jmh:jmh-core:$jmhVersion")
     "compileOnly"("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
 
-    "testImplementation"("junit:junit:$junitVersion")
     testImplementation("org.spockframework:spock-core:$spockVersion") {
-        exclude(mapOf("group" to "org.codehaus.groovy", "module" to "groovy-all"))
+        exclude(mapOf("group" to "org.codehaus.groovy"))
     }
     "testImplementation"("com.github.jengelman.gradle.plugins:shadow:$shadowVersion")
 

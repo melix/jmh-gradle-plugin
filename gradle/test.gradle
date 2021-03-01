@@ -31,4 +31,10 @@ project.tasks.withType(Test).configureEach {
             }
         }
     }
+
+    useJUnitPlatform()
+
+    // disabling Spock checks because Spock for whatever reason seems to consider the Groovy version of the
+    // Gradle version under test to be processed, when it shouldn't
+    jvmArgs("-Dspock.iKnowWhatImDoing.disableGroovyVersionCheck=true")
 }

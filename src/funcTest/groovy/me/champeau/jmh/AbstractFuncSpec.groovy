@@ -19,19 +19,18 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GFileUtils
 import org.gradle.util.GradleVersion
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
 
-class AbstractFuncSpec extends Specification {
+abstract class AbstractFuncSpec extends Specification {
 
     protected static final List<GradleVersion> TESTED_GRADLE_VERSIONS = [
             GradleVersion.version('6.8'),
             GradleVersion.current()
     ]
 
-    @Rule
-    TemporaryFolder temporaryFolder = new TemporaryFolder()
+    @TempDir
+    File temporaryFolder
 
     private GradleVersion testedGradleVersion = GradleVersion.current()
 
@@ -46,7 +45,7 @@ class AbstractFuncSpec extends Specification {
     }
 
     File getProjectDir() {
-        temporaryFolder.root
+        temporaryFolder
     }
 
     File getBuildFile() {
@@ -97,7 +96,11 @@ class AbstractFuncSpec extends Specification {
             println("Configuration cache disabled: $noConfigurationCacheReason")
         }
         (gradleVersionWithConfigurationCache && !noConfigurationCacheReason
-                ? ['--stacktrace', '--configuration-cache']
+                ? ['--stacktrace',
+                   '--configuration-cache',
+                   // need to say to "warn" because for some reason the system property 'spock.iKnowWhatImDoing.disableGroovyVersionCheck'
+                   // is leaking to the process under test as being read
+                   '--configuration-cache-problems', 'warn']
                 : ['--stacktrace']) + (arguments as List)
     }
 }
