@@ -1,6 +1,6 @@
 = JMH Gradle Plugin
 :jmh-version: 1.28
-:plugin-version: 0.6.1
+:plugin-version: 0.6.2
 
 image:https://github.com/melix/jmh-gradle-plugin/workflows/Main/badge.svg["Build Status", link="https://github.com/melix/jmh-gradle-plugin/actions?query=workflow%3AMain"]
 image:https://img.shields.io/coveralls/melix/jmh-gradle-plugin/master.svg["Coverage Status (coveralls)", link="https://coveralls.io/r/melix/jmh-gradle-plugin"]
