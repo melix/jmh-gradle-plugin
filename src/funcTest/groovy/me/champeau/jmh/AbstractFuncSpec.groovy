@@ -65,19 +65,11 @@ abstract class AbstractFuncSpec extends Specification {
         new File(projectDir, path)
     }
 
-    private List<File> getPluginClasspath() {
-        def pluginClasspathResource = getClass().classLoader.getResourceAsStream("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-        pluginClasspathResource.readLines().collect { new File(it) }
-    }
-
     private GradleRunner gradleRunner(List<String> arguments) {
         GradleRunner.create()
                 .withGradleVersion(testedGradleVersion.version)
                 .forwardOutput()
-                .withPluginClasspath(pluginClasspath)
+                .withPluginClasspath()
                 .withProjectDir(projectDir)
                 .withArguments(arguments)
     }
@@ -97,10 +89,7 @@ abstract class AbstractFuncSpec extends Specification {
         }
         (gradleVersionWithConfigurationCache && !noConfigurationCacheReason
                 ? ['--stacktrace',
-                   '--configuration-cache',
-                   // need to say to "warn" because for some reason the system property 'spock.iKnowWhatImDoing.disableGroovyVersionCheck'
-                   // is leaking to the process under test as being read
-                   '--configuration-cache-problems', 'warn']
+                   '--configuration-cache']
                 : ['--stacktrace']) + (arguments as List)
     }
 }

@@ -39,15 +39,13 @@ val shadowVersion: String by project
 val jacocoVersion: String by project
 
 dependencies {
-    "implementation"(localGroovy())
-    "implementation"(gradleApi())
     "implementation"("org.openjdk.jmh:jmh-core:$jmhVersion")
     "compileOnly"("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
 
     testImplementation("org.spockframework:spock-core:$spockVersion") {
         exclude(mapOf("group" to "org.codehaus.groovy"))
     }
-    "testImplementation"("com.github.jengelman.gradle.plugins:shadow:$shadowVersion")
+    "pluginsUnderTest"("com.github.jengelman.gradle.plugins:shadow:$shadowVersion")
 
     "testImplementation"("org.openjdk.jmh:jmh-core:$jmhVersion")
     "testImplementation"("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
