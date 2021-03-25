@@ -1,6 +1,7 @@
 Version 0.6.3
 -------------
     * Fix jmhJar accidentally including `.class` files as zips
+    * Restore previous behavior of not redirecting output to file by default
 Version 0.6.2
 -------------
     * Fix output file names not being used when configured via extension

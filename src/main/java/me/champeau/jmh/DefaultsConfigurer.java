@@ -32,10 +32,6 @@ class DefaultsConfigurer {
                 project.getProviders().zip(params.getResultFormat(), project.getLayout().getBuildDirectory(), (format, dir) ->
                         dir.file("results/" + nameOf(params) + "/results." + extensionFor(format)))
         );
-        params.getHumanOutputFile().convention(
-                project.getProviders().zip(params.getResultFormat(), project.getLayout().getBuildDirectory(), (format, dir) ->
-                        dir.file("results/" + nameOf(params) + "/results." + extensionFor(format)))
-        );
     }
 
     private static String nameOf(JmhParameters params) {

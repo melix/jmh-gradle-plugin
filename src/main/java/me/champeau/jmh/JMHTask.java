@@ -23,6 +23,7 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.jvm.toolchain.JavaLauncher;
@@ -55,6 +56,7 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
 
 
     @OutputFile
+    @Optional
     public abstract RegularFileProperty getHumanOutputFile();
 
     @OutputFile
