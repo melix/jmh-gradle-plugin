@@ -250,11 +250,13 @@ class JMHPlugin implements Plugin<Project> {
             if (extension.includeTests.get()) {
                 it.inputs.files project.sourceSets.test.output
             }
-            it.from {
-                runtimeConfiguration.asFileTree.collect { File f ->
-                    f.isDirectory() ? f : project.zipTree(f)
-                }
-            }.exclude(metaInfExcludes)
+            it.from(runtimeConfiguration.elements.map {
+                it.collect { it.asFile }
+                        .findAll { it.directory || it.name.toLowerCase().endsWith('.jar') }
+                        .collect {
+                            it.directory ? it : project.zipTree(it)
+                        } as Set
+            }).exclude(metaInfExcludes)
             def jmhSourceSetOutput = project.sourceSets.jmh.output
             def mainSourceSetOutput = project.sourceSets.main.output
             def testSourceSetOutput = project.sourceSets.test.output
