@@ -106,6 +106,7 @@ signing {
     publishing.publications.configureEach {
         sign(this)
     }
+    sign(configurations.archives.get())
     useGpgCmd()
 }
 
