@@ -40,7 +40,6 @@ val jacocoVersion: String by project
 
 dependencies {
     "implementation"("org.openjdk.jmh:jmh-core:$jmhVersion")
-    "compileOnly"("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
 
     testImplementation("org.spockframework:spock-core:$spockVersion") {
         exclude(mapOf("group" to "org.codehaus.groovy"))

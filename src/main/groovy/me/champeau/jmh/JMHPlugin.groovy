@@ -155,7 +155,7 @@ class JMHPlugin implements Plugin<Project> {
             it.group JMH_GROUP
             it.jmhClasspath.from(project.configurations.jmh)
             it.generatorType.convention('default')
-            it.generatedClassesDir.set(jmhGeneratedResourcesDir)
+            it.generatedResourcesDir.set(jmhGeneratedResourcesDir)
             it.generatedSourcesDir.set(jmhGeneratedSourcesDir)
             it.runtimeClasspath.from(project.sourceSets.jmh.runtimeClasspath)
             it.classesDirsToProcess.from(project.sourceSets.jmh.output.classesDirs)

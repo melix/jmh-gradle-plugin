@@ -43,4 +43,18 @@ class MultiLanguageSpec extends AbstractFuncSpec {
                 TESTED_GRADLE_VERSIONS
         ].combinations()
     }
+
+    def "Executes benchmarks with multiple languages"() {
+
+        given:
+        usingSample("mixed-language-project")
+
+        when:
+        def result = build("jmh")
+
+        then:
+        result.task(":jmh").outcome == SUCCESS
+        benchmarksCsv.text.contains('JavaBenchmark.sqrtBenchmark')
+        benchmarksCsv.text.contains('GroovyBenchmark.sqrtBenchmark')
+    }
 }
