@@ -20,22 +20,19 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.Classpath;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.OutputDirectory;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.provider.Provider;
+import org.gradle.api.tasks.*;
 import org.gradle.jvm.toolchain.JavaLauncher;
-import org.gradle.workers.WorkerExecutor;
+import org.gradle.process.ExecOperations;
 
 import javax.inject.Inject;
+import java.io.File;
 
 @CacheableTask
 public abstract class JmhBytecodeGeneratorTask extends DefaultTask implements WithJavaToolchain {
 
     @Inject
-    public abstract WorkerExecutor getWorkerExecutor();
+    public abstract ExecOperations getExecOperations();
 
     @Input
     public abstract ListProperty<String> getJvmArgs();
@@ -53,25 +50,29 @@ public abstract class JmhBytecodeGeneratorTask extends DefaultTask implements Wi
     public abstract ConfigurableFileCollection getClassesDirsToProcess();
 
     @OutputDirectory
-    public abstract DirectoryProperty getGeneratedClassesDir();
+    public abstract DirectoryProperty getGeneratedSourcesDir();
 
     @OutputDirectory
-    public abstract DirectoryProperty getGeneratedSourcesDir();
+    public abstract DirectoryProperty getGeneratedResourcesDir();
 
     @TaskAction
     public void generate() {
-        getWorkerExecutor().processIsolation(process -> {
-            if (getJavaLauncher().isPresent()) {
-                process.getForkOptions().executable(getJavaLauncher().get().getExecutablePath().getAsFile());
-            }
-            process.getClasspath().setFrom(getJmhClasspath());
-            process.getForkOptions().jvmArgs(getJvmArgs().get());
-        }).submit(JmhBytecodeGeneratorRunnable.class, params -> {
-            params.getClasspath().from(getRuntimeClasspath());
-            params.getGeneratorType().set(getGeneratorType());
-            params.getOutputSourceDirectory().set(getGeneratedSourcesDir());
-            params.getOutputResourceDirectory().set(getGeneratedClassesDir());
-            params.getClassesDirsToProcess().from(getClassesDirsToProcess());
-        });
+        for (File classesDir : getClassesDirsToProcess()) {
+            getExecOperations().javaexec(spec -> {
+                spec.setMain("org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator");
+                spec.classpath(getJmhClasspath(), getRuntimeClasspath(), getClassesDirsToProcess());
+                spec.args(
+                        classesDir,
+                        getGeneratedSourcesDir().get().getAsFile(),
+                        getGeneratedResourcesDir().get().getAsFile(),
+                        getGeneratorType().get()
+                );
+                spec.jvmArgs(getJvmArgs().get());
+                Provider<JavaLauncher> javaLauncher = getJavaLauncher();
+                if (javaLauncher.isPresent()) {
+                    spec.executable(javaLauncher.get().getExecutablePath().getAsFile());
+                }
+            });
+        }
     }
 }
