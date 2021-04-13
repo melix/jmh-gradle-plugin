@@ -110,6 +110,10 @@ signing {
     useGpgCmd()
 }
 
+tasks.withType<Sign>().configureEach {
+    onlyIf { signing.isRequired }
+}
+
 gradlePlugin {
     plugins.create("jmh") {
         id = "me.champeau.jmh"

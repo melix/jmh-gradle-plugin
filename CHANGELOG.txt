@@ -1,3 +1,6 @@
+Version 0.6.4
+-------------
+    * Migrate the JMHBytecodeGenerator task to use exec services
 Version 0.6.3
 -------------
     * Fix jmhJar accidentally including `.class` files as zips
