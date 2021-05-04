@@ -37,7 +37,8 @@ import org.gradle.util.GradleVersion
  * Configures the JMH Plugin.
  */
 class JMHPlugin implements Plugin<Project> {
-    private static boolean IS_GRADLE_MIN = GradleVersion.current() >= GradleVersion.version('6.8')
+    private static GradleVersion GRADLE_MIN = GradleVersion.version('6.8')
+    private static boolean IS_GRADLE_MIN = GradleVersion.current() >= GRADLE_MIN
 
     public static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
     public static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
@@ -99,7 +100,7 @@ class JMHPlugin implements Plugin<Project> {
 
     private static void assertMinimalGradleVersion() {
         if (!IS_GRADLE_MIN) {
-            throw new RuntimeException("This version of the JMH Gradle plugin requires Gradle 6+, you are using ${GradleVersion.current().version}. Please upgrade Gradle or use an older version of the plugin.");
+            throw new RuntimeException("This version of the JMH Gradle plugin requires ${GRADLE_MIN.version}+, you are using ${GradleVersion.current().version}. Please upgrade Gradle or use an older version of the JMH Gradle plugin.");
         }
     }
 
