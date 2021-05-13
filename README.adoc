@@ -97,7 +97,7 @@ gradle jmh
 == Configuration options
 
 By default, all benchmarks will be executed, and the results will be generated into `$buildDir/reports/jmh`. But you
-can change various options thanks to the `jmh` configuration block. All configurations variables apart from `include`
+can change various options thanks to the `jmh` configuration block. All configurations variables apart from `includes`
 are unset, implying that they fall back to the default JMH values:
 
 [source,groovy]
@@ -105,8 +105,8 @@ are unset, implying that they fall back to the default JMH values:
 .build.gradle
 ----
 jmh {
-   include = ['some regular expression'] // include pattern (regular expression) for benchmarks to be executed
-   exclude = ['some regular expression'] // exclude pattern (regular expression) for benchmarks to be executed
+   includes = ['some regular expression'] // include pattern (regular expression) for benchmarks to be executed
+   excludes = ['some regular expression'] // exclude pattern (regular expression) for benchmarks to be executed
    iterations = 10 // Number of measurement iterations to do.
    benchmarkMode = ['thrpt','ss'] // Benchmark mode. Available modes are: [Throughput/thrpt, AverageTime/avgt, SampleTime/sample, SingleShotTime/ss, All/all]
    batchSize = 1 // Batch size: number of benchmark method calls per operation. (some benchmark modes can ignore this setting)
