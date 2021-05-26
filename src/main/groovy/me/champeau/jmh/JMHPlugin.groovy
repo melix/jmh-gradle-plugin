@@ -170,8 +170,6 @@ class JMHPlugin implements Plugin<Project> {
     private void createJmhSourceSet(Project project) {
         project.sourceSets {
             jmh {
-                java.srcDir 'src/jmh/java'
-                resources.srcDir 'src/jmh/resources'
                 compileClasspath += main.output
                 runtimeClasspath += main.output
             }

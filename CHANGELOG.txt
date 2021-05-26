@@ -1,3 +1,7 @@
+Version 0.6.5
+-------------
+    * Remove redundant declaration of source/resource directories
+    * Improved error message in case of unsupported Gradle versions
 Version 0.6.4
 -------------
     * Migrate the JMHBytecodeGenerator task to use exec services
