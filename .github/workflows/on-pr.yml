@@ -11,6 +11,7 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 8
+    - uses: gradle/wrapper-validation-action@v1.0.3
     - uses: eskatos/gradle-command-action@v1
       with:
         arguments: build --scan
