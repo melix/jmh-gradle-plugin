@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.jmh.mixlang
+package me.champeau.gradle.jmh.mixlang
 
-import me.champeau.gradle.jmh.mixlang.doNothing
-import org.openjdk.jmh.annotations.*
-
-@State(Scope.Benchmark)
-@Fork(1)
-@Warmup(iterations = 0)
-@Measurement(iterations = 1)
-open class KotlinBenchmark {
-    var value: Double = 0.0
-
-    @Setup
-    fun setUp(): Unit {
-        value = 3.0
-        doNothing()
-    }
-
-    @Benchmark
-    fun sqrtBenchmark(): Double = Math.sqrt(value)
-
-}
+internal fun doNothing() {}
