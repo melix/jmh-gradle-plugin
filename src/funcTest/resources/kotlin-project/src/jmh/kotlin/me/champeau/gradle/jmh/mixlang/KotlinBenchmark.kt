@@ -15,6 +15,7 @@
  */
 package me.champeau.jmh.mixlang
 
+import me.champeau.gradle.jmh.mixlang.doNothing
 import org.openjdk.jmh.annotations.*
 
 @State(Scope.Benchmark)
@@ -27,6 +28,7 @@ open class KotlinBenchmark {
     @Setup
     fun setUp(): Unit {
         value = 3.0
+        doNothing()
     }
 
     @Benchmark
