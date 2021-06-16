@@ -30,17 +30,6 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal() // for dependency on the shadow plugin
-        exclusiveContent {
-            forRepository {
-                maven {
-                    name = "OSS_Snapshot_Repository"
-                    url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-                }
-            }
-            filter {
-                includeGroup("org.spockframework")
-            }
-        }
     }
 }
 
