@@ -37,9 +37,9 @@ public class ParameterConverter {
         addBooleanOption(into, from.getFailOnError(), "foe");
         addBooleanOption(into, from.getForceGC(), "gc");
         addOption(into, from.getJvm(), "jvm");
-        addOption(into, from.getJvmArgs(), "jvmArgs");
-        addOption(into, from.getJvmArgsAppend(), "jvmArgsAppend");
-        addOption(into, from.getJvmArgsPrepend(), "jvmArgsPrepend");
+        addOption(into, from.getJvmArgs(), "jvmArgs", " ");
+        addOption(into, from.getJvmArgsAppend(), "jvmArgsAppend", " ");
+        addOption(into, from.getJvmArgsPrepend(), "jvmArgsPrepend", " ");
         addFileOption(into, from.getHumanOutputFile(), "o");
         addIntOption(into, from.getOperationsPerInvocation(), "opi");
         addMapOption(into, from.getBenchmarkParameters(), "p");
