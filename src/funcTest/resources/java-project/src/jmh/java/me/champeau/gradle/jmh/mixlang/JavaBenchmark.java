@@ -24,13 +24,19 @@ import org.openjdk.jmh.annotations.*;
 public class JavaBenchmark {
     private double value;
 
+    @Param({"a", "b"})
+    String a;
+
     @Setup
     public void setUp() {
         value = 3.0;
     }
 
     @Benchmark
-    public double sqrtBenchmark(){
+    public double sqrtBenchmark() {
+        if (!"a".equals(a)) {
+            throw new RuntimeException("parameter option not respected");
+        }
         return Math.sqrt(value);
     }
 }
