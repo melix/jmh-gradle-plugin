@@ -57,6 +57,12 @@ public abstract class JmhBytecodeGeneratorTask extends DefaultTask implements Wi
 
     @TaskAction
     public void generate() {
+
+        // Delete output directories, since JMH doesn't clean up between runs automatically. If we don't delete the
+        //  former outputs, we might end up with stale classes.
+        cleanup(getGeneratedSourcesDir().get().getAsFile());
+        cleanup(getGeneratedResourcesDir().get().getAsFile());
+
         for (File classesDir : getClassesDirsToProcess()) {
             getExecOperations().javaexec(spec -> {
                 spec.setMain("org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator");
@@ -73,6 +79,18 @@ public abstract class JmhBytecodeGeneratorTask extends DefaultTask implements Wi
                     spec.executable(javaLauncher.get().getExecutablePath().getAsFile());
                 }
             });
+        }
+    }
+
+    private static void cleanup(final File file) {
+        if (file.exists()) {
+            File[] listing = file.listFiles();
+            if (listing != null) {
+                for (File sub : listing) {
+                    cleanup(sub);
+                }
+            }
+            file.delete();
         }
     }
 }
