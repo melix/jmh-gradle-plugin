@@ -5,6 +5,7 @@ Version 0.6.6
     * Fix a bug where benchmarkParameters were not respected
     * Delete stale JMH classes before producing new ones
     * Fix missing dependency on tests when compiling JMH classes
+    * Updrade to JMH 1.29
 Version 0.6.5
 -------------
     * Remove redundant declaration of source/resource directories
