@@ -183,11 +183,6 @@ class JMHPlugin implements Plugin<Project> {
             jmhRuntimeClasspath.extendsFrom(implementation, runtimeOnly)
         }
 
-        if (extension.includeTests.get()) {
-            project.tasks.named("compileJmhJava", JavaCompile.class).configure {
-                dependsOn(project.tasks.named(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME, JavaCompile.class))
-            }
-        }
     }
 
     private TaskProvider<Jar> createShadowJmhJar(Project project, JmhParameters extension,
@@ -285,7 +280,7 @@ class JMHPlugin implements Plugin<Project> {
 
     private void registerBuildListener(
             final Project project, final JmhParameters extension) {
-        project.gradle.projectsEvaluated {
+        project.afterEvaluate {
             if (extension.includeTests.get()) {
                 project.sourceSets {
                     jmh {
