@@ -37,4 +37,21 @@ class ProjectWithTestDependenciesSpec extends AbstractFuncSpec {
         where:
         gradleVersion << TESTED_GRADLE_VERSIONS
     }
+
+    def "Run project with dependencies on test sources and configure-on-demand (#gradleVersion)"() {
+
+        given:
+        usingSample('java-project-with-test-dependencies')
+        usingGradleVersion(gradleVersion)
+
+        when:
+        def result = build("--configure-on-demand", "jmh")
+
+        then:
+        result.task(":compileTestJava").outcome == TaskOutcome.SUCCESS
+        !result.output.contains("Task ':compileJmhJava' uses this output of task ':compileTestJava' without declaring an explicit or implicit dependency.")
+
+        where:
+        gradleVersion << TESTED_GRADLE_VERSIONS
+    }
 }
