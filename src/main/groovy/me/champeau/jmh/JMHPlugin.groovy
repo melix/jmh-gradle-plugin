@@ -94,13 +94,23 @@ class JMHPlugin implements Plugin<Project> {
             it.humanOutputFile.convention(extension.humanOutputFile)
         }
 
-
+        configureKotlin(project)
         configureIDESupport(project)
     }
 
     private static void assertMinimalGradleVersion() {
         if (!IS_GRADLE_MIN) {
             throw new RuntimeException("This version of the JMH Gradle plugin requires ${GRADLE_MIN.version}+, you are using ${GradleVersion.current().version}. Please upgrade Gradle or use an older version of the JMH Gradle plugin.");
+        }
+    }
+
+    private static void configureKotlin(Project project) {
+        // Associate the JMH Kotlin compilation with the main compilation. This allows resolution of Kotlin "internal" visibility.
+        project.pluginManager.withPlugin('org.jetbrains.kotlin.jvm') {
+            def kotlinCompilations = project.extensions.getByName("kotlin").target.compilations
+            def mainCompilation = kotlinCompilations.getByName("main")
+            def jmhCompilation = kotlinCompilations.getByName(JMH_NAME)
+            jmhCompilation.associateWith(mainCompilation)
         }
     }
 
