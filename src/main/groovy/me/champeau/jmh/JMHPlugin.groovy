@@ -62,7 +62,7 @@ class JMHPlugin implements Plugin<Project> {
 
         def hasShadow = project.plugins.findPlugin('com.github.johnrengelman.shadow') != null
 
-        createJmhSourceSet(project)
+        createJmhSourceSet(project, extension)
 
         registerBuildListener(project, extension)
 
@@ -167,7 +167,7 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    private void createJmhSourceSet(Project project) {
+    private void createJmhSourceSet(Project project, JmhParameters extension) {
         project.sourceSets {
             jmh {
                 compileClasspath += main.output
@@ -182,6 +182,7 @@ class JMHPlugin implements Plugin<Project> {
             jmhCompileClasspath.extendsFrom(implementation, compileOnly)
             jmhRuntimeClasspath.extendsFrom(implementation, runtimeOnly)
         }
+
     }
 
     private TaskProvider<Jar> createShadowJmhJar(Project project, JmhParameters extension,
@@ -279,7 +280,7 @@ class JMHPlugin implements Plugin<Project> {
 
     private void registerBuildListener(
             final Project project, final JmhParameters extension) {
-        project.gradle.projectsEvaluated {
+        project.afterEvaluate {
             if (extension.includeTests.get()) {
                 project.sourceSets {
                     jmh {
