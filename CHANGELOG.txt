@@ -1,3 +1,10 @@
+Version 0.6.6
+-------------
+    * Modify Kotlin functional test to support "internal" code
+    * Fixed a bug where arguments were combined with a comma instead of a space
+    * Fix a bug where benchmarkParameters were not respected
+    * Delete stale JMH classes before producing new ones
+    * Fix missing dependency on tests when compiling JMH classes
 Version 0.6.5
 -------------
     * Remove redundant declaration of source/resource directories
