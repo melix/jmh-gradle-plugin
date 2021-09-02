@@ -128,7 +128,7 @@ public class ParameterConverter {
             map.forEach((key, listProperty) -> {
                 List<String> value = listProperty.get();
                 for (String str : value) {
-                    options.add(" -" + option);
+                    options.add("-" + option);
                     options.add(key + "=" + str);
                 }
             });

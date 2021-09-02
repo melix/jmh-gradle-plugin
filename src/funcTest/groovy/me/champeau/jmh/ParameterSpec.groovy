@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-    id 'java'
-    id 'me.champeau.jmh'
-}
+package me.champeau.jmh
 
-repositories {
-    mavenCentral()
-}
 
-jmh {
-    resultFormat = 'csv'
-    benchmarkMode = ['thrpt','ss']
-    resultsFile = file('build/reports/benchmarks.csv')
-    def aParams = project.objects.listProperty(String).value(['a'])
-    benchmarkParameters = [a: aParams]
-    failOnError = true
+import spock.lang.Unroll
+
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+
+@Unroll
+class ParameterSpec extends AbstractFuncSpec {
+
+    def "Executes benchmarks with parameters"() {
+
+        given:
+        usingSample("java-project")
+
+        when:
+        def result = build("jmh")
+
+        then:
+        result.task(":jmh").outcome == SUCCESS
+        !result.output.contains('parameter option not respected')
+    }
 }
