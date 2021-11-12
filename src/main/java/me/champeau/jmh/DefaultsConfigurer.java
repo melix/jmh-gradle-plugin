@@ -84,6 +84,7 @@ class DefaultsConfigurer {
         into.getZip64().convention(from.getZip64());
         into.getDuplicateClassesStrategy().convention(from.getDuplicateClassesStrategy());
         into.getJavaLauncher().convention(from.getJavaLauncher());
+        into.getEnvironmentVariables().convention(from.getEnvironmentVariables());
     }
 
 }
