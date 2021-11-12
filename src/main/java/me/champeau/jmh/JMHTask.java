@@ -31,7 +31,9 @@ import org.gradle.process.ExecOperations;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The JMH task is responsible for launching a JMH benchmark.
@@ -65,13 +67,16 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
     @TaskAction
     public void callJmh() {
         List<String> jmhArgs = new ArrayList<>();
+        Map<String, String> env = new HashMap<>();
         ParameterConverter.collectParameters(this, jmhArgs);
+        ParameterConverter.collectEnvironment(this, env);
         getLogger().info("Running JMH with arguments: " + jmhArgs);
         getExecOperations().javaexec(spec -> {
             spec.setClasspath(computeClasspath());
             spec.getMainClass().set("org.openjdk.jmh.Main");
             spec.args(jmhArgs);
             spec.systemProperty(JAVA_IO_TMPDIR, getTemporaryDir().getAbsolutePath());
+            spec.environment(env);
             Provider<JavaLauncher> javaLauncher = getJavaLauncher();
             if (javaLauncher.isPresent()) {
                 spec.executable(javaLauncher.get().getExecutablePath().getAsFile());

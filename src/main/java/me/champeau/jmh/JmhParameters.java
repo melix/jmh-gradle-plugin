@@ -145,6 +145,10 @@ public interface JmhParameters extends WithJavaToolchain {
     @Input
     Property<DuplicatesStrategy> getDuplicateClassesStrategy();
 
+    @Input
+    @Optional
+    MapProperty<String, String> getEnvironmentVariables();
+
     RegularFileProperty getHumanOutputFile();
 
     RegularFileProperty getResultsFile();
