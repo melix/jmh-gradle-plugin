@@ -96,7 +96,7 @@ gradle jmh
 
 == Configuration options
 
-By default, all benchmarks will be executed, and the results will be generated into `$buildDir/reports/jmh`. But you
+By default, all benchmarks will be executed, and the results will be generated into `$buildDir/results/jmh`. But you
 can change various options thanks to the `jmh` configuration block. All configurations variables apart from `includes`
 are unset, implying that they fall back to the default JMH values:
 
@@ -117,8 +117,8 @@ jmh {
    jvmArgs = ['Custom JVM args to use when forking.']
    jvmArgsAppend = ['Custom JVM args to use when forking (append these)']
    jvmArgsPrepend =[ 'Custom JVM args to use when forking (prepend these)']
-   humanOutputFile = project.file("${project.buildDir}/reports/jmh/human.txt") // human-readable output file
-   resultsFile = project.file("${project.buildDir}/reports/jmh/results.txt") // results file
+   humanOutputFile = project.file("${project.buildDir}/results/jmh/human.txt") // human-readable output file
+   resultsFile = project.file("${project.buildDir}/results/jmh/results.txt") // results file
    operationsPerInvocation = 10 // Operations per invocation.
    benchmarkParameters =  [:] // Benchmark parameters.
    profilers = [] // Use profilers to collect additional data. Supported profilers: [cl, comp, gc, stack, perf, perfnorm, perfasm, xperf, xperfasm, hs_cl, hs_comp, hs_gc, hs_rt, hs_thr, async]
