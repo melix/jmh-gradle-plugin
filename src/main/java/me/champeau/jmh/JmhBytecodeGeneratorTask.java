@@ -65,7 +65,7 @@ public abstract class JmhBytecodeGeneratorTask extends DefaultTask implements Wi
 
         for (File classesDir : getClassesDirsToProcess()) {
             getExecOperations().javaexec(spec -> {
-                spec.setMain("org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator");
+                spec.getMainClass().set("org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator");
                 spec.classpath(getJmhClasspath(), getRuntimeClasspath(), getClassesDirsToProcess());
                 spec.args(
                         classesDir,
