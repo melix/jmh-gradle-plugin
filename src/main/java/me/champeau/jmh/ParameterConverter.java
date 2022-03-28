@@ -26,13 +26,6 @@ import java.util.Map;
 import static java.util.stream.Collectors.joining;
 
 public class ParameterConverter {
-    public static void collectEnvironment(JMHTask jmhTask, Map<String, String> env) {
-        MapProperty<String, String> environmentVariables = jmhTask.getEnvironmentVariables();
-        if (environmentVariables.isPresent()) {
-            env.putAll(environmentVariables.get());
-        }
-    }
-
     public static void collectParameters(JmhParameters from, final List<String> into) {
         // ordered as when running -help
         addOption(into, from.getIncludes(), "");

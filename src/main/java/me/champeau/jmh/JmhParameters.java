@@ -147,7 +147,7 @@ public interface JmhParameters extends WithJavaToolchain {
 
     @Input
     @Optional
-    MapProperty<String, String> getEnvironmentVariables();
+    MapProperty<String, Object> getEnvironment();
 
     RegularFileProperty getHumanOutputFile();
 
