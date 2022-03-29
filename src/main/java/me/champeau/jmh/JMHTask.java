@@ -72,6 +72,7 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
             spec.getMainClass().set("org.openjdk.jmh.Main");
             spec.args(jmhArgs);
             spec.systemProperty(JAVA_IO_TMPDIR, getTemporaryDir().getAbsolutePath());
+            spec.environment(getEnvironment().get());
             Provider<JavaLauncher> javaLauncher = getJavaLauncher();
             if (javaLauncher.isPresent()) {
                 spec.executable(javaLauncher.get().getExecutablePath().getAsFile());
