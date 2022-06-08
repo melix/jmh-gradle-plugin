@@ -230,8 +230,3 @@ duplicate classes which means that it is not possible to predict which one will 
 
 To deal with duplicate files other than classes use
 https://github.com/johnrengelman/shadow/[Shadow Plugin] capabilities, see <<Using JMH Gradle Plugin with Shadow Plugin>>.
-
-== Known issues
-
-If a benchmark is written in Groovy, you must use the same version of Groovy as the one bundled with Gradle. This is
-a limitation of the Gradle Worker API that is going to be fixed in the future.
