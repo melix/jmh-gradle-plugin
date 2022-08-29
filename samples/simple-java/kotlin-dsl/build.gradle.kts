@@ -15,7 +15,7 @@
  */
 plugins {
     `java-library`
-    id("me.champeau.jmh") version "0.6.6"
+    id("me.champeau.jmh") version "0.6.7"
 }
 
 repositories {
