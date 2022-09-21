@@ -126,7 +126,7 @@ class JMHPlugin implements Plugin<Project> {
                 project.idea {
                     module {
                         project.sourceSets.jmh.java.srcDirs.each {
-                            testSourceDirs += project.file(it)
+                            testSources.from(project.file(it))
                         }
                     }
                 }
