@@ -24,10 +24,12 @@ import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.plugins.ide.eclipse.EclipsePlugin
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
 import org.gradle.plugins.ide.idea.IdeaPlugin
@@ -69,8 +71,12 @@ class JMHPlugin implements Plugin<Project> {
         def jmhGeneratedSourcesDir = project.layout.buildDirectory.dir("jmh-generated-sources")
         def jmhGeneratedClassesDir = project.layout.buildDirectory.dir("jmh-generated-classes")
         def jmhGeneratedResourcesDir = project.layout.buildDirectory.dir("jmh-generated-resources")
-        def runtimeBytecodeGeneraratorTask = createJmhRunBytecodeGeneratorTask(project, jmhGeneratedSourcesDir, extension, jmhGeneratedResourcesDir)
-        def jmhCompileGenerated = createJmhCompileGeneratedClassesTask(project, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, extension)
+
+        var java = project.extensions.getByType(JavaPluginExtension)
+        var toolchainService = project.extensions.getByType(JavaToolchainService)
+
+        def runtimeBytecodeGeneratorTask = createJmhRunBytecodeGeneratorTask(project, jmhGeneratedSourcesDir, extension, jmhGeneratedResourcesDir, java, toolchainService)
+        def jmhCompileGenerated = createJmhCompileGeneratedClassesTask(project, jmhGeneratedSourcesDir, jmhGeneratedClassesDir, extension, java, toolchainService)
 
         def metaInfExcludes = ['module-info.class', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
         TaskProvider<Jar> jmhJar = null
@@ -92,6 +98,7 @@ class JMHPlugin implements Plugin<Project> {
             it.jarArchive.set(jmhJar.flatMap { it.archiveFile })
             it.resultsFile.convention(extension.resultsFile)
             it.humanOutputFile.convention(extension.humanOutputFile)
+            it.javaLauncher.convention(toolchainService.launcherFor(java.toolchain))
         }
 
         configureKotlin(project)
@@ -144,7 +151,9 @@ class JMHPlugin implements Plugin<Project> {
     private static TaskProvider<JavaCompile> createJmhCompileGeneratedClassesTask(Project project,
                                                                                   Provider<Directory> jmhGeneratedSourcesDir,
                                                                                   Provider<Directory> jmhGeneratedClassesDir,
-                                                                                  JmhParameters extension) {
+                                                                                  JmhParameters extension,
+                                                                                  JavaPluginExtension java,
+                                                                                  JavaToolchainService toolchainService) {
         project.tasks.register(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME, JavaCompile) {
             it.group JMH_GROUP
             it.dependsOn 'jmhRunBytecodeGenerator'
@@ -155,13 +164,16 @@ class JMHPlugin implements Plugin<Project> {
             }
             it.source(jmhGeneratedSourcesDir)
             it.destinationDirectory.set(jmhGeneratedClassesDir)
+            it.javaCompiler.convention(toolchainService.compilerFor(java.toolchain))
         }
     }
 
     private static TaskProvider<JmhBytecodeGeneratorTask> createJmhRunBytecodeGeneratorTask(Project project,
                                                                                             Provider<Directory> jmhGeneratedSourcesDir,
                                                                                             JmhParameters extension,
-                                                                                            Provider<Directory> jmhGeneratedResourcesDir) {
+                                                                                            Provider<Directory> jmhGeneratedResourcesDir,
+                                                                                            JavaPluginExtension java,
+                                                                                            JavaToolchainService toolchainService) {
         project.tasks.register('jmhRunBytecodeGenerator', JmhBytecodeGeneratorTask) {
             it.group JMH_GROUP
             it.jmhClasspath.from(project.configurations.jmh)
@@ -174,6 +186,7 @@ class JMHPlugin implements Plugin<Project> {
                 it.runtimeClasspath.from(project.sourceSets.test.runtimeClasspath)
                 it.classesDirsToProcess.from(project.sourceSets.test.output.classesDirs)
             }
+            it.javaLauncher.convention(toolchainService.launcherFor(java.toolchain))
         }
     }
 
