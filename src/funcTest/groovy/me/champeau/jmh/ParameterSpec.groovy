@@ -15,10 +15,11 @@
  */
 package me.champeau.jmh
 
-
+import org.gradle.util.GradleVersion
 import spock.lang.Unroll
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 @Unroll
 class ParameterSpec extends AbstractFuncSpec {
@@ -34,5 +35,26 @@ class ParameterSpec extends AbstractFuncSpec {
         then:
         result.task(":jmh").outcome == SUCCESS
         !result.output.contains('parameter option not respected')
+    }
+
+    def "executes with configuration cache"() {
+        given:
+        usingGradleVersion(GradleVersion.version("7.6"))
+        usingSample("java-project")
+
+        when:
+        def result = build("jmhJar", "--configuration-cache")
+
+        then:
+        result.task(":jmhJar").outcome == SUCCESS
+        result.output.contains("Calculating task graph as no configuration cache is available for tasks: jmhJar")
+
+        when:
+        result = build("jmhJar", "--configuration-cache")
+
+        then:
+        result.task(":jmhJar").outcome == UP_TO_DATE
+        result.output.contains("Configuration cache entry reused.")
+
     }
 }
