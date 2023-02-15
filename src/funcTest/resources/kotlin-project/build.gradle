@@ -18,7 +18,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0'
     }
 }
 
@@ -30,10 +30,6 @@ apply plugin: 'kotlin'
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.2.0'
 }
 
 jmh {
