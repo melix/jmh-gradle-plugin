@@ -217,9 +217,13 @@ class JMHPlugin implements Plugin<Project> {
             it.group = JMH_GROUP
             it.dependsOn(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME)
             it.description = 'Create a combined JAR of project and runtime dependencies'
-            it.conventionMapping.with {
-                map('classifier') {
-                    JMH_NAME
+            if (GradleVersion.current() >= GradleVersion.version("5.1")) {
+                it.archiveClassifier.set(JMH_NAME)
+            } else {
+                it.conventionMapping.with {
+                    map('classifier') {
+                        JMH_NAME
+                    }
                 }
             }
             it.manifest.inheritFrom project.tasks.jar.manifest
