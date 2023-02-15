@@ -98,10 +98,8 @@ publishing {
 }
 
 signing {
-    setRequired {
-        gradle.taskGraph.allTasks.any {
-            it.name.startsWith("publish")
-        }
+    isRequired = gradle.taskGraph.allTasks.any {
+        it.name.startsWith("publish")
     }
     publishing.publications.configureEach {
         sign(this)
@@ -115,22 +113,19 @@ tasks.withType<Sign>().configureEach {
 }
 
 gradlePlugin {
+    website.set(properties.get("project_website").toString())
+    vcsUrl.set(properties.get("project_vcs").toString())
+
     plugins.create("jmh") {
         id = "me.champeau.jmh"
-        displayName = properties.get("project_description").toString()
         implementationClass = "me.champeau.jmh.JMHPlugin"
+        displayName = properties.get("project_description").toString()
+        description = properties.get("project_description").toString()
+        tags.set(listOf("jmh"))
     }
-}
-
-pluginBundle {
-    website = properties.get("project_website").toString()
-    vcsUrl = properties.get("project_vcs").toString()
-    description = properties.get("project_description").toString()
-    tags = listOf("jmh")
 }
 
 fun systemProp(name: String) = project
     .providers
     .systemProperty(name)
-    .forUseAtConfigurationTime()
     .orNull
