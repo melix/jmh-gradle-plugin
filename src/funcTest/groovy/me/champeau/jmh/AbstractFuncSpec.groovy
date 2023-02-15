@@ -25,7 +25,7 @@ import spock.lang.TempDir
 abstract class AbstractFuncSpec extends Specification {
 
     protected static final List<GradleVersion> TESTED_GRADLE_VERSIONS = [
-            GradleVersion.version('6.8'),
+            GradleVersion.version('7.0'),
             GradleVersion.current()
     ]
 
