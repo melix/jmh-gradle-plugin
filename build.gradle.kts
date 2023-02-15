@@ -68,11 +68,6 @@ tasks.jacocoTestReport {
     additionalSourceDirs.setFrom(project.files(sourceSets.main.get().allSource.srcDirs))
     sourceDirectories.setFrom(project.files(sourceSets.main.get().allSource.srcDirs))
     classDirectories.setFrom(project.files(sourceSets.main.get().output))
-    reports {
-        xml.isEnabled = true
-        csv.isEnabled = false
-        html.isEnabled = true
-    }
 }
 
 tasks.withType<GroovyCompile>().configureEach {

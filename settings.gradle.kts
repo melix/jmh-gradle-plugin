@@ -14,7 +14,7 @@
 rootProject.name = "jmh-gradle-plugin"
 
 plugins {
-   id("com.gradle.enterprise") version "3.4.1"
+   id("com.gradle.enterprise") version "3.12.3"
 }
 
 gradleEnterprise {
