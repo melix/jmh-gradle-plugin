@@ -38,15 +38,15 @@ val shadowVersion: String by project
 val jacocoVersion: String by project
 
 dependencies {
-    "implementation"("org.openjdk.jmh:jmh-core:$jmhVersion")
+    implementation("org.openjdk.jmh:jmh-core:$jmhVersion")
 
     testImplementation("org.spockframework:spock-core:$spockVersion") {
         exclude(mapOf("group" to "org.codehaus.groovy"))
     }
     "pluginsUnderTest"("gradle.plugin.com.github.johnrengelman:shadow:$shadowVersion")
 
-    "testImplementation"("org.openjdk.jmh:jmh-core:$jmhVersion")
-    "testImplementation"("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
+    testImplementation("org.openjdk.jmh:jmh-core:$jmhVersion")
+    testImplementation("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
 }
 
 java {
@@ -87,5 +87,4 @@ tasks.rat {
         add("gradlew.bat")
         add("gradle/wrapper/gradle-wrapper.properties")
     }
-
 }
