@@ -21,7 +21,7 @@ import org.gradle.api.file.DuplicatesStrategy;
 
 class DefaultsConfigurer {
     public static void configureDefaults(JmhParameters params, Project project) {
-        params.getJmhVersion().convention("1.35");
+        params.getJmhVersion().convention("1.36");
         params.getIncludeTests().convention(true);
         params.getZip64().convention(false);
         params.getDuplicateClassesStrategy().convention(DuplicatesStrategy.INCLUDE);
