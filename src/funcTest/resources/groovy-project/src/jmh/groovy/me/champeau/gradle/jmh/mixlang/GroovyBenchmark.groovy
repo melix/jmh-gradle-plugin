@@ -21,8 +21,8 @@ import org.openjdk.jmh.annotations.*
 @Fork(1)
 @Warmup(iterations = 0)
 @Measurement(iterations = 1)
-public class GroovyBenchmark {
-    private double value;
+class GroovyBenchmark {
+    private double value
 
     @Setup
     void setUp() {

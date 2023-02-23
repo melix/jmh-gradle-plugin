@@ -39,16 +39,16 @@ import org.gradle.util.GradleVersion
  * Configures the JMH Plugin.
  */
 class JMHPlugin implements Plugin<Project> {
-    private static GradleVersion GRADLE_MIN = GradleVersion.version('6.8')
+    private static GradleVersion GRADLE_MIN = GradleVersion.version('7.0')
     private static boolean IS_GRADLE_MIN = GradleVersion.current() >= GRADLE_MIN
 
-    public static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
-    public static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
-    public static final String JMH_GROUP = 'jmh'
-    public static final String JMH_NAME = 'jmh'
-    public static final String JMH_JAR_TASK_NAME = 'jmhJar'
-    public static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
-    public static final String JHM_RUNTIME_CLASSPATH_CONFIGURATION = 'jmhRuntimeClasspath'
+    static final String JMH_CORE_DEPENDENCY = 'org.openjdk.jmh:jmh-core:'
+    static final String JMH_GENERATOR_DEPENDENCY = 'org.openjdk.jmh:jmh-generator-bytecode:'
+    static final String JMH_GROUP = 'jmh'
+    static final String JMH_NAME = 'jmh'
+    static final String JMH_JAR_TASK_NAME = 'jmhJar'
+    static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
+    static final String JHM_RUNTIME_CLASSPATH_CONFIGURATION = 'jmhRuntimeClasspath'
 
     void apply(Project project) {
         assertMinimalGradleVersion()
@@ -64,7 +64,7 @@ class JMHPlugin implements Plugin<Project> {
 
         def hasShadow = project.plugins.findPlugin('com.github.johnrengelman.shadow') != null
 
-        createJmhSourceSet(project, extension)
+        createJmhSourceSet(project)
 
         registerBuildListener(project, extension)
 
@@ -107,7 +107,7 @@ class JMHPlugin implements Plugin<Project> {
 
     private static void assertMinimalGradleVersion() {
         if (!IS_GRADLE_MIN) {
-            throw new RuntimeException("This version of the JMH Gradle plugin requires ${GRADLE_MIN.version}+, you are using ${GradleVersion.current().version}. Please upgrade Gradle or use an older version of the JMH Gradle plugin.");
+            throw new RuntimeException("This version of the JMH Gradle plugin requires ${GRADLE_MIN.version}+, you are using ${GradleVersion.current().version}. Please upgrade Gradle or use an older version of the JMH Gradle plugin.")
         }
     }
 
@@ -155,7 +155,7 @@ class JMHPlugin implements Plugin<Project> {
                                                                                   JavaPluginExtension java,
                                                                                   JavaToolchainService toolchainService) {
         project.tasks.register(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME, JavaCompile) {
-            it.group JMH_GROUP
+            it.group = JMH_GROUP
             it.dependsOn 'jmhRunBytecodeGenerator'
 
             it.classpath = project.sourceSets.jmh.runtimeClasspath
@@ -175,7 +175,7 @@ class JMHPlugin implements Plugin<Project> {
                                                                                             JavaPluginExtension java,
                                                                                             JavaToolchainService toolchainService) {
         project.tasks.register('jmhRunBytecodeGenerator', JmhBytecodeGeneratorTask) {
-            it.group JMH_GROUP
+            it.group = JMH_GROUP
             it.jmhClasspath.from(project.configurations.jmh)
             it.generatorType.convention('default')
             it.generatedResourcesDir.set(jmhGeneratedResourcesDir)
@@ -190,7 +190,7 @@ class JMHPlugin implements Plugin<Project> {
         }
     }
 
-    private void createJmhSourceSet(Project project, JmhParameters extension) {
+    private void createJmhSourceSet(Project project) {
         project.sourceSets {
             jmh {
                 compileClasspath += main.output
@@ -213,15 +213,12 @@ class JMHPlugin implements Plugin<Project> {
                                                  Provider<Directory> jmhGeneratedClassesDir,
                                                  List<String> metaInfExcludes,
                                                  FileCollection runtimeConfiguration) {
-        project.tasks.register(JMH_JAR_TASK_NAME, Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar', true, JMHPlugin.classLoader)) {
+        //noinspection GroovyAssignabilityCheck
+        project.tasks.register(JMH_JAR_TASK_NAME, Class.forName('com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar')) { Jar it ->
             it.group = JMH_GROUP
             it.dependsOn(JMH_TASK_COMPILE_GENERATED_CLASSES_NAME)
             it.description = 'Create a combined JAR of project and runtime dependencies'
-            it.conventionMapping.with {
-                map('classifier') {
-                    JMH_NAME
-                }
-            }
+            it.archiveClassifier.set(JMH_NAME)
             it.manifest.inheritFrom project.tasks.jar.manifest
             it.manifest.attributes 'Main-Class': 'org.openjdk.jmh.Main'
             it.from(runtimeConfiguration)
@@ -255,7 +252,7 @@ class JMHPlugin implements Plugin<Project> {
             it.exclude(metaInfExcludes)
             it.configurations = []
             it.zip64 = extension.zip64.get()
-        }
+        } as TaskProvider<Jar>
     }
 
     private TaskProvider<Jar> createStandardJmhJar(Project project,
@@ -265,7 +262,7 @@ class JMHPlugin implements Plugin<Project> {
                                                    Provider<Directory> jmhGeneratedClassesDir,
                                                    Configuration runtimeConfiguration) {
         project.tasks.register(JMH_JAR_TASK_NAME, Jar) {
-            it.group JMH_GROUP
+            it.group = JMH_GROUP
             it.dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
             it.inputs.files project.sourceSets.jmh.output
             it.inputs.files project.sourceSets.main.output

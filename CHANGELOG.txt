@@ -1,3 +1,6 @@
+Version 0.7.0
+-------------
+    * Fix compatibility with Gradle 8
 Version 0.6.9
 -------------
     * Add compatibility with toolchains

@@ -1,4 +1,4 @@
-import org.gradle.api.internal.artifacts.dsl.dependencies.DependencyFactory
+import org.gradle.api.internal.artifacts.dsl.dependencies.DependencyFactoryInternal
 import org.gradle.internal.component.local.model.OpaqueComponentIdentifier
 
 /*
@@ -52,8 +52,8 @@ gradlePlugin {
 def classpathWithoutDevelopmentLibs = configurations.pluginClasspath.incoming.artifactView {config ->
     config.componentFilter {componentId ->
         if (componentId instanceof OpaqueComponentIdentifier) {
-            DependencyFactory.ClassPathNotation classPathNotation = ((OpaqueComponentIdentifier) componentId).getClassPathNotation();
-            return classPathNotation != DependencyFactory.ClassPathNotation.GRADLE_API && classPathNotation != DependencyFactory.ClassPathNotation.LOCAL_GROOVY;
+            DependencyFactoryInternal.ClassPathNotation classPathNotation = ((OpaqueComponentIdentifier) componentId).getClassPathNotation();
+            return classPathNotation != DependencyFactoryInternal.ClassPathNotation.GRADLE_API && classPathNotation != DependencyFactoryInternal.ClassPathNotation.LOCAL_GROOVY;
         }
         return true;
     }
@@ -71,8 +71,8 @@ def functionalTest = tasks.register("functionalTest", Test) {
     mustRunAfter test
 
     reports {
-        html.destination = project.file("$html.destination/functional")
-        junitXml.destination = project.file("$junitXml.destination/functional")
+        html.outputLocation = project.file("${html.outputLocation.asFile.get().path}/functional")
+        junitXml.outputLocation = project.file("${html.outputLocation.asFile.get().path}/functional")
     }
 }
 
