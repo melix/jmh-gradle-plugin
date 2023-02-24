@@ -15,7 +15,7 @@
  */
 plugins {
     `java-library`
-    id("me.champeau.jmh") version "0.6.7"
+    id("me.champeau.jmh") version "0.7.0"
 }
 
 repositories {
@@ -23,11 +23,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
-tasks.named<Test>("test") {
+tasks.test {
     useJUnitPlatform()
 }
 
