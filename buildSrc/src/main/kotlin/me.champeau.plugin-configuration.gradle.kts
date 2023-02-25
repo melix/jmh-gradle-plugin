@@ -109,6 +109,7 @@ signing {
 }
 
 tasks.withType<Sign>().configureEach {
+    notCompatibleWithConfigurationCache("https://docs.gradle.org/8.0.1/userguide/configuration_cache.html#config_cache:plugins")
     onlyIf { signing.isRequired }
 }
 
@@ -123,6 +124,10 @@ gradlePlugin {
         description = properties.get("project_description").toString()
         tags.set(listOf("jmh"))
     }
+}
+
+tasks.publishPlugins {
+    notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/21283")
 }
 
 fun systemProp(name: String) = project
