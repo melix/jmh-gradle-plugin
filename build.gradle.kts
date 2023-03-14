@@ -16,9 +16,9 @@
 
 plugins {
     id("me.champeau.buildscan-recipes") version "0.2.3"
-    id("org.nosphere.apache.rat") version "0.7.1"
+    id("org.nosphere.apache.rat") version "0.8.0"
     id("net.nemerosa.versioning") version "3.0.0"
-    id("com.github.kt3k.coveralls") version "2.12.0"
+    id("com.github.kt3k.coveralls") version "2.12.2"
     id("me.champeau.plugin-configuration")
     id("jacoco")
     id("groovy")
