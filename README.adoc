@@ -64,7 +64,7 @@ For example, if you want to use `commons-io`, you can add the dependency like th
 .build.gradle
 ----
 dependencies {
-    jmh 'commons-io:commons-io:2.4'
+    jmh 'commons-io:commons-io:2.7'
 }
 ----
 
