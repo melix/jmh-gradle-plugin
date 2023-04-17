@@ -56,7 +56,6 @@ class JMHPlugin implements Plugin<Project> {
         final JmhParameters extension = project.extensions.create(JMH_NAME, JmhParameters)
         DefaultsConfigurer.configureDefaults(extension, project)
         final Configuration configuration = project.configurations.create(JMH_NAME)
-        final Configuration runtimeConfiguration = createJmhRuntimeClasspathConfiguration(project, extension)
 
         DependencyHandler dependencyHandler = project.getDependencies()
         dependencyHandler.addProvider(JMH_NAME, project.providers.provider { "${JMH_CORE_DEPENDENCY}${extension.jmhVersion.get()}" }) {}
@@ -65,6 +64,7 @@ class JMHPlugin implements Plugin<Project> {
         def hasShadow = project.plugins.findPlugin('com.github.johnrengelman.shadow') != null
 
         createJmhSourceSet(project)
+        final Configuration runtimeConfiguration = configureJmhRuntimeClasspathConfiguration(project, extension)
 
         registerBuildListener(project, extension)
 
@@ -313,8 +313,8 @@ class JMHPlugin implements Plugin<Project> {
     }
 
     @CompileStatic
-    private static Configuration createJmhRuntimeClasspathConfiguration(Project project, JmhParameters extension) {
-        def newConfig = project.configurations.create(JHM_RUNTIME_CLASSPATH_CONFIGURATION)
+    private static Configuration configureJmhRuntimeClasspathConfiguration(Project project, JmhParameters extension) {
+        def newConfig = project.configurations.findByName(JHM_RUNTIME_CLASSPATH_CONFIGURATION)
         newConfig.setCanBeConsumed(false)
         newConfig.setCanBeResolved(true)
         newConfig.setVisible(false)
