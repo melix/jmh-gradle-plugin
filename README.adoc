@@ -128,7 +128,7 @@ jmh {
    synchronizeIterations = false // Synchronize iterations?
    threads = 4 // Number of worker threads to run with.
    threadGroups = [2,3,4] //Override thread group distribution for asymmetric benchmarks.
-   timeout = '1s' // Timeout for benchmark iteration.
+   jmhTimeout = '1s' // Timeout for benchmark iteration.
    timeUnit = 'ms' // Output time unit. Available time units are: [m, s, ms, us, ns].
    verbosity = 'NORMAL' // Verbosity mode. Available modes are: [SILENT, NORMAL, EXTRA]
    warmup = '1s' // Time to spend at each warmup iteration.
@@ -173,7 +173,7 @@ The following table describes the mappings between JMH's command line options an
 | -si <bool>               | synchronizeIterations
 | -t <int>                 | threads
 | -tg <int+>               | threadGroups
-| -to <time>               | timeout
+| -to <time>               | jmhTimeout
 | -tu <TU>                 | timeUnit
 | -v <mode>                | verbosity
 | -w <time>                | warmup
