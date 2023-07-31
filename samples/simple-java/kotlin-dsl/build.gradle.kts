@@ -15,7 +15,7 @@
  */
 plugins {
     `java-library`
-    id("me.champeau.jmh") version "0.7.0"
+    id("me.champeau.jmh") version "0.7.1"
 }
 
 repositories {
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
@@ -32,7 +32,7 @@ tasks.test {
 }
 
 jmh {
-    warmupIterations.set(2)
-    iterations.set(2)
-    fork.set(2)
+    warmupIterations = 2
+    iterations = 2
+    fork = 2
 }

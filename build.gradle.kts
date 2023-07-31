@@ -15,22 +15,20 @@
  */
 
 plugins {
+    jacoco
     id("me.champeau.buildscan-recipes") version "0.2.3"
     id("org.nosphere.apache.rat") version "0.8.0"
     id("net.nemerosa.versioning") version "3.0.0"
     id("com.github.kt3k.coveralls") version "2.12.2"
+    id("me.champeau.convention-test")
+    id("me.champeau.convention-funcTest")
     id("me.champeau.plugin-configuration")
-    id("jacoco")
-    id("groovy")
 }
 
 buildScanRecipes {
     recipes("git-status", "travis-ci")
     recipe(mapOf("baseUrl" to "https://github.com/melix/jmh-gradle-plugin/tree"), "git-commit")
 }
-
-apply(from = "gradle/test.gradle")
-apply(from = "gradle/funcTest.gradle")
 
 val jmhVersion: String by project
 val spockVersion: String by project
@@ -43,7 +41,7 @@ dependencies {
     testImplementation("org.spockframework:spock-core:$spockVersion") {
         exclude(mapOf("group" to "org.codehaus.groovy"))
     }
-    "pluginsUnderTest"("gradle.plugin.com.github.johnrengelman:shadow:$shadowVersion")
+    pluginsUnderTest("gradle.plugin.com.github.johnrengelman:shadow:$shadowVersion")
 
     testImplementation("org.openjdk.jmh:jmh-core:$jmhVersion")
     testImplementation("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
@@ -51,7 +49,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion = JavaLanguageVersion.of(8)
     }
     withSourcesJar()
     withJavadocJar()
