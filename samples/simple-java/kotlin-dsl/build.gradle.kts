@@ -32,7 +32,7 @@ tasks.test {
 }
 
 jmh {
-    warmupIterations.set(2)
-    iterations.set(2)
-    fork.set(2)
+    warmupIterations = 2
+    iterations = 2
+    fork = 2
 }

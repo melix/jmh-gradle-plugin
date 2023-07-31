@@ -63,32 +63,32 @@ publishing {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
             pom {
-                name.set("Gradle Plugin for JMH")
-                description.set(properties.getting("project_description"))
-                url.set(properties.getting("project_website"))
+                name = "Gradle Plugin for JMH"
+                description = properties.getting("project_description")
+                url = properties.getting("project_website")
                 issueManagement {
-                    system.set("GitHub")
-                    url.set(properties.getting("project_issues"))
+                    system = "GitHub"
+                    url = properties.getting("project_issues")
                 }
                 scm {
-                    url.set(properties.getting("project_website"))
-                    connection.set(properties.getting("project_vcs").map { "scm:git:$it" })
-                    developerConnection.set("scm:git:git@github.com:melix/jmh-gradle-plugin.git")
+                    url = properties.getting("project_website")
+                    connection = properties.getting("project_vcs").map { "scm:git:$it" }
+                    developerConnection = "scm:git:git@github.com:melix/jmh-gradle-plugin.git"
                 }
                 licenses {
                     license {
-                        name.set("The Apache Software License, Version 2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                        distribution.set("repo")
+                        name = "The Apache Software License, Version 2.0"
+                        url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                        distribution = "repo"
                     }
                 }
                 developers {
                     developer {
-                        id.set("melix")
-                        name.set("Cédric Champeau")
+                        id = "melix"
+                        name = "Cédric Champeau"
                         organization {
-                            name.set("Personal")
-                            url.set("https://melix.github.io/blog")
+                            name = "Personal"
+                            url = "https://melix.github.io/blog"
                         }
                     }
                 }
@@ -113,15 +113,15 @@ tasks.withType<Sign>().configureEach {
 }
 
 gradlePlugin {
-    website.set(properties.get("project_website").toString())
-    vcsUrl.set(properties.get("project_vcs").toString())
+    website = properties.get("project_website").toString()
+    vcsUrl = properties.get("project_vcs").toString()
 
     plugins.create("jmh") {
         id = "me.champeau.jmh"
         implementationClass = "me.champeau.jmh.JMHPlugin"
         displayName = properties.get("project_description").toString()
         description = properties.get("project_description").toString()
-        tags.set(listOf("jmh"))
+        tags = listOf("jmh")
     }
 }
 
