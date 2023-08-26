@@ -142,7 +142,10 @@ class JMHPlugin implements Plugin<Project> {
             def hasEclipseWtpPlugin = project.plugins.findPlugin(EclipseWtpPlugin)
             if (hasEclipsePlugin != null || hasEclipseWtpPlugin != null) {
                 project.eclipse {
-                    classpath.plusConfigurations += [project.configurations.jmh]
+                    classpath {
+                        plusConfigurations += [project.configurations.jmh]
+                        testSourceSets = [project.sourceSets.test, project.sourceSets.jmh]
+                    }
                 }
             }
         }
