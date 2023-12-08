@@ -20,6 +20,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileCopyDetails
@@ -35,10 +36,12 @@ import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.util.GradleVersion
 
+import javax.inject.Inject
+
 /**
  * Configures the JMH Plugin.
  */
-class JMHPlugin implements Plugin<Project> {
+abstract class JMHPlugin implements Plugin<Project> {
     private static GradleVersion GRADLE_MIN = GradleVersion.version('7.0')
     private static boolean IS_GRADLE_MIN = GradleVersion.current() >= GRADLE_MIN
 
@@ -49,6 +52,9 @@ class JMHPlugin implements Plugin<Project> {
     static final String JMH_JAR_TASK_NAME = 'jmhJar'
     static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
     static final String JHM_RUNTIME_CLASSPATH_CONFIGURATION = 'jmhRuntimeClasspath'
+
+    @Inject
+    protected abstract ArchiveOperations getArchives()
 
     void apply(Project project) {
         assertMinimalGradleVersion()
@@ -265,6 +271,8 @@ class JMHPlugin implements Plugin<Project> {
                                                    Provider<Directory> jmhGeneratedClassesDir,
                                                    Configuration runtimeConfiguration) {
         project.tasks.register(JMH_JAR_TASK_NAME, Jar) {
+            def archives = archives
+
             it.group = JMH_GROUP
             it.dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
             it.inputs.files project.sourceSets.jmh.output
@@ -277,7 +285,7 @@ class JMHPlugin implements Plugin<Project> {
                 it.collect { it.asFile }
                         .findAll { it.directory || it.name.toLowerCase().endsWith('.jar') }
                         .collect {
-                            it.directory ? it : project.zipTree(it)
+                            it.directory ? it : archives.zipTree(it)
                         } as Set
             }).exclude(metaInfExcludes)
             def jmhSourceSetOutput = project.sourceSets.jmh.output

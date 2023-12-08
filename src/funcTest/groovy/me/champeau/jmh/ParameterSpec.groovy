@@ -39,7 +39,6 @@ class ParameterSpec extends AbstractFuncSpec {
 
     def "executes with configuration cache"() {
         given:
-        usingGradleVersion(GradleVersion.version("7.6"))
         usingSample("java-project")
 
         when:
