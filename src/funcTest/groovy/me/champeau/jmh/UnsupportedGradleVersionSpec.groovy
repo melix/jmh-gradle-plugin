@@ -15,7 +15,7 @@
  */
 package me.champeau.jmh
 
-import org.gradle.testkit.runner.TaskOutcome
+
 import org.gradle.util.GradleVersion
 import spock.lang.Unroll
 
@@ -32,7 +32,7 @@ class UnsupportedGradleVersionSpec extends AbstractFuncSpec {
         def result = buildAndFail("jmh")
 
         then:
-	result.output.contains('Please upgrade Gradle or use an older version of the JMH Gradle plugin.')
+	    result.output.contains('Please upgrade Gradle or use an older version of the JMH Gradle plugin.')
 
         where:
         gradleVersion << GradleVersion.version('6.9')

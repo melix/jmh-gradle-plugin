@@ -41,7 +41,7 @@ import javax.inject.Inject
 /**
  * Configures the JMH Plugin.
  */
-abstract class JMHPlugin implements Plugin<Project> {
+class JMHPlugin implements Plugin<Project> {
     private static GradleVersion GRADLE_MIN = GradleVersion.version('7.0')
     private static boolean IS_GRADLE_MIN = GradleVersion.current() >= GRADLE_MIN
 
@@ -52,9 +52,6 @@ abstract class JMHPlugin implements Plugin<Project> {
     static final String JMH_JAR_TASK_NAME = 'jmhJar'
     static final String JMH_TASK_COMPILE_GENERATED_CLASSES_NAME = 'jmhCompileGeneratedClasses'
     static final String JHM_RUNTIME_CLASSPATH_CONFIGURATION = 'jmhRuntimeClasspath'
-
-    @Inject
-    protected abstract ArchiveOperations getArchiveOperations()
 
     void apply(Project project) {
         assertMinimalGradleVersion()
@@ -271,8 +268,7 @@ abstract class JMHPlugin implements Plugin<Project> {
                                                    Provider<Directory> jmhGeneratedClassesDir,
                                                    Configuration runtimeConfiguration) {
         project.tasks.register(JMH_JAR_TASK_NAME, Jar) {
-            def archives = archiveOperations
-
+            def archives = project.objects.newInstance(ServiceInjection).archiveOperations
             it.group = JMH_GROUP
             it.dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
             it.inputs.files project.sourceSets.jmh.output
@@ -336,5 +332,10 @@ abstract class JMHPlugin implements Plugin<Project> {
             }
         }
         newConfig
+    }
+
+    interface ServiceInjection {
+        @Inject
+        ArchiveOperations getArchiveOperations()
     }
 }
