@@ -54,7 +54,7 @@ abstract class JMHPlugin implements Plugin<Project> {
     static final String JHM_RUNTIME_CLASSPATH_CONFIGURATION = 'jmhRuntimeClasspath'
 
     @Inject
-    protected abstract ArchiveOperations getArchives()
+    protected abstract ArchiveOperations getArchiveOperations()
 
     void apply(Project project) {
         assertMinimalGradleVersion()
@@ -271,7 +271,7 @@ abstract class JMHPlugin implements Plugin<Project> {
                                                    Provider<Directory> jmhGeneratedClassesDir,
                                                    Configuration runtimeConfiguration) {
         project.tasks.register(JMH_JAR_TASK_NAME, Jar) {
-            def archives = archives
+            def archives = archiveOperations
 
             it.group = JMH_GROUP
             it.dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
