@@ -15,7 +15,7 @@
  */
 package me.champeau.jmh
 
-import org.gradle.util.GradleVersion
+
 import spock.lang.Unroll
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
@@ -39,7 +39,6 @@ class ParameterSpec extends AbstractFuncSpec {
 
     def "executes with configuration cache"() {
         given:
-        usingGradleVersion(GradleVersion.version("7.6"))
         usingSample("java-project")
 
         when:
@@ -47,7 +46,8 @@ class ParameterSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmhJar").outcome == SUCCESS
-        result.output.contains("Calculating task graph as no configuration cache is available for tasks: jmhJar")
+        result.output.contains("Calculating task graph as no configuration cache is available for tasks: jmhJar") ||
+                result.output.contains("Calculating task graph as no cached configuration is available for tasks: jmhJar")
 
         when:
         result = build("jmhJar", "--configuration-cache")

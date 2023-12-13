@@ -26,6 +26,7 @@ abstract class AbstractFuncSpec extends Specification {
 
     protected static final List<GradleVersion> TESTED_GRADLE_VERSIONS = [
             GradleVersion.version('7.0'),
+            GradleVersion.version('8.0'),
             GradleVersion.current()
     ]
 

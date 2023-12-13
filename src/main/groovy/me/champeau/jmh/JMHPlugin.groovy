@@ -20,6 +20,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileCopyDetails
@@ -34,6 +35,8 @@ import org.gradle.plugins.ide.eclipse.EclipsePlugin
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.util.GradleVersion
+
+import javax.inject.Inject
 
 /**
  * Configures the JMH Plugin.
@@ -265,6 +268,7 @@ class JMHPlugin implements Plugin<Project> {
                                                    Provider<Directory> jmhGeneratedClassesDir,
                                                    Configuration runtimeConfiguration) {
         project.tasks.register(JMH_JAR_TASK_NAME, Jar) {
+            def archives = project.objects.newInstance(ServiceInjection).archiveOperations
             it.group = JMH_GROUP
             it.dependsOn JMH_TASK_COMPILE_GENERATED_CLASSES_NAME
             it.inputs.files project.sourceSets.jmh.output
@@ -277,7 +281,7 @@ class JMHPlugin implements Plugin<Project> {
                 it.collect { it.asFile }
                         .findAll { it.directory || it.name.toLowerCase().endsWith('.jar') }
                         .collect {
-                            it.directory ? it : project.zipTree(it)
+                            it.directory ? it : archives.zipTree(it)
                         } as Set
             }).exclude(metaInfExcludes)
             def jmhSourceSetOutput = project.sourceSets.jmh.output
@@ -328,5 +332,10 @@ class JMHPlugin implements Plugin<Project> {
             }
         }
         newConfig
+    }
+
+    interface ServiceInjection {
+        @Inject
+        ArchiveOperations getArchiveOperations()
     }
 }
