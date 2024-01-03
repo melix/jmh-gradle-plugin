@@ -30,6 +30,16 @@ abstract class AbstractFuncSpec extends Specification {
             GradleVersion.current()
     ]
 
+    protected static final List<String> TESTED_SHADOW_PLUGINS = [
+            'com.github.johnrengelman.shadow',
+            'io.github.goooler.shadow'
+    ]
+
+    protected static final Map<String, String> TESTED_SHADOW_PLUGIN_FOLDERS = [
+            'com.github.johnrengelman.shadow':  'shadow',
+            'io.github.goooler.shadow':         'forked-shadow'
+    ]
+
     @TempDir
     File temporaryFolder
 

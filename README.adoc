@@ -195,8 +195,10 @@ It is possible a dependency on the `test` source set by setting property `includ
 
 == Using JMH Gradle Plugin with Shadow Plugin
 
-Optionally it is possible to use https://github.com/johnrengelman/shadow/[Shadow Plugin] to do actual JMH jar
-creation. The configuration of Shadow Plugin for JMH jar is done via `jmhJar` block.
+Optionally it is possible to use the https://github.com/johnrengelman/shadow/[Shadow Plugin] (or the
+https://github.com/Goooler/shadow[forked Shadow Plugin]) to do actual JMH jar creation. The configuration of
+Shadow Plugin for JMH jar is done via `jmhJar` block.
+
 For example:
 [source,groovy]
 .build.gradle
@@ -231,4 +233,5 @@ However if you do encounter problem with defaut value it means that the classpat
 duplicate classes which means that it is not possible to predict which one will be used when fat jar will generated.
 
 To deal with duplicate files other than classes use
-https://github.com/johnrengelman/shadow/[Shadow Plugin] capabilities, see <<Using JMH Gradle Plugin with Shadow Plugin>>.
+https://github.com/johnrengelman/shadow/[Shadow Plugin] / https://github.com/Goooler/shadow[forked Shadow Plugin]
+capabilities, see <<Using JMH Gradle Plugin with Shadow Plugin>>.

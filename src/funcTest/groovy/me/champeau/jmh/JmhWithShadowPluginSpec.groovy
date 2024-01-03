@@ -22,10 +22,10 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 @Unroll
 class JmhWithShadowPluginSpec extends AbstractFuncSpec {
 
-    def "Run #language benchmarks that are packaged with Shadow plugin (#gradleVersion)"() {
+    def "Run #language benchmarks that are packaged with Shadow plugin (#gradleVersion #language #shadowPlugin)"() {
 
         given:
-        usingSample("${language.toLowerCase()}-shadow-project")
+        usingSample("${language.toLowerCase()}-${TESTED_SHADOW_PLUGIN_FOLDERS[shadowPlugin]}-project")
         usingGradleVersion(gradleVersion)
         withoutConfigurationCache('shadow plugin unsupported')
 
@@ -37,9 +37,10 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
         benchmarksCsv.text.contains(language + 'Benchmark.sqrtBenchmark')
 
         where:
-        [language, gradleVersion] << [
+        [language, gradleVersion, shadowPlugin] << [
                 ['Java', 'Scala'],
-                TESTED_GRADLE_VERSIONS
+                TESTED_GRADLE_VERSIONS,
+                TESTED_SHADOW_PLUGINS
         ].combinations()
     }
 }

@@ -50,7 +50,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Run project with duplicate dependencies with Shadow applied (#gradleVersion)"() {
+    def "Run project with duplicate dependencies with Shadow applied (#gradleVersion #shadowPlugin)"() {
 
         given:
         usingGradleVersion(gradleVersion)
@@ -60,7 +60,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         createBuildFile("""
             plugins {
                 id 'java'
-                id 'com.github.johnrengelman.shadow'
+                id '$shadowPlugin'
                 id 'me.champeau.jmh'
             }
         """)
@@ -73,7 +73,10 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         benchmarksCsv.text.contains('JavaBenchmark.sqrtBenchmark')
 
         where:
-        gradleVersion << TESTED_GRADLE_VERSIONS
+        [shadowPlugin, gradleVersion] << [
+                TESTED_SHADOW_PLUGINS,
+                TESTED_GRADLE_VERSIONS
+        ].combinations()
     }
 
     void createBuildFile(String plugins) {

@@ -33,6 +33,7 @@ buildScanRecipes {
 val jmhVersion: String by project
 val spockVersion: String by project
 val shadowVersion: String by project
+val shadowForkVersion: String by project
 val jacocoVersion: String by project
 
 dependencies {
@@ -42,6 +43,7 @@ dependencies {
         exclude(mapOf("group" to "org.codehaus.groovy"))
     }
     pluginsUnderTest("gradle.plugin.com.github.johnrengelman:shadow:$shadowVersion")
+    pluginsUnderTest("io.github.goooler:shadow:$shadowForkVersion")
 
     testImplementation("org.openjdk.jmh:jmh-core:$jmhVersion")
     testImplementation("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
