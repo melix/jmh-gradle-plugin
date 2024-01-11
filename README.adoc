@@ -76,6 +76,7 @@ The plugin uses JMH {jmh-version}. You can upgrade the version just by changing 
 dependencies {
     jmh 'org.openjdk.jmh:jmh-core:0.9'
     jmh 'org.openjdk.jmh:jmh-generator-annprocess:0.9'
+    jmh 'org.openjdk.jmh:jmh-generator-bytecode:0.9'
 }
 ----
 
