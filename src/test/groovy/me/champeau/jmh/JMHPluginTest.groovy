@@ -102,21 +102,27 @@ class JMHPluginTest extends Specification {
         }
     }
 
-    def "plugin is applied together with shadow"() {
+    def "plugin is applied together with shadow plugin (#shadowPlugin)"() {
         when:
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenCentral()
         }
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.johnrengelman.shadow'
+        project.apply plugin: shadowPlugin
         project.apply plugin: 'me.champeau.jmh'
 
         then:
         def task = project.tasks.findByName('jmhJar')
         task instanceof ShadowJar
+
+        where:
+        shadowPlugin << [
+                'com.github.johnrengelman.shadow',
+                'io.github.goooler.shadow'
+        ]
     }
-    
+
     void "default duplicates strategy is to include"() {
         when:
         Project project = ProjectBuilder.builder().build()

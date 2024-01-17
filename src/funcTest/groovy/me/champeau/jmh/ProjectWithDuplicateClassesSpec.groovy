@@ -58,7 +58,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Fail the build while executing jmhJar task when Shadow plugin applied (#gradleVersion)"() {
+    def "Fail the build while executing jmhJar task when Shadow plugin applied (#gradleVersion #shadowPlugin)"() {
 
         given:
         usingGradleVersion(gradleVersion)
@@ -68,7 +68,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.johnrengelman.shadow'
+                id '$shadowPlugin'
                 id 'me.champeau.jmh'
             }
 
@@ -88,7 +88,10 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         result.task(":jmhJar").outcome == FAILED
 
         where:
-        gradleVersion << TESTED_GRADLE_VERSIONS
+        [shadowPlugin, gradleVersion] << [
+                TESTED_SHADOW_PLUGINS,
+                TESTED_GRADLE_VERSIONS
+        ].combinations()
     }
 
     def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used (#gradleVersion)"() {
@@ -123,7 +126,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         gradleVersion << TESTED_GRADLE_VERSIONS
     }
 
-    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used and Shadow plugin applied (#gradleVersion)"() {
+    def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used and Shadow plugin applied (#gradleVersion #shadowPlugin)"() {
 
         given:
         usingGradleVersion(gradleVersion)
@@ -133,7 +136,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.johnrengelman.shadow'
+                id '$shadowPlugin'
                 id 'me.champeau.jmh'
             }
 
@@ -154,6 +157,9 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         result.output.contains('"me/champeau/jmh/Helper.class"')
 
         where:
-        gradleVersion << TESTED_GRADLE_VERSIONS
+        [shadowPlugin, gradleVersion] << [
+                TESTED_SHADOW_PLUGINS,
+                TESTED_GRADLE_VERSIONS
+        ].combinations()
     }
 }
