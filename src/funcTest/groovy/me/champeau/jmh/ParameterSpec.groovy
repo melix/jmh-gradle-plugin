@@ -42,7 +42,7 @@ class ParameterSpec extends AbstractFuncSpec {
         usingSample("java-project")
 
         when:
-        def result = build("jmhJar", "--configuration-cache")
+        def result = build("jmhJar")
 
         then:
         result.task(":jmhJar").outcome == SUCCESS
@@ -50,7 +50,7 @@ class ParameterSpec extends AbstractFuncSpec {
                 result.output.contains("Calculating task graph as no cached configuration is available for tasks: jmhJar")
 
         when:
-        result = build("jmhJar", "--configuration-cache")
+        result = build("jmhJar")
 
         then:
         result.task(":jmhJar").outcome == UP_TO_DATE
