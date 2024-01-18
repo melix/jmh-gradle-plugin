@@ -17,7 +17,7 @@
 plugins {
     jacoco
     id("me.champeau.buildscan-recipes") version "0.2.3"
-    id("org.nosphere.apache.rat") version "0.8.0"
+    id("org.nosphere.apache.rat") version "0.8.1"
     id("net.nemerosa.versioning") version "3.0.0"
     id("com.github.kt3k.coveralls") version "2.12.2"
     id("me.champeau.convention-test")
