@@ -51,6 +51,8 @@ abstract class AbstractFuncSpec extends Specification {
         testedGradleVersion = gradleVersion
     }
 
+    // TODO: We can remove this and fully enable CC in tests once bump the Shadow version to 8.1.1+.
+    // TODO: But Kotlin test still fails, it was suppressed in 1bab41646df6f47aea84ea3febeeec1c76cd2e79, need to investigate.
     protected void withoutConfigurationCache(String reason) {
         noConfigurationCacheReason = reason
     }
@@ -83,6 +85,7 @@ abstract class AbstractFuncSpec extends Specification {
                 .withPluginClasspath()
                 .withProjectDir(projectDir)
                 .withArguments(arguments)
+                .withTestKitDir(testKitDir)
     }
 
     protected BuildResult build(String... arguments) {
@@ -94,13 +97,17 @@ abstract class AbstractFuncSpec extends Specification {
     }
 
     private List<String> calculateArguments(String... arguments) {
-        def gradleVersionWithConfigurationCache = testedGradleVersion >= GradleVersion.version('6.6')
-        if (gradleVersionWithConfigurationCache && noConfigurationCacheReason) {
-            println("Configuration cache disabled: $noConfigurationCacheReason")
-        }
-        (gradleVersionWithConfigurationCache && !noConfigurationCacheReason
+        (!noConfigurationCacheReason
                 ? ['--stacktrace',
                    '--configuration-cache']
                 : ['--stacktrace']) + (arguments as List)
+    }
+
+    private static File getTestKitDir() {
+        def gradleUserHome = System.getenv("GRADLE_USER_HOME")
+        if (!gradleUserHome) {
+            gradleUserHome = new File(System.getProperty("user.home"), ".gradle").absolutePath
+        }
+        return new File(gradleUserHome, "testkit")
     }
 }

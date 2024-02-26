@@ -15,7 +15,7 @@
  */
 plugins {
     id 'java-library'
-    id "me.champeau.jmh" version "0.7.1"
+    id "me.champeau.jmh" version "0.7.2"
 }
 
 repositories {
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
