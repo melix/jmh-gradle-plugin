@@ -64,13 +64,9 @@ jacoco {
 tasks.jacocoTestReport {
     group = "Reporting"
     description = "Generate Jacoco coverage reports after running tests."
-    additionalSourceDirs.setFrom(project.files(sourceSets.main.get().allSource.srcDirs))
-    sourceDirectories.setFrom(project.files(sourceSets.main.get().allSource.srcDirs))
-    classDirectories.setFrom(project.files(sourceSets.main.get().output))
-}
-
-tasks.withType<GroovyCompile>().configureEach {
-    options.encoding = "UTF-8"
+    additionalSourceDirs = files(sourceSets.main.get().allSource.srcDirs)
+    sourceDirectories = files(sourceSets.main.get().allSource.srcDirs)
+    classDirectories = files(sourceSets.main.get().output)
 }
 
 tasks.rat {

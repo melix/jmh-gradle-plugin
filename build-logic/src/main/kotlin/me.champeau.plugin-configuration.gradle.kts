@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.Date
 
 plugins {
     `maven-publish`
@@ -23,17 +23,17 @@ plugins {
     id("com.gradle.plugin-publish")
 }
 
-val buildTimeAndDate by lazy {
+val buildTimeAndDate: Date by lazy {
     if ((version as String).endsWith("SNAPSHOT")) {
         Date(0)
     } else {
         Date()
     }
 }
-val buildDate by lazy {
+val buildDate: String by lazy {
     SimpleDateFormat("yyyy-MM-dd").format(buildTimeAndDate)
 }
-val buildTime by lazy {
+val buildTime: String by lazy {
     SimpleDateFormat("HH:mm:ss.SSSZ").format(buildTimeAndDate)
 }
 
@@ -113,19 +113,16 @@ tasks.withType<Sign>().configureEach {
 }
 
 gradlePlugin {
-    website = properties.get("project_website").toString()
-    vcsUrl = properties.get("project_vcs").toString()
+    website = properties["project_website"].toString()
+    vcsUrl = properties["project_vcs"].toString()
 
     plugins.create("jmh") {
         id = "me.champeau.jmh"
         implementationClass = "me.champeau.jmh.JMHPlugin"
-        displayName = properties.get("project_description").toString()
-        description = properties.get("project_description").toString()
+        displayName = properties["project_description"].toString()
+        description = properties["project_description"].toString()
         tags = listOf("jmh")
     }
 }
 
-fun systemProp(name: String) = project
-    .providers
-    .systemProperty(name)
-    .orNull
+fun systemProp(name: String): String? = providers.systemProperty(name).orNull
