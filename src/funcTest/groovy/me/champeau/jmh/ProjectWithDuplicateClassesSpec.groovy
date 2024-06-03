@@ -15,6 +15,7 @@
  */
 package me.champeau.jmh
 
+import org.gradle.util.GradleVersion
 import spock.lang.Unroll
 
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
@@ -120,7 +121,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmh").outcome == SUCCESS
-        result.output.contains('"me/champeau/jmh/Helper.class"')
+        assertDuplicateClassesWarning(gradleVersion, result.output)
 
         where:
         gradleVersion << TESTED_GRADLE_VERSIONS
@@ -154,12 +155,19 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
         then:
         result.task(":jmh").outcome == SUCCESS
-        result.output.contains('"me/champeau/jmh/Helper.class"')
+        assertDuplicateClassesWarning(gradleVersion, result.output)
 
         where:
         [shadowPlugin, gradleVersion] << [
                 TESTED_SHADOW_PLUGINS,
                 TESTED_GRADLE_VERSIONS
         ].combinations()
+    }
+
+    private static boolean assertDuplicateClassesWarning(GradleVersion gradleVersion, String output) {
+        final def message = gradleVersion >= GradleVersion.version("8.8") ?
+                "will be copied to 'me/champeau/jmh/Helper.class', overwriting file" :
+                "Encountered duplicate path \"me/champeau/jmh/Helper.class\" during copy operation configured with DuplicatesStrategy.WARN"
+        return output.contains(message)
     }
 }
