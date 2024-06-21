@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+val isCiBuild = providers.environmentVariable("CI").isPresent
+
 tasks.withType<Test>().configureEach {
     addTestListener(object : TestListener {
         override fun beforeSuite(suite: TestDescriptor) = Unit
@@ -40,6 +42,13 @@ tasks.withType<Test>().configureEach {
     }
 
     useJUnitPlatform()
+
+    maxParallelForks = if (isCiBuild) {
+        Runtime.getRuntime().availableProcessors()
+    } else {
+        // https://docs.gradle.org/8.8/userguide/performance.html#execute_tests_in_parallel
+        (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    }
 
     // disabling Spock checks because Spock for whatever reason seems to consider the Groovy version of the
     // Gradle version under test to be processed, when it shouldn't
