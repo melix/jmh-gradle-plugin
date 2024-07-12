@@ -30,23 +30,19 @@ buildScanRecipes {
     recipe(mapOf("baseUrl" to "https://github.com/melix/jmh-gradle-plugin/tree"), "git-commit")
 }
 
-val jmhVersion: String by project
-val spockVersion: String by project
-val shadowVersion: String by project
-val shadowForkVersion: String by project
-val jacocoVersion: String by project
-
 dependencies {
+    val jmhVersion = "1.37"
     implementation("org.openjdk.jmh:jmh-core:$jmhVersion")
 
-    testImplementation("org.spockframework:spock-core:$spockVersion") {
+    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
         exclude(mapOf("group" to "org.codehaus.groovy"))
     }
-    pluginsUnderTest("gradle.plugin.com.github.johnrengelman:shadow:$shadowVersion")
-    pluginsUnderTest("io.github.goooler.shadow:shadow-gradle-plugin:$shadowForkVersion")
+    pluginsUnderTest("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
+    pluginsUnderTest("io.github.goooler.shadow:shadow-gradle-plugin:8.1.8")
 
     testImplementation("org.openjdk.jmh:jmh-core:$jmhVersion")
     testImplementation("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
+    testImplementation("commons-io:commons-io:2.16.1")
 }
 
 java {
@@ -58,7 +54,7 @@ java {
 }
 
 jacoco {
-    toolVersion = jacocoVersion
+    toolVersion = "0.8.12"
 }
 
 tasks.jacocoTestReport {

@@ -15,9 +15,9 @@
  */
 package me.champeau.jmh
 
+import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.gradle.util.GFileUtils
 import org.gradle.util.GradleVersion
 import spock.lang.Specification
 import spock.lang.TempDir
@@ -65,13 +65,17 @@ abstract class AbstractFuncSpec extends Specification {
         file('build.gradle')
     }
 
+    File getSettingsFile() {
+        file('settings.gradle')
+    }
+
     File getBenchmarksCsv() {
         file("build/reports/benchmarks.csv")
     }
 
     protected void usingSample(String name) {
         File sampleDir = new File("src/funcTest/resources/$name")
-        GFileUtils.copyDirectory(sampleDir, projectDir)
+        FileUtils.copyDirectory(sampleDir, projectDir)
     }
 
     protected File file(String path) {

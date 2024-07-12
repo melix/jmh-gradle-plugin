@@ -16,6 +16,7 @@
 package me.champeau.jmh
 
 import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.util.GradleVersion
 import spock.lang.Unroll
 
 @Unroll
@@ -28,6 +29,17 @@ class ProjectWithFeaturePreviewSpec extends AbstractFuncSpec {
     def "successfully executes benchmark which uses feature previews (#gradleVersion)"() {
         given:
         usingGradleVersion(gradleVersion)
+
+        and:
+        // TODO: we can move this into the test fixture project once we drop support for Gradle 7.x
+        if (gradleVersion >= GradleVersion.version("8.9")) {
+            settingsFile.text =
+            """
+                plugins {
+                    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+                }\n
+            """ + settingsFile.text
+        }
 
         when:
         def result = build("jmh")
