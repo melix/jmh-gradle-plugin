@@ -18,7 +18,9 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: 21
+          java-version: |
+            22
+            21
       - uses: gradle/actions/setup-gradle@v4
       - name: Execute Gradle build
         run: ./gradlew build
