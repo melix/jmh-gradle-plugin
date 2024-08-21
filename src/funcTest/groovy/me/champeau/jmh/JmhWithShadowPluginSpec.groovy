@@ -25,6 +25,9 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
     def "Run #language benchmarks that are packaged with Shadow plugin (#gradleVersion #language #shadowPlugin)"() {
 
         given:
+        System.err.println("LANG: $language")
+        System.err.println("G: $gradleVersion")
+        System.err.println("P: $shadowPlugin")
         usingSample("${language.toLowerCase()}-${TESTED_SHADOW_PLUGIN_FOLDERS[shadowPlugin]}-project")
         usingGradleVersion(gradleVersion)
         withoutConfigurationCache('shadow plugin unsupported')
@@ -37,10 +40,9 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
         benchmarksCsv.text.contains(language + 'Benchmark.sqrtBenchmark')
 
         where:
-        [language, gradleVersion, shadowPlugin] << [
-                ['Java', 'Scala'],
-                TESTED_GRADLE_VERSIONS,
-                TESTED_SHADOW_PLUGINS
-        ].combinations()
+        [language, gradleVersion, shadowPlugin] <<
+                TESTED_SHADOW_GRADLE_COMBINATIONS.collect { plugin, gradle ->
+                    ['Java', 'Scala'].collect { lang -> [lang, gradle, plugin ] }
+                }.inject([]) { a, b -> a.addAll(b); a }
     }
 }

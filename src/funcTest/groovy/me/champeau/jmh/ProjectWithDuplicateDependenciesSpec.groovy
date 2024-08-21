@@ -73,10 +73,7 @@ class ProjectWithDuplicateDependenciesSpec extends AbstractFuncSpec {
         benchmarksCsv.text.contains('JavaBenchmark.sqrtBenchmark')
 
         where:
-        [shadowPlugin, gradleVersion] << [
-                TESTED_SHADOW_PLUGINS,
-                TESTED_GRADLE_VERSIONS
-        ].combinations()
+        [shadowPlugin, gradleVersion] << TESTED_SHADOW_GRADLE_COMBINATIONS
     }
 
     void createBuildFile(String plugins) {

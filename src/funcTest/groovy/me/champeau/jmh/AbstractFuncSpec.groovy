@@ -25,19 +25,28 @@ import spock.lang.TempDir
 abstract class AbstractFuncSpec extends Specification {
 
     protected static final List<GradleVersion> TESTED_GRADLE_VERSIONS = [
-            GradleVersion.version('8.3'),
+            GradleVersion.version('7.0'),
+            GradleVersion.version('8.0'),
             GradleVersion.current()
     ]
 
-    protected static final List<String> TESTED_SHADOW_PLUGINS = [
-            'com.gradleup.shadow',
-            'com.github.johnrengelman.shadow'
+    /** Plugin + min Gradle version the plugin supports. */
+    protected static final Map<String, GradleVersion> TESTED_SHADOW_PLUGINS = [
+            'com.gradleup.shadow':              GradleVersion.version('8.3'),
+            'com.github.johnrengelman.shadow':  GradleVersion.version('8.3')
     ]
 
     protected static final Map<String, String> TESTED_SHADOW_PLUGIN_FOLDERS = [
             'com.gradleup.shadow':              'shadow',
             'com.github.johnrengelman.shadow':  'shadow-old'
     ]
+
+    /** List of plugin + Gradle version combinations. */
+    protected static final List<Tuple2<String, GradleVersion>> TESTED_SHADOW_GRADLE_COMBINATIONS =
+            TESTED_SHADOW_PLUGINS.collect { shadowGradle ->
+                TESTED_GRADLE_VERSIONS.findAll { gradle -> gradle >= shadowGradle.value }
+                        .collect { gradle -> new Tuple(shadowGradle.key, gradle) }
+            }.inject([]) { a, b -> a.addAll(b); a }
 
     @TempDir
     File temporaryFolder
