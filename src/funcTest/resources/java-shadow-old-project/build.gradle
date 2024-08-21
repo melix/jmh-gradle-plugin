@@ -15,7 +15,7 @@
  */
 plugins {
     id 'java'
-    id 'io.github.goooler.shadow'
+	id 'com.github.johnrengelman.shadow'
     id 'me.champeau.jmh'
 }
 

@@ -64,7 +64,7 @@ class JMHPlugin implements Plugin<Project> {
         dependencyHandler.addProvider(JMH_NAME, project.providers.provider { "${JMH_CORE_DEPENDENCY}${extension.jmhVersion.get()}" }) {}
         dependencyHandler.addProvider(JMH_NAME, project.providers.provider { "${JMH_GENERATOR_DEPENDENCY}${extension.jmhVersion.get()}" }) {}
 
-        def hasShadow = project.plugins.findPlugin('com.github.johnrengelman.shadow') != null || project.plugins.findPlugin('io.github.goooler.shadow') != null
+        def hasShadow = project.plugins.findPlugin('com.gradleup.shadow') != null || project.plugins.findPlugin('com.github.johnrengelman.shadow') != null
 
         createJmhSourceSet(project)
         final Configuration runtimeConfiguration = configureJmhRuntimeClasspathConfiguration(project, extension)

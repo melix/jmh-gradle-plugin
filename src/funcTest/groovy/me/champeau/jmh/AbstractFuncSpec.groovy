@@ -25,19 +25,18 @@ import spock.lang.TempDir
 abstract class AbstractFuncSpec extends Specification {
 
     protected static final List<GradleVersion> TESTED_GRADLE_VERSIONS = [
-            GradleVersion.version('7.0'),
-            GradleVersion.version('8.0'),
+            GradleVersion.version('8.3'),
             GradleVersion.current()
     ]
 
     protected static final List<String> TESTED_SHADOW_PLUGINS = [
-            'com.github.johnrengelman.shadow',
-            'io.github.goooler.shadow'
+            'com.gradleup.shadow',
+            'com.github.johnrengelman.shadow'
     ]
 
     protected static final Map<String, String> TESTED_SHADOW_PLUGIN_FOLDERS = [
-            'com.github.johnrengelman.shadow':  'shadow',
-            'io.github.goooler.shadow':         'forked-shadow'
+            'com.gradleup.shadow':              'shadow',
+            'com.github.johnrengelman.shadow':  'shadow-old'
     ]
 
     @TempDir

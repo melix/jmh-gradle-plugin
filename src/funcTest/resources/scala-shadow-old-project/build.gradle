@@ -13,4 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "scala-forked-shadow-project"
+plugins {
+    id 'scala'
+    id 'com.github.johnrengelman.shadow'
+    id 'me.champeau.jmh'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.scala-lang:scala-library:2.13.14'
+}
+
+jmh {
+    resultFormat = 'csv'
+    resultsFile = file('build/reports/benchmarks.csv')
+}
