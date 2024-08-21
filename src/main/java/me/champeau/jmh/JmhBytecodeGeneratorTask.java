@@ -26,7 +26,9 @@ import org.gradle.jvm.toolchain.JavaLauncher;
 import org.gradle.process.ExecOperations;
 
 import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.OutputStream;
 
 @CacheableTask
 public abstract class JmhBytecodeGeneratorTask extends DefaultTask implements WithJavaToolchain {
@@ -73,6 +75,14 @@ public abstract class JmhBytecodeGeneratorTask extends DefaultTask implements Wi
                         getGeneratedResourcesDir().get().getAsFile(),
                         getGeneratorType().get()
                 );
+
+                // "Disable" stdout if Gradle's log level is not "into" or more verbose to
+                // prevent the just informational messaged from JMH's bytecode generator, like
+                // "Processing 30 classes from ..." and "Writing out Java source to ...".
+                if (!getLogger().isInfoEnabled()) {
+                    spec.setStandardOutput(new ByteArrayOutputStream());
+                }
+
                 spec.jvmArgs(getJvmArgs().get());
                 Provider<JavaLauncher> javaLauncher = getJavaLauncher();
                 if (javaLauncher.isPresent()) {
