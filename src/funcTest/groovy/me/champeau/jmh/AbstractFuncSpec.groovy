@@ -33,7 +33,7 @@ abstract class AbstractFuncSpec extends Specification {
     /** Plugin + min Gradle version the plugin supports. */
     protected static final Map<String, GradleVersion> TESTED_SHADOW_PLUGINS = [
             'com.gradleup.shadow':              GradleVersion.version('8.3'),
-            'com.github.johnrengelman.shadow':  GradleVersion.version('8.3')
+            'com.github.johnrengelman.shadow':  GradleVersion.version('7.0')
     ]
 
     protected static final Map<String, String> TESTED_SHADOW_PLUGIN_FOLDERS = [
@@ -43,10 +43,10 @@ abstract class AbstractFuncSpec extends Specification {
 
     /** List of plugin + Gradle version combinations. */
     protected static final List<Tuple2<String, GradleVersion>> TESTED_SHADOW_GRADLE_COMBINATIONS =
-            TESTED_SHADOW_PLUGINS.collect { shadowGradle ->
-                TESTED_GRADLE_VERSIONS.findAll { gradle -> gradle >= shadowGradle.value }
-                        .collect { gradle -> new Tuple(shadowGradle.key, gradle) }
-            }.inject([]) { a, b -> a.addAll(b); a }
+            TESTED_SHADOW_PLUGINS.collect { plugin, minGradle ->
+                TESTED_GRADLE_VERSIONS.findAll { gradle -> gradle >= minGradle }
+                        .collect { gradle -> Tuple.tuple(plugin, gradle) }
+            }.collectMany { it }
 
     @TempDir
     File temporaryFolder
