@@ -32,7 +32,7 @@ tasks.withType(JavaCompile).configureEach {
     })
 }
 
-// Then configure the JMH Tasks to build with Java 15
+// Then configure the JMH Tasks to build with Java 22
 tasks.withType(me.champeau.jmh.WithJavaToolchain).configureEach {
     javaLauncher.set(javaToolchains.launcherFor {
         languageVersion.set(JavaLanguageVersion.of(22))
