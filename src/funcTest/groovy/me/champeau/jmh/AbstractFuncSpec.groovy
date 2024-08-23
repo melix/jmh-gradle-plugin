@@ -36,11 +36,6 @@ abstract class AbstractFuncSpec extends Specification {
             'com.github.johnrengelman.shadow':  GradleVersion.version('7.0')
     ]
 
-    protected static final Map<String, String> TESTED_SHADOW_PLUGIN_FOLDERS = [
-            'com.gradleup.shadow':              'shadow',
-            'com.github.johnrengelman.shadow':  'shadow-old'
-    ]
-
     /** List of plugin + Gradle version combinations. */
     protected static final List<Tuple2<String, GradleVersion>> TESTED_SHADOW_GRADLE_COMBINATIONS =
             TESTED_SHADOW_PLUGINS.collect { plugin, minGradle ->
@@ -81,9 +76,10 @@ abstract class AbstractFuncSpec extends Specification {
         file("build/reports/benchmarks.csv")
     }
 
-    protected void usingSample(String name) {
+    protected File usingSample(String name) {
         File sampleDir = new File("src/funcTest/resources/$name")
         FileUtils.copyDirectory(sampleDir, projectDir)
+        return sampleDir
     }
 
     protected File file(String path) {

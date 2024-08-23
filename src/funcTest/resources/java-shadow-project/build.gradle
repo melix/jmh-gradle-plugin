@@ -15,7 +15,7 @@
  */
 plugins {
     id 'java'
-    id 'com.gradleup.shadow'
+    id 'shadowPlugin'
     id 'me.champeau.jmh'
 }
 

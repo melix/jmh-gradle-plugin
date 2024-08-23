@@ -28,7 +28,11 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
         System.err.println("LANG: $language")
         System.err.println("G: $gradleVersion")
         System.err.println("P: $shadowPlugin")
-        usingSample("${language.toLowerCase()}-${TESTED_SHADOW_PLUGIN_FOLDERS[shadowPlugin]}-project")
+        def projectRoot = usingSample("${language.toLowerCase()}-shadow-project")
+        def rootBuildFile = new File(projectRoot, 'build.gradle')
+        def buildFileContent = rootBuildFile.text.replace("shadowPlugin", shadowPlugin)
+        rootBuildFile.text = buildFileContent
+
         usingGradleVersion(gradleVersion)
         withoutConfigurationCache('shadow plugin unsupported')
 
