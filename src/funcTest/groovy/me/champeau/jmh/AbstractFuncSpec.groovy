@@ -59,6 +59,15 @@ abstract class AbstractFuncSpec extends Specification {
         noConfigurationCacheReason = reason
     }
 
+    /**
+     * TODO: remove this once we bumped min Shadow support to 8.1.1 or dropped it.
+     */
+    protected void disableConfigCacheForShadow(String pluginId) {
+        if (pluginId == 'com.github.johnrengelman.shadow') {
+            noConfigurationCacheReason = 'com.github.johnrengelman.shadow supports CC from 8.1.1+'
+        }
+    }
+
     File getProjectDir() {
         temporaryFolder
     }

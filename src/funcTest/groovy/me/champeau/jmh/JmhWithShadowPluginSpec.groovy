@@ -34,10 +34,7 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
         rootBuildFile.text = buildFileContent
 
         usingGradleVersion(gradleVersion)
-        // TODO: com.github.johnrengelman.shadow supports CC from 8.1.1+.
-        if (shadowPlugin == 'com.github.johnrengelman.shadow') {
-            withoutConfigurationCache('shadow plugin unsupported')
-        }
+        disableConfigCacheForShadow(shadowPlugin)
 
         when:
         def result = build("jmh")
