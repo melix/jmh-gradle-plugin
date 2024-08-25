@@ -47,9 +47,12 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
         benchmarksCsv.text.contains(language + 'Benchmark.sqrtBenchmark')
 
         where:
-        [language, gradleVersion, shadowPlugin] <<
-                TESTED_SHADOW_GRADLE_COMBINATIONS.collect { plugin, gradle ->
-                    ['Java', 'Scala'].collect { lang -> [lang, gradle, plugin ] }
-                }.inject([]) { a, b -> a.addAll(b); a }
+        [language, gradleVersion, shadowPlugin] << [
+                ['Java', 'Scala'],
+                TESTED_SHADOW_GRADLE_COMBINATIONS,
+        ].combinations { lang, tuple ->
+            def (plugin, gradle) = tuple
+            [lang, gradle, plugin]
+        }
     }
 }
