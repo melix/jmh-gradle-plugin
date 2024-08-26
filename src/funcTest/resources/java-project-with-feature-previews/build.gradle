@@ -25,8 +25,10 @@ repositories {
 // Configure Java compilation tasks to enable feature previews
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs.add("--enable-preview")
+    options.release = 22
     javaCompiler.set(javaToolchains.compilerFor {
-        // Using 15 so that we can try a feature preview
+        // Using 22 so that we can try a feature preview, because
+        // --enable-preview does not work with 21.
         languageVersion.set(JavaLanguageVersion.of(22))
     })
 }
