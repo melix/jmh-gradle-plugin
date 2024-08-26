@@ -30,15 +30,18 @@ abstract class AbstractFuncSpec extends Specification {
             GradleVersion.current()
     ]
 
-    protected static final List<String> TESTED_SHADOW_PLUGINS = [
-            'com.github.johnrengelman.shadow',
-            'io.github.goooler.shadow'
+    /** Plugin + min Gradle version the plugin supports. */
+    protected static final Map<String, GradleVersion> TESTED_SHADOW_PLUGINS = [
+            'com.gradleup.shadow':              GradleVersion.version('8.3'),
+            'com.github.johnrengelman.shadow':  GradleVersion.version('7.0')
     ]
 
-    protected static final Map<String, String> TESTED_SHADOW_PLUGIN_FOLDERS = [
-            'com.github.johnrengelman.shadow':  'shadow',
-            'io.github.goooler.shadow':         'forked-shadow'
-    ]
+    /** List of plugin + Gradle version combinations. */
+    protected static final List<Tuple2<String, GradleVersion>> TESTED_SHADOW_GRADLE_COMBINATIONS =
+            TESTED_SHADOW_PLUGINS.collect { plugin, minGradle ->
+                TESTED_GRADLE_VERSIONS.findAll { gradle -> gradle >= minGradle }
+                        .collect { gradle -> Tuple.tuple(plugin, gradle) }
+            }.collectMany { it }
 
     @TempDir
     File temporaryFolder
@@ -51,10 +54,18 @@ abstract class AbstractFuncSpec extends Specification {
         testedGradleVersion = gradleVersion
     }
 
-    // TODO: We can remove this and fully enable CC in tests once bump the Shadow version to 8.1.1+.
     // TODO: But Kotlin test still fails, it was suppressed in 1bab41646df6f47aea84ea3febeeec1c76cd2e79, need to investigate.
     protected void withoutConfigurationCache(String reason) {
         noConfigurationCacheReason = reason
+    }
+
+    /**
+     * TODO: remove this once we bumped min Shadow support to 8.1.1 or dropped it.
+     */
+    protected void disableConfigCacheForShadow(String pluginId) {
+        if (pluginId == 'com.github.johnrengelman.shadow') {
+            noConfigurationCacheReason = 'com.github.johnrengelman.shadow supports CC from 8.1.1+'
+        }
     }
 
     File getProjectDir() {
@@ -73,9 +84,10 @@ abstract class AbstractFuncSpec extends Specification {
         file("build/reports/benchmarks.csv")
     }
 
-    protected void usingSample(String name) {
+    protected File usingSample(String name) {
         File sampleDir = new File("src/funcTest/resources/$name")
         FileUtils.copyDirectory(sampleDir, projectDir)
+        return projectDir
     }
 
     protected File file(String path) {

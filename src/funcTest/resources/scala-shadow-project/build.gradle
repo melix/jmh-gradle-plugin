@@ -15,7 +15,7 @@
  */
 plugins {
     id 'scala'
-    id 'com.github.johnrengelman.shadow'
+    id 'shadowPlugin'
     id 'me.champeau.jmh'
 }
 

@@ -25,9 +25,13 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
     def "Run #language benchmarks that are packaged with Shadow plugin (#gradleVersion #language #shadowPlugin)"() {
 
         given:
-        usingSample("${language.toLowerCase()}-${TESTED_SHADOW_PLUGIN_FOLDERS[shadowPlugin]}-project")
+        def projectRoot = usingSample("${language.toLowerCase()}-shadow-project")
+        def rootBuildFile = new File(projectRoot, 'build.gradle')
+        def buildFileContent = rootBuildFile.text.replace("shadowPlugin", shadowPlugin)
+        rootBuildFile.text = buildFileContent
+
         usingGradleVersion(gradleVersion)
-        withoutConfigurationCache('shadow plugin unsupported')
+        disableConfigCacheForShadow(shadowPlugin)
 
         when:
         def result = build("jmh")
@@ -39,8 +43,10 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
         where:
         [language, gradleVersion, shadowPlugin] << [
                 ['Java', 'Scala'],
-                TESTED_GRADLE_VERSIONS,
-                TESTED_SHADOW_PLUGINS
-        ].combinations()
+                TESTED_SHADOW_GRADLE_COMBINATIONS,
+        ].combinations { lang, tuple ->
+            def (plugin, gradle) = tuple
+            [lang, gradle, plugin]
+        }
     }
 }

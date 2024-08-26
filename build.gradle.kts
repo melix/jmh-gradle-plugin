@@ -38,7 +38,7 @@ dependencies {
         exclude(mapOf("group" to "org.codehaus.groovy"))
     }
     pluginsUnderTest("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
-    pluginsUnderTest("io.github.goooler.shadow:shadow-gradle-plugin:8.1.8")
+    pluginsUnderTest("com.gradleup.shadow:shadow-gradle-plugin:8.3.0")
 
     testImplementation("org.openjdk.jmh:jmh-core:$jmhVersion")
     testImplementation("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")

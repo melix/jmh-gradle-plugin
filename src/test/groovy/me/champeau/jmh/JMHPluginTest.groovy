@@ -118,8 +118,8 @@ class JMHPluginTest extends Specification {
 
         where:
         shadowPlugin << [
-                'com.github.johnrengelman.shadow',
-                'io.github.goooler.shadow'
+                'com.gradleup.shadow',
+                'com.github.johnrengelman.shadow'
         ]
     }
 

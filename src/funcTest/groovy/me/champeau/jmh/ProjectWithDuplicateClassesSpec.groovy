@@ -63,7 +63,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
         given:
         usingGradleVersion(gradleVersion)
-        withoutConfigurationCache('shadow plugin unsupported')
+        disableConfigCacheForShadow(shadowPlugin)
 
         and:
         buildFile << """
@@ -89,10 +89,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         result.task(":jmhJar").outcome == FAILED
 
         where:
-        [shadowPlugin, gradleVersion] << [
-                TESTED_SHADOW_PLUGINS,
-                TESTED_GRADLE_VERSIONS
-        ].combinations()
+        [shadowPlugin, gradleVersion] << TESTED_SHADOW_GRADLE_COMBINATIONS
     }
 
     def "Show warning for duplicate classes when DuplicatesStrategy.WARN is used (#gradleVersion)"() {
@@ -131,7 +128,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
         given:
         usingGradleVersion(gradleVersion)
-        withoutConfigurationCache('shadow plugin unsupported')
+        disableConfigCacheForShadow(shadowPlugin)
 
         and:
         buildFile << """
@@ -158,10 +155,7 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
         assertDuplicateClassesWarning(gradleVersion, result.output)
 
         where:
-        [shadowPlugin, gradleVersion] << [
-                TESTED_SHADOW_PLUGINS,
-                TESTED_GRADLE_VERSIONS
-        ].combinations()
+        [shadowPlugin, gradleVersion] << TESTED_SHADOW_GRADLE_COMBINATIONS
     }
 
     private static boolean assertDuplicateClassesWarning(GradleVersion gradleVersion, String output) {

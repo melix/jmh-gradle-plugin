@@ -195,9 +195,8 @@ It is possible a dependency on the `test` source set by setting property `includ
 
 == Using JMH Gradle Plugin with Shadow Plugin
 
-Optionally it is possible to use the https://github.com/johnrengelman/shadow/[Shadow Plugin] (or the
-https://github.com/Goooler/shadow[forked Shadow Plugin]) to do actual JMH jar creation. The configuration of
-Shadow Plugin for JMH jar is done via `jmhJar` block.
+Optionally it is possible to use the https://github.com/GradleUp/shadow[Shadow Plugin] to do actual JMH jar creation.
+The configuration of Shadow Plugin for JMH jar is done via `jmhJar` block.
 
 For example:
 [source,groovy]
