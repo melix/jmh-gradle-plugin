@@ -25,9 +25,6 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
     def "Run #language benchmarks that are packaged with Shadow plugin (#gradleVersion #language #shadowPlugin)"() {
 
         given:
-        System.err.println("LANG: $language")
-        System.err.println("G: $gradleVersion")
-        System.err.println("P: $shadowPlugin")
         def projectRoot = usingSample("${language.toLowerCase()}-shadow-project")
         def rootBuildFile = new File(projectRoot, 'build.gradle')
         def buildFileContent = rootBuildFile.text.replace("shadowPlugin", shadowPlugin)
