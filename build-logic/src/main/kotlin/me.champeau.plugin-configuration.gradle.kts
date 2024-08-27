@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 plugins {
     `java-gradle-plugin`
@@ -62,8 +62,9 @@ tasks.jar {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
     withSourcesJar()
     withJavadocJar()
 }
