@@ -22,6 +22,10 @@ plugins {
     id("com.vanniktech.maven.publish")
 }
 
+version = providers.gradleProperty("VERSION_NAME").get()
+group = providers.gradleProperty("GROUP").get()
+description = providers.gradleProperty("POM_DESCRIPTION").get()
+
 val buildTimeAndDate: Date by lazy {
     if ((version as String).endsWith("SNAPSHOT")) {
         Date(0)
@@ -44,10 +48,10 @@ tasks.jar {
             "Build-Date" to buildDate,
             "Build-Time" to buildTime,
 //            "Build-Revision" to versioning.info.commit,
-            "Specification-Title" to project.name,
-            "Specification-Version" to project.version,
-            "Implementation-Title" to project.name,
-            "Implementation-Version" to project.version
+            "Specification-Title" to name,
+            "Specification-Version" to version,
+            "Implementation-Title" to name,
+            "Implementation-Version" to version
         )
     }
     metaInf {
