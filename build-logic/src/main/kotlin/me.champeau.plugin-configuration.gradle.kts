@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 
 plugins {
     `java-gradle-plugin`
