@@ -17,11 +17,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 plugins {
-    `maven-publish`
     `java-gradle-plugin`
-    signing
     id("com.gradle.plugin-publish")
+    id("com.vanniktech.maven.publish")
 }
+
+version = providers.gradleProperty("VERSION_NAME").get()
+group = providers.gradleProperty("GROUP").get()
+description = providers.gradleProperty("POM_DESCRIPTION").get()
 
 val buildTimeAndDate: Date by lazy {
     if ((version as String).endsWith("SNAPSHOT")) {
@@ -45,10 +48,10 @@ tasks.jar {
             "Build-Date" to buildDate,
             "Build-Time" to buildTime,
 //            "Build-Revision" to versioning.info.commit,
-            "Specification-Title" to project.name,
-            "Specification-Version" to project.version,
-            "Implementation-Title" to project.name,
-            "Implementation-Version" to project.version
+            "Specification-Title" to name,
+            "Specification-Version" to version,
+            "Implementation-Title" to name,
+            "Implementation-Version" to version
         )
     }
     metaInf {
@@ -58,69 +61,15 @@ tasks.jar {
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            pom {
-                name = "Gradle Plugin for JMH"
-                description = properties.getting("project_description")
-                url = properties.getting("project_website")
-                issueManagement {
-                    system = "GitHub"
-                    url = properties.getting("project_issues")
-                }
-                scm {
-                    url = properties.getting("project_website")
-                    connection = properties.getting("project_vcs").map { "scm:git:$it" }
-                    developerConnection = "scm:git:git@github.com:melix/jmh-gradle-plugin.git"
-                }
-                licenses {
-                    license {
-                        name = "The Apache Software License, Version 2.0"
-                        url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                        distribution = "repo"
-                    }
-                }
-                developers {
-                    developer {
-                        id = "melix"
-                        name = "Cédric Champeau"
-                        organization {
-                            name = "Personal"
-                            url = "https://melix.github.io/blog"
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-signing {
-    isRequired = gradle.taskGraph.allTasks.any {
-        it.name.startsWith("publish")
-    }
-    publishing.publications.configureEach {
-        sign(this)
-    }
-    sign(configurations.archives.get())
-    useGpgCmd()
-}
-
-tasks.withType<Sign>().configureEach {
-    onlyIf { signing.isRequired }
-}
-
 gradlePlugin {
-    website = properties["project_website"].toString()
-    vcsUrl = properties["project_vcs"].toString()
+    website = providers.gradleProperty("POM_URL")
+    vcsUrl = providers.gradleProperty("POM_URL")
 
     plugins.create("jmh") {
         id = "me.champeau.jmh"
         implementationClass = "me.champeau.jmh.JMHPlugin"
-        displayName = properties["project_description"].toString()
-        description = properties["project_description"].toString()
+        displayName = providers.gradleProperty("POM_NAME").get()
+        description = providers.gradleProperty("POM_DESCRIPTION").get()
         tags = listOf("jmh")
     }
 }
