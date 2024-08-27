@@ -61,6 +61,13 @@ tasks.jar {
     }
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    withSourcesJar()
+    withJavadocJar()
+}
+
 gradlePlugin {
     website = providers.gradleProperty("POM_URL")
     vcsUrl = providers.gradleProperty("POM_URL")

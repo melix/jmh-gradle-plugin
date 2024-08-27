@@ -45,13 +45,6 @@ dependencies {
     testImplementation("commons-io:commons-io:2.16.1")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
-    withJavadocJar()
-}
-
 jacoco {
     toolVersion = "0.8.12"
 }
