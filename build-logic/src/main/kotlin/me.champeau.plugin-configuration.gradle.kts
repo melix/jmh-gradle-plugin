@@ -61,14 +61,6 @@ tasks.jar {
     }
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
-    withSourcesJar()
-    withJavadocJar()
-}
-
 gradlePlugin {
     website = providers.gradleProperty("POM_URL")
     vcsUrl = providers.gradleProperty("POM_URL")
