@@ -43,7 +43,7 @@ dependencies {
 
     testImplementation("org.openjdk.jmh:jmh-core:$jmhVersion")
     testImplementation("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
-    testImplementation("commons-io:commons-io:2.16.1")
+    testImplementation("commons-io:commons-io:2.18.0")
 }
 
 java {
