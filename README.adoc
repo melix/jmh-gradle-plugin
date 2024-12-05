@@ -24,7 +24,7 @@ WARNING: Versions of the plugin prior to 0.6.0 used the `me.champeau.gradle.jmh`
 
 Integration Samples
 
-* https://github.com/melix/jmh-gradle-plugin/tree/master/samples[In built samples]
+* https://github.com/melix/jmh-gradle-plugin/tree/master/samples[Built-in samples]
 
 * https://github.com/twoVersatile/jmhsample[java@8 + gradle@7.1]
 
