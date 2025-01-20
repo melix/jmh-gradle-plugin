@@ -95,7 +95,7 @@ class JMHPlugin implements Plugin<Project> {
         }
 
         project.tasks.register(JMH_NAME, JMHTask) {
-            it.group JMH_GROUP
+            it.group = JMH_GROUP
             it.jmhClasspath.from(configuration)
             it.testRuntimeClasspath.from(runtimeConfiguration)
             it.jarArchive.set(jmhJar.flatMap { it.archiveFile })
