@@ -113,10 +113,14 @@ abstract class AbstractFuncSpec extends Specification {
     }
 
     private List<String> calculateArguments(String... arguments) {
-        (!noConfigurationCacheReason
-                ? ['--stacktrace',
-                   '--configuration-cache']
-                : ['--stacktrace']) + (arguments as List)
+        def extraArgs = [
+                '--stacktrace',
+                '--warning-mode=fail',
+        ]
+        if (noConfigurationCacheReason?.isEmpty() == true) {
+            extraArgs << '--configuration-cache'
+        }
+        return extraArgs + (arguments as List)
     }
 
     private static File getTestKitDir() {
