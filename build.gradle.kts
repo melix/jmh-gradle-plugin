@@ -72,6 +72,7 @@ tasks.rat {
         add("**/build/**")
         add(".github/**")
         add(".idea/**")
+        add(".kotlin/**")
         add("**/*.iws")
         add("**/*.iml")
         add("**/*.ipr")

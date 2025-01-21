@@ -15,7 +15,7 @@
  */
 package me.champeau.jmh
 
-
+import org.gradle.util.GradleVersion
 import spock.lang.Unroll
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
@@ -41,7 +41,11 @@ class MultiLanguageSpec extends AbstractFuncSpec {
         [language, gradleVersion] << [
                 ['Groovy', 'Java', 'Kotlin', 'Scala'],
                 TESTED_GRADLE_VERSIONS
-        ].combinations()
+        ].combinations().findAll { lang, gradleVer ->
+            // TODO: remove this condition when TESTED_GRADLE_VERSIONS gets updated to 7.6.3 or higher.
+            // Kotlin 2.1.0 requires the minimum Gradle version 7.6.3, see https://kotlinlang.org/docs/gradle-configure-project.html#kotlin-gradle-plugin-data-in-a-project
+            !(lang == 'Kotlin' && gradleVer < GradleVersion.version('7.6.3'))
+        }
     }
 
     def "Executes benchmarks with multiple languages"() {
