@@ -15,6 +15,8 @@
  */
 package me.champeau.jmh;
 
+import java.util.List;
+
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.ListProperty;
@@ -75,7 +77,7 @@ public interface JmhParameters extends WithJavaToolchain {
     Property<Integer> getOperationsPerInvocation();
 
     @Input
-    MapProperty<String, ListProperty<String>> getBenchmarkParameters();
+    MapProperty<String, List<String>> getBenchmarkParameters();
 
     @Input
     @Optional
