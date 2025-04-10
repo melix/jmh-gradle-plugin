@@ -37,7 +37,7 @@ dependencies {
     testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
         exclude(mapOf("group" to "org.codehaus.groovy"))
     }
-    pluginsUnderTest("org.gradle.toolchains:foojay-resolver:0.9.0")
+    pluginsUnderTest("org.gradle.toolchains:foojay-resolver:0.10.0")
     pluginsUnderTest("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
     pluginsUnderTest("com.gradleup.shadow:shadow-gradle-plugin:8.3.0")
 
