@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.codehaus.groovy:groovy-all:3.0.24'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.25'
 }
 
 jmh {
