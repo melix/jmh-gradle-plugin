@@ -122,11 +122,11 @@ public class ParameterConverter {
 
     }
 
-    private static void addMapOption(List<String> options, MapProperty<String, ListProperty<String>> params, String option) {
+    private static void addMapOption(List<String> options, MapProperty<String, List<String>> params, String option) {
         if (params.isPresent()) {
-            Map<String, ListProperty<String>> map = params.get();
-            map.forEach((key, listProperty) -> {
-                List<String> value = listProperty.get();
+            Map<String, List<String>> map = params.get();
+            map.forEach((key, list) -> {
+                List<String> value = list;
                 for (String str : value) {
                     options.add("-" + option);
                     options.add(key + "=" + str);
