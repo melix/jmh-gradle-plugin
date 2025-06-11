@@ -101,7 +101,7 @@ public class ParameterConverter {
     private static void addBooleanOption(List<String> options, Provider<Boolean> b, String option) {
         if (b.isPresent()) {
             options.add("-" + option);
-            options.add(b.get() ? "1" : "0");
+            options.add(b.get() ? "true" : "false");
         }
 
     }
