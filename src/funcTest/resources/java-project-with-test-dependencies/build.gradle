@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.apache.commons:commons-lang3:3.18.0'
+    testImplementation 'org.apache.commons:commons-lang3:3.19.0'
 }
 
 jmh {
