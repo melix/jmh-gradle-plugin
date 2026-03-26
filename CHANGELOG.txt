@@ -1,3 +1,7 @@
+Version 0.7.4
+-------------
+    * Fix benchmarkParameters to use List instead of ListProperty (#206)
+    * Fix failOnError not being honored due to boolean CLI options using "1"/"0" instead of "true"/"false" (#284)
 Version 0.7.0
 -------------
     * Fix compatibility with Gradle 8
