@@ -2,6 +2,22 @@ Unreleased
 -------------
     * Fix benchmarkParameters to use List instead of ListProperty (#206)
     * Fix failOnError not being honored due to boolean CLI options using "1"/"0" instead of "true"/"false" (#284)
+Version 0.7.3
+-------------
+    * Do not access 'project.zipTree' in mapping closure
+    * Support `io.github.goooler.shadow` plugin
+    * Support `com.gradleup.shadow` plugin
+    * Prevent informational JMH messages for default Gradle log level
+    * Test on Gradle 8.10 and minor CI updates
+Version 0.7.2
+-------------
+    * Fix incorrect configuration parameter "timeout" to "jmhTimeout" in README
+    * Remove setCanBeResolved(true)
+    * Mark jmh source set as eclipse test source
+Version 0.7.1
+-------------
+    * Fix `jmhRuntimeClasspath` being created before the source set
+    * Upgrade vulnerable dependency
 Version 0.7.0
 -------------
     * Fix compatibility with Gradle 8
