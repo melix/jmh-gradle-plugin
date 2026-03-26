@@ -21,6 +21,7 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class JMHPluginTest extends Specification {
     def "plugin is applied"() {
@@ -134,5 +135,31 @@ class JMHPluginTest extends Specification {
 
         then:
         project.jmh.duplicateClassesStrategy.get() == DuplicatesStrategy.INCLUDE
+    }
+
+    @Unroll
+    def "failOnError #value generates -foe #expected in JMH arguments"() {
+        given:
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenCentral()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.jmh'
+
+        when:
+        def task = project.tasks.findByName('jmh') as JMHTask
+        task.failOnError.set(value)
+        def args = []
+        ParameterConverter.collectParameters(task, args)
+
+        then:
+        args.contains('-foe')
+        args[args.indexOf('-foe') + 1] == expected
+
+        where:
+        value | expected
+        true  | 'true'
+        false | 'false'
     }
 }
