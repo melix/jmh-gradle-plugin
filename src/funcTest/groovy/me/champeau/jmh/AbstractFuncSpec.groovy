@@ -25,15 +25,14 @@ import spock.lang.TempDir
 abstract class AbstractFuncSpec extends Specification {
 
     protected static final List<GradleVersion> TESTED_GRADLE_VERSIONS = [
-            GradleVersion.version('7.0'),
             GradleVersion.version('8.0'),
+            GradleVersion.version('9.0.0'),
             GradleVersion.current()
     ]
 
     /** Plugin + min Gradle version the plugin supports. */
     protected static final Map<String, GradleVersion> TESTED_SHADOW_PLUGINS = [
             'com.gradleup.shadow':              GradleVersion.version('8.3'),
-            'com.github.johnrengelman.shadow':  GradleVersion.version('7.0')
     ]
 
     /** List of plugin + Gradle version combinations. */

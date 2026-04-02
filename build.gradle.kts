@@ -34,16 +34,18 @@ dependencies {
     val jmhVersion = "1.37"
     implementation("org.openjdk.jmh:jmh-core:$jmhVersion")
 
-    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
-        exclude(mapOf("group" to "org.codehaus.groovy"))
+    testImplementation("org.spockframework:spock-core:2.3-groovy-4.0") {
+        exclude(mapOf("group" to "org.apache.groovy"))
     }
-    pluginsUnderTest("org.gradle.toolchains:foojay-resolver:0.10.0")
-    pluginsUnderTest("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
+    testImplementation(localGroovy())
+    testImplementation(gradleTestKit())
+    pluginsUnderTest("org.gradle.toolchains:foojay-resolver:1.0.0")
     pluginsUnderTest("com.gradleup.shadow:shadow-gradle-plugin:8.3.0")
 
     testImplementation("org.openjdk.jmh:jmh-core:$jmhVersion")
     testImplementation("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
     testImplementation("commons-io:commons-io:2.21.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 java {
@@ -58,6 +60,18 @@ jacoco {
     toolVersion = "0.8.14"
 }
 
+tasks.test {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+tasks.named<Test>("functionalTest") {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 tasks.jacocoTestReport {
     group = "Reporting"
     description = "Generate Jacoco coverage reports after running tests."
@@ -68,6 +82,7 @@ tasks.jacocoTestReport {
 
 tasks.rat {
     excludes.apply {
+        add(".sdkmanrc")
         add("README.adoc")
         add("**/build/**")
         add(".github/**")
