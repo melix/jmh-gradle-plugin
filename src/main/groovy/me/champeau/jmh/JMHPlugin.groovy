@@ -300,7 +300,7 @@ class JMHPlugin implements Plugin<Project> {
                 attributes 'Main-Class': 'org.openjdk.jmh.Main'
             }
 
-            it.archiveClassifier = JMH_NAME
+            it.archiveClassifier.set(JMH_NAME)
             it.zip64 = extension.zip64.get()
         }
     }
