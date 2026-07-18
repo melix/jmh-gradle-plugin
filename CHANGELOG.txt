@@ -2,6 +2,7 @@ Unreleased
 -------------
     * Fix benchmarkParameters to use List instead of ListProperty (#206)
     * Fix failOnError not being honored due to boolean CLI options using "1"/"0" instead of "true"/"false" (#284)
+    * Add jmhOptions passthrough (List<String>) to pass arbitrary JMH command line options verbatim to the JMH runner (#46)
 Version 0.7.3
 -------------
     * Do not access 'project.zipTree' in mapping closure

@@ -85,6 +85,7 @@ class DefaultsConfigurer {
         into.getDuplicateClassesStrategy().convention(from.getDuplicateClassesStrategy());
         into.getJavaLauncher().convention(from.getJavaLauncher());
         into.getEnvironment().convention(from.getEnvironment());
+        into.getJmhOptions().convention(from.getJmhOptions());
     }
 
 }

@@ -59,6 +59,18 @@ public class ParameterConverter {
         addIntOption(into, from.getWarmupIterations(), "wi");
         addOption(into, from.getWarmupMode(), "wm");
         addOption(into, from.getWarmupBenchmarks(), "wmb");
+        addRawOptions(into, from.getJmhOptions());
+    }
+
+    private static void addRawOptions(List<String> into, ListProperty<String> options) {
+        if (!options.isPresent()) {
+            return;
+        }
+        for (String option : options.get()) {
+            if (option != null && !option.isEmpty()) {
+                into.add(option);
+            }
+        }
     }
 
     private static <T> void addOption(List<String> into, Provider<T> str, String option) {

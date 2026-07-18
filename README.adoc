@@ -143,6 +143,8 @@ jmh {
    warmupMode = 'INDI' // Warmup mode for warming up selected benchmarks. Warmup modes are: [INDI, BULK, BULK_INDI].
    warmupBenchmarks = ['.*Warmup'] // Warmup benchmarks to include in the run in addition to already selected. JMH will not measure these benchmarks, but only use them for the warmup.
 
+   jmhOptions = ['-o', 'result.txt', '-rf', 'json'] // Arbitrary JMH command line options passed verbatim to the JMH runner. Useful for options not natively modeled by the plugin, or to combine several options at once. Avoid duplicating flags already modeled by the plugin (e.g. listBenchmarks, listProfilers, verbosity).
+
    zip64 = true // Use ZIP64 format for bigger archives
    jmhVersion = '{jmh-version}' // Specifies JMH version
    includeTests = true // Allows to include test sources into generate JMH jar, i.e. use it when benchmarks depend on the test classes.
@@ -187,6 +189,7 @@ The following table describes the mappings between JMH's command line options an
 | -wi <int>                | warmupIterations
 | -wm <mode>               | warmupMode
 | -wmb <regexp+>           | warmupBenchmarks
+| (raw JMH options)        | jmhOptions
 |===
 
 == Dependency on project files

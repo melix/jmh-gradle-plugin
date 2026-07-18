@@ -162,4 +162,54 @@ class JMHPluginTest extends Specification {
         true  | 'true'
         false | 'false'
     }
+
+    def "jmhOptions are passed through verbatim to JMH arguments"() {
+        given:
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenCentral()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.jmh'
+
+        when:
+        def task = project.tasks.findByName('jmh') as JMHTask
+        task.jmhOptions.set(['-l', '-lp', '-wbs', '5'])
+        def args = []
+        ParameterConverter.collectParameters(task, args)
+
+        then:
+        args.containsAll(['-l', '-lp', '-wbs', '5'])
+
+        when: 'jmhOptions is set to an empty list'
+        def project2 = ProjectBuilder.builder().build()
+        project2.repositories {
+            mavenCentral()
+        }
+        project2.apply plugin: 'java'
+        project2.apply plugin: 'me.champeau.jmh'
+        def task2 = project2.tasks.findByName('jmh') as JMHTask
+        task2.jmhOptions.set([])
+        def args2 = []
+        ParameterConverter.collectParameters(task2, args2)
+
+        then: 'no extra arguments are emitted beyond the modeled defaults'
+        !args2.contains('-wbs')
+
+        when: 'jmhOptions contains an empty element'
+        def project3 = ProjectBuilder.builder().build()
+        project3.repositories {
+            mavenCentral()
+        }
+        project3.apply plugin: 'java'
+        project3.apply plugin: 'me.champeau.jmh'
+        def task3 = project3.tasks.findByName('jmh') as JMHTask
+        task3.jmhOptions.set(['-rf', 'json', ''])
+        def args3 = []
+        ParameterConverter.collectParameters(task3, args3)
+
+        then: 'empty elements are filtered out, real options pass through'
+        args3.containsAll(['-rf', 'json'])
+        !args3.contains('')
+    }
 }
