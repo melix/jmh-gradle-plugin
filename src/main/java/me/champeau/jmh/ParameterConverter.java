@@ -59,6 +59,10 @@ public class ParameterConverter {
         addIntOption(into, from.getWarmupIterations(), "wi");
         addOption(into, from.getWarmupMode(), "wm");
         addOption(into, from.getWarmupBenchmarks(), "wmb");
+        addPresenceOption(into, from.getListBenchmarks(), "l");
+        addPresenceOption(into, from.getListProfilers(), "lp");
+        addPresenceOption(into, from.getListProfilersDetails(), "lprof");
+        addPresenceOption(into, from.getListResultFormats(), "lrf");
         addRawOptions(into, from.getJmhOptions());
     }
 
@@ -115,7 +119,17 @@ public class ParameterConverter {
             options.add("-" + option);
             options.add(b.get() ? "true" : "false");
         }
+    }
 
+    /**
+     * Emits a JMH flag that is a presence-based switch (no value), such as the list
+     * flags -l, -lp, -lprof, -lrf. JMH treats these as "flag present = do it", so the
+     * flag is emitted only when the boolean is explicitly true; false/absent emits nothing.
+     */
+    private static void addPresenceOption(List<String> options, Provider<Boolean> b, String option) {
+        if (b.isPresent() && Boolean.TRUE.equals(b.get())) {
+            options.add("-" + option);
+        }
     }
 
     private static void addIntOption(List<String> options, Provider<Integer> i, String option) {
