@@ -16,10 +16,10 @@
 
 plugins {
     jacoco
-    id("me.champeau.buildscan-recipes") version "0.2.3"
-    id("org.nosphere.apache.rat") version "0.8.1"
-    id("net.nemerosa.versioning") version "3.1.0"
-    id("com.github.kt3k.coveralls") version "2.12.2"
+    alias(libs.plugins.buildScanRecipes)
+    alias(libs.plugins.apache.rat)
+    alias(libs.plugins.versioning)
+    alias(libs.plugins.coveralls)
     id("me.champeau.convention-test")
     id("me.champeau.convention-funcTest")
     id("me.champeau.plugin-configuration")
@@ -31,23 +31,22 @@ buildScanRecipes {
 }
 
 dependencies {
-    val jmhVersion = "1.37"
-    implementation("org.openjdk.jmh:jmh-core:$jmhVersion")
+    implementation(libs.jmh.core)
 
-    testImplementation("org.spockframework:spock-core:2.3-groovy-4.0") {
+    testImplementation(libs.spock.core) {
         exclude(mapOf("group" to "org.apache.groovy"))
     }
     testImplementation(localGroovy())
     testImplementation(gradleTestKit())
 
-    pluginsUnderTest("org.gradle.toolchains:foojay-resolver:1.0.0")
-    pluginsUnderTest("com.gradleup.shadow:shadow-gradle-plugin:8.3.0")
+    pluginsUnderTest(libs.foojayResolver)
+    pluginsUnderTest(libs.shadow.gradlePlugin)
 
-    testImplementation("org.openjdk.jmh:jmh-core:$jmhVersion")
-    testImplementation("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
-    testImplementation("commons-io:commons-io:2.21.0")
-    testImplementation("com.gradleup.shadow:shadow-gradle-plugin:8.3.0")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.jmh.core)
+    testImplementation(libs.jmh.generatorBytecode)
+    testImplementation(libs.apache.commonsIo)
+    testImplementation(libs.shadow.gradlePlugin)
+    testRuntimeOnly(libs.junit.platformLauncher)
 }
 
 java {
