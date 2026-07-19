@@ -148,7 +148,7 @@ jmh {
    listProfilersDetails = true // List the available profilers with their descriptions and exit.
    listResultFormats = true // List the available result formats and exit.
 
-   jmhOptions = ['-o', 'result.txt', '-rf', 'json'] // Arbitrary JMH command line options passed verbatim to the JMH runner. Useful for options not natively modeled by the plugin, or to combine several options at once. Avoid duplicating flags already modeled by the plugin (e.g. listBenchmarks, listProfilers, verbosity).
+  jmhOptions = ['-o', 'result.txt', '-rf', 'json'] // Arbitrary JMH command line options passed through to the JMH runner (null/empty elements are ignored). Useful for options not natively modeled by the plugin, or to combine several options at once. Avoid duplicating flags already modeled by the plugin (e.g. listBenchmarks, listProfilers, verbosity).
 
    zip64 = true // Use ZIP64 format for bigger archives
    jmhVersion = '{jmh-version}' // Specifies JMH version

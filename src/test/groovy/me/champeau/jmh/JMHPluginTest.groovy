@@ -182,11 +182,11 @@ class JMHPluginTest extends Specification {
         ParameterConverter.collectParameters(task, args)
 
         then: 'presence-based flags are emitted as bare flags, with no true/false value token'
-        args.contains('-l')
-        args.contains('-lp')
-        args.contains('-lprof')
-        args.contains('-lrf')
-        !args.contains('true')
+        ['-l', '-lp', '-lprof', '-lrf'].each { flag ->
+            assert args.contains(flag)
+            def idx = args.indexOf(flag)
+            assert idx == args.size() - 1 || !(args[idx + 1] in ['true', 'false'])
+        }
 
         when: 'a list flag is explicitly set to false and the others to true'
         def project2 = ProjectBuilder.builder().build()
@@ -257,13 +257,14 @@ class JMHPluginTest extends Specification {
         project2.apply plugin: 'java'
         project2.apply plugin: 'me.champeau.jmh'
         def task2 = project2.tasks.findByName('jmh') as JMHTask
+        def baseline = []
+        ParameterConverter.collectParameters(task2, baseline)
         task2.jmhOptions.set([])
         def args2 = []
         ParameterConverter.collectParameters(task2, args2)
 
-        then: 'no extra arguments are emitted beyond the modeled defaults'
-        !args2.contains('-wbs')
-
+        then: 'an empty jmhOptions list does not change the computed argument list'
+        args2 == baseline
         when: 'jmhOptions contains an empty element'
         def project3 = ProjectBuilder.builder().build()
         project3.repositories {
