@@ -57,4 +57,71 @@ class ParameterSpec extends AbstractFuncSpec {
         result.output.contains("Configuration cache entry reused.")
 
     }
+
+    def "--jmhArgs project property is tokenized into JMH arguments"() {
+        given:
+        usingSample("java-project")
+
+        when:
+        def result = build("jmh", "--jmhArgs=-t 4 -wi 5 -i 10", "--info")
+
+        then:
+        result.output.contains('Running JMH with arguments:')
+        // the --jmhArgs string is split into individual JMH tokens
+        result.output.contains('-t')
+        result.output.contains('4')
+        result.output.contains('-wi')
+        result.output.contains('5')
+        result.output.contains('-i')
+        result.output.contains('10')
+    }
+
+    def "--jmhArgs adds non-overlapping flags to jmhOptions"() {
+        given:
+        usingSample("java-project")
+
+        when:
+        // jmhOptions in build.gradle is ['-tu', 'ms']; --jmhArgs uses non-overlapping flags
+        def result = build("jmh", "--jmhArgs=-f 1 -wi 5", "--info")
+
+        then:
+        result.output.contains('Running JMH with arguments:')
+        // --jmhArgs flags are present
+        result.output.contains('-wi, 5')
+        result.output.contains('-f, 1')
+        // buildscript's jmhOptions also survive (no overlap, so no conflict)
+        result.output.contains('-tu, ms')
+    }
+
+    def "--jmhArgs replaces matching flags from jmhOptions"() {
+        given:
+        usingSample("java-project")
+
+        when:
+        // jmhOptions in build.gradle is ['-tu', 'ms']; --jmhArgs also sets -tu ns
+        def result = build("jmh", "--jmhArgs=-tu ns -f 1", "--info")
+
+        then:
+        result.output.contains('Running JMH with arguments:')
+        // --jmhArgs -tu ns replaces buildscript -tu ms
+        result.output.contains('-tu, ns')
+        !result.output.contains('-tu, ms')
+        // new flags from --jmhArgs are appended
+        result.output.contains('-f, 1')
+    }
+
+    def "--jmhArgs overrides modeled property from build.gradle"() {
+        given:
+        usingSample("java-project")
+
+        when:
+        // benchmarkMode in build.gradle is ['thrpt','ss'] → args contain -bm thrpt,ss
+        def result = build("jmh", "--jmhArgs=-bm ss", "--info")
+
+        then:
+        result.output.contains('Running JMH with arguments:')
+        // --jmhArgs replaces the modeled -bm value
+        result.output.contains('-bm, ss')
+        !result.output.contains('-bm, thrpt,ss')
+    }
 }

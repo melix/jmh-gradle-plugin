@@ -148,7 +148,8 @@ jmh {
    listProfilersDetails = true // List the available profilers with their descriptions and exit.
    listResultFormats = true // List the available result formats and exit.
 
-  jmhOptions = ['-o', 'result.txt', '-rf', 'json'] // Arbitrary JMH command line options passed through to the JMH runner (null/empty elements are ignored). Useful for options not natively modeled by the plugin, or to combine several options at once. Avoid duplicating flags already modeled by the plugin (e.g. listBenchmarks, listProfilers, verbosity).
+   // See "Passing JMH options at invocation time (jmhArgs)" below for the --jmhArgs option.
+   jmhOptions = ['-o', 'result.txt', '-rf', 'json'] // Arbitrary JMH command line options passed through to the JMH runner (null/empty elements are ignored). Useful for options not natively modeled by the plugin, or to combine several options at once. Avoid duplicating flags already modeled by the plugin (e.g. listBenchmarks, listProfilers, verbosity).
 
    zip64 = true // Use ZIP64 format for bigger archives
    jmhVersion = '{jmh-version}' // Specifies JMH version
@@ -156,6 +157,29 @@ jmh {
    duplicateClassesStrategy = DuplicatesStrategy.FAIL // Strategy to apply when encountring duplicate classes during creation of the fat jar (i.e. while executing jmhJar task)
 }
 ----
+
+=== Passing JMH options at invocation time (jmhArgs)
+
+As a convenience, any JMH command line option can be passed directly at invocation time
+via the `jmhArgs` task option, without editing `build.gradle`:
+
+[source,bash]
+----
+./gradlew jmh --jmhArgs="-t 4 -wi 5 -i 10"
+----
+
+The `--jmhArgs` value is tokenized on whitespace and fed into the same `jmhOptions`
+pass-through described above, so it reaches the JMH runner verbatim. This is handy for
+one-off runs (e.g. quickly changing thread count or warmup iterations) where you do
+not want to modify the build script.
+
+An explicit `--jmhArgs` passed on the command line takes precedence over `jmhOptions`
+set in the `jmh { }` block; if both are present, only the `--jmhArgs` value is used.
+When `--jmhArgs` is omitted, the build script's `jmhOptions` apply.
+
+NOTE: `--jmhArgs` is split on whitespace, so options whose _values_ contain spaces
+(for example `-p "a=1 b=2"`) will not be parsed correctly. For those, use `jmhOptions`
+in `build.gradle` instead.
 
 == JMH Options Mapping
 
@@ -194,10 +218,10 @@ The following table describes the mappings between JMH's command line options an
 | -wi <int>                | warmupIterations
 | -wm <mode>               | warmupMode
 | -wmb <regexp+>           | warmupBenchmarks
-| -l                      | listBenchmarks
-| -lp                     | listProfilers
-| -lprof                  | listProfilersDetails
-| -lrf                    | listResultFormats
+| -l                       | listBenchmarks
+| -lp                      | listProfilers
+| -lprof                   | listProfilersDetails
+| -lrf                     | listResultFormats
 | (raw JMH options)        | jmhOptions
 |===
 

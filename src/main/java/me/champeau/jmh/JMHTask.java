@@ -20,18 +20,23 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.options.Option;
 import org.gradle.work.DisableCachingByDefault;
 import org.gradle.jvm.toolchain.JavaLauncher;
 import org.gradle.process.ExecOperations;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The JMH task is responsible for launching a JMH benchmark.
@@ -39,6 +44,8 @@ import java.util.List;
 @DisableCachingByDefault(because = "Benchmark results depend on the runtime environment and should not be cached")
 public abstract class JMHTask extends DefaultTask implements JmhParameters {
     private final static String JAVA_IO_TMPDIR = "java.io.tmpdir";
+
+    private final Property<String> jmhArgs = getObjects().property(String.class);
 
     @Inject
     public abstract ExecOperations getExecOperations();
@@ -55,7 +62,6 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
     @Classpath
     public abstract RegularFileProperty getJarArchive();
 
-
     @OutputFile
     @Optional
     public abstract RegularFileProperty getHumanOutputFile();
@@ -63,15 +69,36 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
     @OutputFile
     public abstract RegularFileProperty getResultsFile();
 
+    /**
+     * Allows passing arbitrary JMH command line options at invocation time, e.g.
+     * <pre>
+     *     ./gradlew jmh --jmhArgs="-t 4 -wi 5 -i 10"
+     * </pre>
+     * The value is tokenized on whitespace and merged into the JMH arguments,
+     * taking precedence over any {@code jmhOptions} configured in the build script.
+     *
+     * @param value the raw JMH options, space separated
+     */
+    @Option(option = "jmhArgs", description = "Arbitrary JMH command line options to pass to the JMH runner, space separated (takes precedence over jmhOptions).")
+    public void setJmhArgs(String value) {
+        jmhArgs.set(value);
+    }
+
     @TaskAction
     public void callJmh() {
-        List<String> jmhArgs = new ArrayList<>();
-        ParameterConverter.collectParameters(this, jmhArgs);
-        getLogger().info("Running JMH with arguments: " + jmhArgs);
+        List<String> args = new ArrayList<>();
+        ParameterConverter.collectParameters(this, args);
+        if (jmhArgs.isPresent()) {
+            String raw = jmhArgs.get();
+            if (!raw.trim().isEmpty()) {
+                applyCliArgs(args, raw.trim().split("\\s+"));
+            }
+        }
+        getLogger().info("Running JMH with arguments: " + args);
         getExecOperations().javaexec(spec -> {
             spec.setClasspath(computeClasspath());
             spec.getMainClass().set("org.openjdk.jmh.Main");
-            spec.args(jmhArgs);
+            spec.args(args);
             spec.systemProperty(JAVA_IO_TMPDIR, getTemporaryDir().getAbsolutePath());
             spec.environment(getEnvironment().get());
             Provider<JavaLauncher> javaLauncher = getJavaLauncher();
@@ -79,6 +106,47 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
                 spec.executable(javaLauncher.get().getExecutablePath().getAsFile());
             }
         });
+    }
+
+    /**
+     * Applies CLI tokens to the args list: matching flags get their values replaced,
+     * presence-only flags that appear in CLI are kept; new flags are appended.
+     */
+    private static void applyCliArgs(List<String> args, String[] tokens) {
+        // presence-only flags (no value)
+        Set<String> presenceFlags = new LinkedHashSet<>(Arrays.asList(
+                "-l", "-lp", "-lprof", "-lrf", "-h", "-hh"));
+
+        for (int i = 0; i < tokens.length; i++) {
+            String flag = tokens[i];
+            if (!flag.startsWith("-")) {
+                continue;
+            }
+
+            String value = null;
+            if (!presenceFlags.contains(flag)) {
+                boolean hasNextToken = i + 1 < tokens.length;
+                boolean nextIsValue = hasNextToken && !tokens[i + 1].startsWith("-");
+                if (nextIsValue) {
+                    value = tokens[++i];
+                }
+            }
+
+            // replace matching flag in existing args, or append
+            int idx = args.indexOf(flag);
+            if (idx >= 0) {
+                boolean hasBuildscriptValue = idx + 1 < args.size()
+                        && !args.get(idx + 1).startsWith("-");
+                if (value != null && hasBuildscriptValue) {
+                    args.set(idx + 1, value);
+                }
+            } else {
+                args.add(flag);
+                if (value != null) {
+                    args.add(value);
+                }
+            }
+        }
     }
 
     private FileCollection computeClasspath() {

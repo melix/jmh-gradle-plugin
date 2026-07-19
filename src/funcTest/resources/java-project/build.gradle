@@ -28,4 +28,5 @@ jmh {
     resultsFile = file('build/reports/benchmarks.csv')
     benchmarkParameters = [a: ['a']]
     failOnError = true
+    jmhOptions = ['-tu', 'ms']
 }
