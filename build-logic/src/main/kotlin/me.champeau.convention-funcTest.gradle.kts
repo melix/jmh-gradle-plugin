@@ -30,41 +30,18 @@ val functionalTestSourceSet = sourceSets.create("functionalTest") {
 configurations {
     getByName("functionalTestImplementation").extendsFrom(testImplementation.get())
     getByName("functionalTestRuntimeOnly").extendsFrom(testRuntimeOnly.get())
-    val pluginsUnderTest by creating {
-        isCanBeConsumed = false
-        isCanBeResolved = false
-    }
-    val pluginClasspath by creating {
-        isCanBeConsumed = false
-        isCanBeResolved = true
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named<Usage>(Usage.JAVA_RUNTIME))
-            attribute(Category.CATEGORY_ATTRIBUTE, objects.named<Category>(Category.LIBRARY))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 8)
-            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named<Bundling>(Bundling.EXTERNAL))
-        }
-        extendsFrom(implementation.get(), runtimeOnly.get(), pluginsUnderTest)
-    }
-    testImplementation.get().extendsFrom(pluginsUnderTest)
+}
+
+val pluginsUnderTest = configurations.register("pluginsUnderTest") {
+    isCanBeResolved = true
 }
 
 gradlePlugin {
     testSourceSets(functionalTestSourceSet)
 }
 
-val classpathWithoutDevelopmentLibs: ArtifactView = configurations["pluginClasspath"].incoming.artifactView {
-    componentFilter { componentId ->
-        if (componentId is OpaqueComponentIdentifier) {
-            val classPathNotation = componentId.classPathNotation
-            return@componentFilter classPathNotation != DependencyFactoryInternal.ClassPathNotation.GRADLE_API &&
-                classPathNotation != DependencyFactoryInternal.ClassPathNotation.LOCAL_GROOVY
-        }
-        true
-    }
-}
-
 tasks.pluginUnderTestMetadata {
-    pluginClasspath.from(classpathWithoutDevelopmentLibs.files.elements)
+    pluginClasspath.from(pluginsUnderTest)
 }
 
 val functionalTest by tasks.registering(Test::class) {

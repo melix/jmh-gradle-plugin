@@ -22,10 +22,10 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Classpath;
-import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.work.DisableCachingByDefault;
 import org.gradle.jvm.toolchain.JavaLauncher;
 import org.gradle.process.ExecOperations;
 
@@ -36,6 +36,7 @@ import java.util.List;
 /**
  * The JMH task is responsible for launching a JMH benchmark.
  */
+@DisableCachingByDefault(because = "Benchmark results depend on the runtime environment and should not be cached")
 public abstract class JMHTask extends DefaultTask implements JmhParameters {
     private final static String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
@@ -51,7 +52,7 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
     @Classpath
     public abstract ConfigurableFileCollection getTestRuntimeClasspath();
 
-    @InputFile
+    @Classpath
     public abstract RegularFileProperty getJarArchive();
 
 

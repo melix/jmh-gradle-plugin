@@ -40,7 +40,7 @@ val buildTime: String by lazy {
 tasks.jar {
     manifest {
         attributes(
-            "Built-By" to systemProp("user.name"),
+            "Built-By" to systemProp("user.name").orEmpty(),
             "Created-By" to systemProp("java.version") + " (" + systemProp("java.vendor") + " " + systemProp("java.vm.version") + ")",
             "Build-Date" to buildDate,
             "Build-Time" to buildTime,

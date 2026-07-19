@@ -31,7 +31,6 @@ class JmhWithShadowPluginSpec extends AbstractFuncSpec {
         rootBuildFile.text = buildFileContent
 
         usingGradleVersion(gradleVersion)
-        disableConfigCacheForShadow(shadowPlugin)
 
         when:
         def result = build("jmh")

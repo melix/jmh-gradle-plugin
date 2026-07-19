@@ -30,17 +30,6 @@ class ProjectWithFeaturePreviewSpec extends AbstractFuncSpec {
         given:
         usingGradleVersion(gradleVersion)
 
-        and:
-        // TODO: we can move this into the test fixture project once we drop support for Gradle 7.x
-        if (gradleVersion >= GradleVersion.version("8.9")) {
-            settingsFile.text =
-            """
-                plugins {
-                    id("org.gradle.toolchains.foojay-resolver-convention")
-                }\n
-            """ + settingsFile.text
-        }
-
         when:
         def result = build("jmh")
 

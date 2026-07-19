@@ -25,15 +25,14 @@ import spock.lang.TempDir
 abstract class AbstractFuncSpec extends Specification {
 
     protected static final List<GradleVersion> TESTED_GRADLE_VERSIONS = [
-            GradleVersion.version('7.0'),
             GradleVersion.version('8.0'),
+            GradleVersion.version('9.0.0'),
             GradleVersion.current()
     ]
 
     /** Plugin + min Gradle version the plugin supports. */
     protected static final Map<String, GradleVersion> TESTED_SHADOW_PLUGINS = [
             'com.gradleup.shadow':              GradleVersion.version('8.3'),
-            'com.github.johnrengelman.shadow':  GradleVersion.version('7.0')
     ]
 
     /** List of plugin + Gradle version combinations. */
@@ -57,15 +56,6 @@ abstract class AbstractFuncSpec extends Specification {
     // TODO: But Kotlin test still fails, it was suppressed in 1bab41646df6f47aea84ea3febeeec1c76cd2e79, need to investigate.
     protected void withoutConfigurationCache(String reason) {
         noConfigurationCacheReason = reason
-    }
-
-    /**
-     * TODO: remove this once we bumped min Shadow support to 8.1.1 or dropped it.
-     */
-    protected void disableConfigCacheForShadow(String pluginId) {
-        if (pluginId == 'com.github.johnrengelman.shadow') {
-            noConfigurationCacheReason = 'com.github.johnrengelman.shadow supports CC from 8.1.1+'
-        }
     }
 
     File getProjectDir() {
