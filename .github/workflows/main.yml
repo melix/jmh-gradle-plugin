@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - trunk
   workflow_dispatch:
 
 jobs:
