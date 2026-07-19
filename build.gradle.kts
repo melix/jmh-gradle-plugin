@@ -33,10 +33,8 @@ buildScanRecipes {
 
 buildConfig {
     packageName = "me.champeau.jmh"
-
-    sourceSets.named("main") {
-        buildConfigField("JMH_VERSION", libs.versions.jmh.get())
-    }
+    useJavaOutput()
+    buildConfigField("JMH_VERSION", libs.versions.jmh.get())
 }
 
 dependencies {
@@ -51,7 +49,6 @@ dependencies {
     pluginsUnderTest(libs.foojayResolver)
     pluginsUnderTest(libs.shadow.gradlePlugin)
 
-    testImplementation(libs.jmh.core)
     testImplementation(libs.jmh.generatorBytecode)
     testImplementation(libs.apache.commonsIo)
     testImplementation(libs.shadow.gradlePlugin)

@@ -16,3 +16,7 @@ apache-rat = "org.nosphere.apache.rat:0.8.1"
 buildScanRecipes = "me.champeau.buildscan-recipes:0.2.3"
 coveralls = "com.github.kt3k.coveralls:2.12.2"
 versioning = "net.nemerosa.versioning:3.1.0"
+
+[libraries]
+jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
+jmh-generator-bytecode = { module = "org.openjdk.jmh:jmh-generator-bytecode", version.ref = "jmh" }
