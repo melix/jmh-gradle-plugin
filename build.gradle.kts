@@ -20,7 +20,7 @@ plugins {
     alias(libs.plugins.apache.rat)
     alias(libs.plugins.versioning)
     alias(libs.plugins.coveralls)
-    id("com.github.gmazzo.buildconfig") version "6.0.10"
+    alias(libs.plugins.buildconfig)
     id("me.champeau.convention-test")
     id("me.champeau.convention-funcTest")
     id("me.champeau.plugin-configuration")
