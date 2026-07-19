@@ -22,3 +22,19 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
       - name: Execute Gradle build
         run: ./gradlew build
+
+  # Status check that is required in branch protection rules.
+  final-status:
+    needs:
+      - build
+    runs-on: ubuntu-slim
+    if: always()
+    steps:
+      - name: Check
+        run: |
+          results=$(tr -d '\n' <<< '${{ toJSON(needs.*.result) }}')
+          if ! grep -q -v -E '(failure|cancelled)' <<< "$results"; then
+            echo "One or more required jobs failed"
+            exit 1
+          fi
+          echo "All required jobs completed successfully."
