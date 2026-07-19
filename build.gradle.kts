@@ -39,12 +39,14 @@ dependencies {
     }
     testImplementation(localGroovy())
     testImplementation(gradleTestKit())
+
     pluginsUnderTest("org.gradle.toolchains:foojay-resolver:1.0.0")
     pluginsUnderTest("com.gradleup.shadow:shadow-gradle-plugin:8.3.0")
 
     testImplementation("org.openjdk.jmh:jmh-core:$jmhVersion")
     testImplementation("org.openjdk.jmh:jmh-generator-bytecode:$jmhVersion")
     testImplementation("commons-io:commons-io:2.21.0")
+    testImplementation("com.gradleup.shadow:shadow-gradle-plugin:8.3.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
