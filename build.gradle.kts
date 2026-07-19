@@ -71,7 +71,6 @@ tasks.jacocoTestReport {
 
 tasks.rat {
     excludes.apply {
-        add(".sdkmanrc")
         add("README.adoc")
         add("**/build/**")
         add(".github/**")
