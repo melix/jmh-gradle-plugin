@@ -82,5 +82,6 @@ tasks.rat {
         add("gradlew")
         add("gradlew.bat")
         add("gradle/wrapper/gradle-wrapper.properties")
+        add("gradle/libs.versions.toml")
     }
 }
