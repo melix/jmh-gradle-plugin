@@ -2,6 +2,8 @@ Unreleased
 -------------
     * Fix benchmarkParameters to use List instead of ListProperty (#206)
     * Fix failOnError not being honored due to boolean CLI options using "1"/"0" instead of "true"/"false" (#284)
+    * Support Gradle 9 (#288)
+    * Bump min Java requirement to 11 (#288)
 Version 0.7.3
 -------------
     * Do not access 'project.zipTree' in mapping closure
