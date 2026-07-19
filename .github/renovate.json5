@@ -4,4 +4,11 @@
     "config:recommended",
   ],
   automerge: true,
+  packageRules: [
+    {
+      // Used as a baseline, no need auto-updates.
+      matchDepNames: ["com.gradleup.shadow:shadow-gradle-plugin"],
+      enabled: false,
+    },
+  ],
 }

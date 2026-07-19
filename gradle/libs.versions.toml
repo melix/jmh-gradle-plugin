@@ -1,6 +1,6 @@
 [versions]
 jmh = "1.37"
-shadow = "8.3.11"
+shadow = "8.3.0"
 
 [libraries]
 apache-commonsIo = "commons-io:commons-io:2.21.0"
