@@ -42,7 +42,6 @@ dependencies {
     pluginsUnderTest(libs.foojayResolver)
     pluginsUnderTest(libs.shadow.gradlePlugin)
 
-    testImplementation(libs.jmh.core)
     testImplementation(libs.jmh.generatorBytecode)
     testImplementation(libs.apache.commonsIo)
     testImplementation(libs.shadow.gradlePlugin)
