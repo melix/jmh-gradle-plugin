@@ -34,7 +34,9 @@ buildScanRecipes {
 buildConfig {
     packageName = "me.champeau.jmh"
     useJavaOutput()
-    buildConfigField("JMH_VERSION", libs.versions.jmh.get())
+    sourceSets.named("main") {
+        buildConfigField("JMH_VERSION", libs.versions.jmh)
+    }
 }
 
 dependencies {
