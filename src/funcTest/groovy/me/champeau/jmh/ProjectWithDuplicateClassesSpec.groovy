@@ -63,7 +63,6 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
         given:
         usingGradleVersion(gradleVersion)
-        disableConfigCacheForShadow(shadowPlugin)
 
         and:
         buildFile << """
@@ -128,7 +127,6 @@ class ProjectWithDuplicateClassesSpec extends AbstractFuncSpec {
 
         given:
         usingGradleVersion(gradleVersion)
-        disableConfigCacheForShadow(shadowPlugin)
 
         and:
         buildFile << """
