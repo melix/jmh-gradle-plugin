@@ -154,4 +154,29 @@ public interface JmhParameters extends WithJavaToolchain {
     RegularFileProperty getHumanOutputFile();
 
     RegularFileProperty getResultsFile();
+
+    @Input
+    @Optional
+    Property<Boolean> getListBenchmarks();
+
+    @Input
+    @Optional
+    Property<Boolean> getListProfilers();
+
+    @Input
+    @Optional
+    Property<Boolean> getListProfilersDetails();
+
+    @Input
+    @Optional
+    Property<Boolean> getListResultFormats();
+
+    /**
+     * Arbitrary JMH command line options that are passed through to the JMH runner (null/empty elements are ignored).
+     * This is a catch-all for any JMH option not explicitly exposed by the plugin,
+     * and allows combining several options that the plugin does not natively model.
+     */
+    @Input
+    @Optional
+    ListProperty<String> getJmhOptions();
 }

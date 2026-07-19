@@ -5,6 +5,8 @@ Unreleased
     * Support Gradle 9 (#288)
     * Bump min Java requirement to 11 (#288)
     * Bump default JMH version from 1.36 to 1.37 (#291)
+    * Add jmhOptions passthrough (List<String>) to pass arbitrary JMH command line options verbatim to the JMH runner (#46)
+    * Add JMH list flags (listBenchmarks, listProfilers, listProfilersDetails, listResultFormats) to expose more JMH command line options (#46)
 Version 0.7.3
 -------------
     * Do not access 'project.zipTree' in mapping closure

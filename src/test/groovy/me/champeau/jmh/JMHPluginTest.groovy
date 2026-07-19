@@ -161,4 +161,123 @@ class JMHPluginTest extends Specification {
         true  | 'true'
         false | 'false'
     }
+
+   def "list flags emit a bare JMH flag when true and nothing when false"() {
+        given:
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenCentral()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.jmh'
+
+        when: 'all list flags are set to true'
+        def task = project.tasks.findByName('jmh') as JMHTask
+        task.listBenchmarks.set(true)
+        task.listProfilers.set(true)
+        task.listProfilersDetails.set(true)
+        task.listResultFormats.set(true)
+        def args = []
+        ParameterConverter.collectParameters(task, args)
+
+        then: 'presence-based flags are emitted as bare flags, with no true/false value token'
+        ['-l', '-lp', '-lprof', '-lrf'].each { flag ->
+            assert args.contains(flag)
+            def idx = args.indexOf(flag)
+            assert idx == args.size() - 1 || !(args[idx + 1] in ['true', 'false'])
+        }
+
+        when: 'a list flag is explicitly set to false and the others to true'
+        def project2 = ProjectBuilder.builder().build()
+        project2.repositories {
+            mavenCentral()
+        }
+        project2.apply plugin: 'java'
+        project2.apply plugin: 'me.champeau.jmh'
+        def task2 = project2.tasks.findByName('jmh') as JMHTask
+        task2.listBenchmarks.set(false)
+        task2.listProfilers.set(true)
+        task2.listProfilersDetails.set(true)
+        task2.listResultFormats.set(true)
+        def args2 = []
+        ParameterConverter.collectParameters(task2, args2)
+
+        then: 'only the false flag is suppressed; the other list flags remain'
+        !args2.contains('-l')
+        args2.contains('-lp')
+        args2.contains('-lprof')
+        args2.contains('-lrf')
+    }
+
+    def "absent list flags emit no JMH options"() {
+        given:
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenCentral()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.jmh'
+
+        when:
+        def task = project.tasks.findByName('jmh') as JMHTask
+        def args = []
+        ParameterConverter.collectParameters(task, args)
+
+        then:
+        !args.contains('-l')
+        !args.contains('-lp')
+        !args.contains('-lprof')
+        !args.contains('-lrf')
+    }
+
+    def "jmhOptions are passed through verbatim to JMH arguments"() {
+        given:
+        Project project = ProjectBuilder.builder().build()
+        project.repositories {
+            mavenCentral()
+        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'me.champeau.jmh'
+
+        when:
+        def task = project.tasks.findByName('jmh') as JMHTask
+        task.jmhOptions.set(['-l', '-lp', '-wbs', '5'])
+        def args = []
+        ParameterConverter.collectParameters(task, args)
+
+        then:
+        args.containsAll(['-l', '-lp', '-wbs', '5'])
+
+        when: 'jmhOptions is set to an empty list'
+        def project2 = ProjectBuilder.builder().build()
+        project2.repositories {
+            mavenCentral()
+        }
+        project2.apply plugin: 'java'
+        project2.apply plugin: 'me.champeau.jmh'
+        def task2 = project2.tasks.findByName('jmh') as JMHTask
+        def baseline = []
+        ParameterConverter.collectParameters(task2, baseline)
+        task2.jmhOptions.set([])
+        def args2 = []
+        ParameterConverter.collectParameters(task2, args2)
+
+        then: 'an empty jmhOptions list does not change the computed argument list'
+        args2 == baseline
+        when: 'jmhOptions contains an empty element'
+        def project3 = ProjectBuilder.builder().build()
+        project3.repositories {
+            mavenCentral()
+        }
+        project3.apply plugin: 'java'
+        project3.apply plugin: 'me.champeau.jmh'
+        def task3 = project3.tasks.findByName('jmh') as JMHTask
+        task3.jmhOptions.set(['-rf', 'json', ''])
+        def args3 = []
+        ParameterConverter.collectParameters(task3, args3)
+
+        then: 'empty elements are filtered out, real options pass through'
+        args3.containsAll(['-rf', 'json'])
+        !args3.contains('')
+    }
 }
