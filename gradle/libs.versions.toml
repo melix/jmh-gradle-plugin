@@ -1,0 +1,12 @@
+[versions]
+jmh = "1.37"
+shadow = "8.3.0"
+
+[libraries]
+apache-commonsIo = "commons-io:commons-io:2.21.0"
+foojayResolver = "org.gradle.toolchains:foojay-resolver:1.0.0"
+jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
+jmh-generatorBytecode = { module = "org.openjdk.jmh:jmh-generator-bytecode", version.ref = "jmh" }
+junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
+shadow-gradlePlugin = { module = "com.gradleup.shadow:shadow-gradle-plugin", version.ref = "shadow" }
+spock-core = "org.spockframework:spock-core:2.3-groovy-4.0"
