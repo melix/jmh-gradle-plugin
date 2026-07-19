@@ -25,18 +25,18 @@ repositories {
 // Configure Java compilation tasks to enable feature previews
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs.add("--enable-preview")
-    options.release = 22
+    options.release = 25
     javaCompiler.set(javaToolchains.compilerFor {
-        // Using 22 so that we can try a feature preview, because
+        // Using 25 so that we can try a feature preview, because
         // --enable-preview does not work with 21.
-        languageVersion.set(JavaLanguageVersion.of(22))
+        languageVersion.set(JavaLanguageVersion.of(25))
     })
 }
 
-// Then configure the JMH Tasks to build with Java 22
+// Then configure the JMH Tasks to build with Java 25
 tasks.withType(me.champeau.jmh.WithJavaToolchain).configureEach {
     javaLauncher.set(javaToolchains.launcherFor {
-        languageVersion.set(JavaLanguageVersion.of(22))
+        languageVersion.set(JavaLanguageVersion.of(25))
     })
 }
 
