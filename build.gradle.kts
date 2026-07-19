@@ -20,6 +20,7 @@ plugins {
     alias(libs.plugins.apache.rat)
     alias(libs.plugins.versioning)
     alias(libs.plugins.coveralls)
+    alias(libs.plugins.buildconfig)
     id("me.champeau.convention-test")
     id("me.champeau.convention-funcTest")
     id("me.champeau.plugin-configuration")
@@ -28,6 +29,14 @@ plugins {
 buildScanRecipes {
     recipes("git-status", "travis-ci")
     recipe(mapOf("baseUrl" to "https://github.com/melix/jmh-gradle-plugin/tree"), "git-commit")
+}
+
+buildConfig {
+    packageName = "me.champeau.jmh"
+    useJavaOutput()
+    sourceSets.named("main") {
+        buildConfigField("JMH_VERSION", libs.versions.jmh)
+    }
 }
 
 dependencies {
