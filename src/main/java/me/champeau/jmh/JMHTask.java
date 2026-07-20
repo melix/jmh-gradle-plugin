@@ -118,6 +118,7 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
         for (int i = 0; i < tokens.length; i++) {
             String flag = tokens[i];
             if (!flag.startsWith("-")) {
+                args.add(flag);
                 continue;
             }
 
