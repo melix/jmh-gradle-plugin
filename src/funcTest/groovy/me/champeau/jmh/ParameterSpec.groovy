@@ -130,13 +130,13 @@ class ParameterSpec extends AbstractFuncSpec {
         usingSample("java-project")
 
         when:
-        // --jmhArgs contains a benchmark name pattern as a positional (non-flag) token
-        def result = build("jmh", "--jmhArgs=MyBenchmark -t 4", "--info")
+        // --jmhArgs contains a real benchmark class pattern (non-flag token) + JMH flags
+        def result = build("jmh", "--jmhArgs=JavaBenchmark -t 4", "--info")
 
         then:
         result.output.contains('Running JMH with arguments:')
         // non-flag token is appended, not dropped
-        result.output.contains('MyBenchmark')
+        result.output.contains('JavaBenchmark')
         // flag tokens are still processed normally
         result.output.contains('-t, 4')
     }
