@@ -24,6 +24,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
@@ -44,8 +45,6 @@ import java.util.Set;
 @DisableCachingByDefault(because = "Benchmark results depend on the runtime environment and should not be cached")
 public abstract class JMHTask extends DefaultTask implements JmhParameters {
     private final static String JAVA_IO_TMPDIR = "java.io.tmpdir";
-
-    private final Property<String> jmhArgs = getObjects().property(String.class);
 
     @Inject
     public abstract ExecOperations getExecOperations();
@@ -74,22 +73,21 @@ public abstract class JMHTask extends DefaultTask implements JmhParameters {
      * <pre>
      *     ./gradlew jmh --jmhArgs="-t 4 -wi 5 -i 10"
      * </pre>
-     * The value is tokenized on whitespace and merged into the JMH arguments,
-     * taking precedence over any {@code jmhOptions} configured in the build script.
+     * The value is tokenized on whitespace and replaces matching flags from the build script.
      *
-     * @param value the raw JMH options, space separated
+     * @return the raw JMH options, space separated
      */
-    @Option(option = "jmhArgs", description = "Arbitrary JMH command line options to pass to the JMH runner, space separated (takes precedence over jmhOptions).")
-    public void setJmhArgs(String value) {
-        jmhArgs.set(value);
-    }
+    @Optional
+    @Input
+    @Option(option = "jmhArgs", description = "Arbitrary JMH command line options to pass to the JMH runner, space separated.")
+    public abstract Property<String> getJmhArgs();
 
     @TaskAction
     public void callJmh() {
         List<String> args = new ArrayList<>();
         ParameterConverter.collectParameters(this, args);
-        if (jmhArgs.isPresent()) {
-            String raw = jmhArgs.get();
+        if (getJmhArgs().isPresent()) {
+            String raw = getJmhArgs().get();
             if (!raw.trim().isEmpty()) {
                 applyCliArgs(args, raw.trim().split("\\s+"));
             }
