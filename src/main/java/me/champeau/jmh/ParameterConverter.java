@@ -22,6 +22,7 @@ import org.gradle.api.provider.Provider;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 import static java.util.stream.Collectors.joining;
 
@@ -67,11 +68,8 @@ public class ParameterConverter {
     }
 
     private static void addRawOptions(List<String> into, ListProperty<String> options) {
-        if (!options.isPresent()) {
-            return;
-        }
-        for (String option : options.get()) {
-            if (option != null && !option.isEmpty()) {
+        for (String option : options.getOrElse(Collections.emptyList())) {
+            if (!option.isEmpty()) {
                 into.add(option);
             }
         }
@@ -127,7 +125,7 @@ public class ParameterConverter {
      * flag is emitted only when the boolean is explicitly true; false/absent emits nothing.
      */
     private static void addPresenceOption(List<String> options, Provider<Boolean> b, String option) {
-        if (b.isPresent() && Boolean.TRUE.equals(b.get())) {
+        if (b.isPresent() && b.get()) {
             options.add("-" + option);
         }
     }

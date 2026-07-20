@@ -7,6 +7,7 @@ Unreleased
     * Bump default JMH version from 1.36 to 1.37 (#291)
     * Add jmhOptions passthrough (List<String>) to pass arbitrary JMH command line options verbatim to the JMH runner (#46)
     * Add JMH list flags (listBenchmarks, listProfilers, listProfilersDetails, listResultFormats) to expose more JMH command line options (#46)
+    * Add --jmhArgs task option as a zero-config shorthand for jmhOptions, allowing raw JMH options to be passed at invocation time (e.g. `./gradlew jmh --jmhArgs="-t 4 -wi 5 -i 10"`) without editing build.gradle. --jmhArgs takes precedence over a jmhOptions set in build.gradle (#54)
 Version 0.7.3
 -------------
     * Do not access 'project.zipTree' in mapping closure
