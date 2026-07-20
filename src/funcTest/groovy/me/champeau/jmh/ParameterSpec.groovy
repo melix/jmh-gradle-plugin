@@ -124,4 +124,20 @@ class ParameterSpec extends AbstractFuncSpec {
         result.output.contains('-bm, ss')
         !result.output.contains('-bm, thrpt,ss')
     }
+
+    def "--jmhArgs appends non-flag tokens as positional JMH args"() {
+        given:
+        usingSample("java-project")
+
+        when:
+        // --jmhArgs contains a benchmark name pattern as a positional (non-flag) token
+        def result = build("jmh", "--jmhArgs=MyBenchmark -t 4", "--info")
+
+        then:
+        result.output.contains('Running JMH with arguments:')
+        // non-flag token is appended, not dropped
+        result.output.contains('MyBenchmark')
+        // flag tokens are still processed normally
+        result.output.contains('-t, 4')
+    }
 }
