@@ -3,7 +3,7 @@ jmh = "1.37"
 shadow = "8.3.0"
 
 [libraries]
-apache-commonsIo = "commons-io:commons-io:2.21.0"
+apache-commonsIo = "commons-io:commons-io:2.22.0"
 foojayResolver = "org.gradle.toolchains:foojay-resolver:1.0.0"
 jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
 jmh-generatorBytecode = { module = "org.openjdk.jmh:jmh-generator-bytecode", version.ref = "jmh" }
