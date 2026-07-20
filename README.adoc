@@ -173,9 +173,7 @@ pass-through described above, so it reaches the JMH runner verbatim. This is han
 one-off runs (e.g. quickly changing thread count or warmup iterations) where you do
 not want to modify the build script.
 
-An explicit `--jmhArgs` passed on the command line takes precedence over `jmhOptions`
-set in the `jmh { }` block; if both are present, only the `--jmhArgs` value is used.
-When `--jmhArgs` is omitted, the build script's `jmhOptions` apply.
+An explicit `--jmhArgs` passed on the command line takes precedence over modeled options and any overlapping flags from `jmhOptions` set in the `jmh { }` block; when the same flag is present in both places, the `--jmhArgs` value wins. Flags not mentioned in `--jmhArgs` are left untouched. When `--jmhArgs` is omitted, the build script's `jmhOptions` apply.
 
 NOTE: `--jmhArgs` is split on whitespace, so options whose _values_ contain spaces
 (for example `-p "a=1 b=2"`) will not be parsed correctly. For those, use `jmhOptions`

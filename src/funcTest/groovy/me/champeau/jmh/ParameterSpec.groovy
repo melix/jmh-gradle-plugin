@@ -58,7 +58,7 @@ class ParameterSpec extends AbstractFuncSpec {
 
     }
 
-    def "--jmhArgs project property is tokenized into JMH arguments"() {
+    def "--jmhArgs task option is tokenized into JMH arguments"() {
         given:
         usingSample("java-project")
 
