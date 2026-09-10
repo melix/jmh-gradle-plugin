@@ -23,5 +23,5 @@ repositories {
 }
 
 dependencies {
-    implementation("com.gradle.publish:plugin-publish-plugin:2.1.1")
+    implementation("com.gradle.publish:plugin-publish-plugin:2.2.1")
 }
