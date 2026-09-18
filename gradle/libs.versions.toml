@@ -14,6 +14,6 @@ spock-core = "org.spockframework:spock-core:2.3-groovy-4.0"
 [plugins]
 apache-rat = "org.nosphere.apache.rat:0.11.0"
 buildScanRecipes = "me.champeau.buildscan-recipes:0.2.3"
-buildconfig = "com.github.gmazzo.buildconfig:6.1.0"
+buildconfig = "com.github.gmazzo.buildconfig:6.1.1"
 coveralls = "com.github.kt3k.coveralls:2.12.2"
 versioning = "net.nemerosa.versioning:4.0.1"
