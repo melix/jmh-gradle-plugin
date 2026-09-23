@@ -323,7 +323,6 @@ class JMHPlugin implements Plugin<Project> {
     private static Configuration configureJmhRuntimeClasspathConfiguration(Project project, JmhParameters extension) {
         def newConfig = project.configurations.findByName(JHM_RUNTIME_CLASSPATH_CONFIGURATION)
         newConfig.setCanBeConsumed(false)
-        newConfig.setVisible(false)
         newConfig.extendsFrom(project.configurations.getByName('jmh'))
         newConfig.extendsFrom(project.configurations.getByName('runtimeClasspath'))
         project.afterEvaluate {
