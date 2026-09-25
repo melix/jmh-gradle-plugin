@@ -44,7 +44,7 @@ tasks.pluginUnderTestMetadata {
     pluginClasspath.from(pluginsUnderTest)
 }
 
-val functionalTest by tasks.registering(Test::class) {
+val functionalTest = tasks.register<Test>("functionalTest") {
     description = "Runs the functional tests."
     group = "verification"
     testClassesDirs = functionalTestSourceSet.output.classesDirs
