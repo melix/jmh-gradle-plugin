@@ -113,14 +113,14 @@ tasks.withType<Sign>().configureEach {
 }
 
 gradlePlugin {
-    website = properties["project_website"].toString()
-    vcsUrl = properties["project_vcs"].toString()
+    website = providers.gradleProperty("project_website")
+    vcsUrl = providers.gradleProperty("project_vcs")
 
     plugins.create("jmh") {
         id = "me.champeau.jmh"
         implementationClass = "me.champeau.jmh.JMHPlugin"
-        displayName = properties["project_description"].toString()
-        description = properties["project_description"].toString()
+        displayName = providers.gradleProperty("project_description").get()
+        description = providers.gradleProperty("project_description").get()
         tags = listOf("jmh")
     }
 }
